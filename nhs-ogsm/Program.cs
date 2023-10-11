@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
 using nhs_ogsm.Data;
+using nhs_ogsm.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddTransient<OgsmItemService>();
+builder.Services.AddDbContextFactory<OgsmDbContext>(opt =>
+    opt.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));
 
 var app = builder.Build();
 

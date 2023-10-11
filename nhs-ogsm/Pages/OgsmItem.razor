@@ -1,0 +1,25 @@
+﻿@page "/OgsmItem"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject OgsmItemService OgsmItemService;
+
+<h3>OgsmItem</h3>
+
+
+<EditForm Model="@OgsmItems" OnValidSubmit="HandleSubmit">
+    <label for="TitleInput">Title</label>
+    <InputText id="TitleInput" @bind-Value="@OgsmItems.Title"></InputText>
+    
+    <button type="submit" class="btn-primary">Save</button>
+</EditForm>
+
+@code
+{
+    OgsmItems OgsmItems = new();
+
+    public void HandleSubmit(EditContext editContext)
+    {
+        var newOgsmItem = (OgsmItems)editContext.Model;
+        OgsmItemService.AddOgsmItem(newOgsmItem);
+    }
+}
