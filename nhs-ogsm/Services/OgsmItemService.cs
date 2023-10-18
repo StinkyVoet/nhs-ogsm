@@ -41,4 +41,14 @@ public class OgsmItemService
             return ogsmItems;
         }
     }
+    
+    
+    public void UpdateOgsmitems(OgsmItems ogsmItems)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            context.Entry(ogsmItems).State = EntityState.Modified;
+            context.SaveChanges();
+        }
+    }
 }

@@ -4,8 +4,7 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @inject OgsmItemService OgsmItemService;
 
-<h3>OgsmItem</h3>
-
+<h3>@pageTitle</h3>
 
 <EditForm Model="@OgsmItems" OnValidSubmit="HandleSubmit">
     <label for="TitleInput">Title</label>
@@ -16,16 +15,53 @@
 
 @code
 {
+    public string pageTitle = "New ogsm item";
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Title</th>
+        <th>Delete</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var ogsmItems in _ogsmItemsArray)
+    {
+        <tr>
+            <td>@ogsmItems.Title</td>
+            <td><input type="button" value="Delete" onclick="@(() => HandleDelete(ogsmItems))" class="btn btn-default" /></td>
+            <td><input type="button" value="Edit" onclick="@(() => EditForm(ogsmItems))" class="btn btn-default" /></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
+
+@code
+{
+    public int userId { get; set; }
     public List<OgsmItems> _ogsmItemsArray;
+    private bool isEdit = false;
     
     //Save new OGSM item
     OgsmItems OgsmItems = new();
     public void HandleSubmit(EditContext editContext)
     {
         var newOgsmItem = (OgsmItems)editContext.Model;
-        OgsmItemService.AddOgsmItem(newOgsmItem);
+        if (isEdit)
+        {
+            OgsmItemService.UpdateOgsmitems(OgsmItems);
+        }
+        else
+        {
+            OgsmItemService.AddOgsmItem(newOgsmItem);
+        }
         OgsmItems = new OgsmItems();
         _ogsmItemsArray = OgsmItemService.GetOgsmitems();
+        StateHasChanged();
     }
     
     //Save new OGSM item
@@ -35,31 +71,14 @@
         _ogsmItemsArray.Remove(item);
         StateHasChanged();
     }
-}
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>Title</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var ogsmItems in _ogsmItemsArray)
+    public void EditForm(OgsmItems item)
     {
-        <tr>
-            <td>@ogsmItems.Title</td>
-            <td><input type="button" value="Delete" onclick="@(() => HandleDelete(ogsmItems))" class="btn btn-default" /></td>
-        </tr>
-        
-
+        isEdit = true;
+        pageTitle = "Editing: "+item.ID;
+        OgsmItems = item;
+        StateHasChanged();
     }
-    </tbody>
-</table>
-
-
-
-@code
-{
     
     //get Ogsm items on load
     protected override async Task OnInitializedAsync()
