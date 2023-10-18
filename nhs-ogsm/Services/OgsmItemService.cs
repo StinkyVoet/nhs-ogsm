@@ -12,11 +12,23 @@ public class OgsmItemService
         _dbContextFactory = dbContextFactory;
     }
 
-    public void AddOgsmItem(OgsmItems ogsmItems)
+    public bool AddOgsmItem(OgsmItems ogsmItems)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
             context.ogsm_items.Add(ogsmItems);
+            context.SaveChanges();
+        }
+        
+        return true;
+    }
+    
+    public void DeleteOgsmItem(int id)  
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            OgsmItems entity = context.ogsm_items.First(t => t.ID == id);
+            context.ogsm_items.Remove(entity);
             context.SaveChanges();
         }
     }
