@@ -14,6 +14,9 @@ public class OgsmDbContext : DbContext
     {
         modelBuilder.UseSerialColumns();
     }
-
+    
     public DbSet<OgsmItems> ogsm_items { get; set; }
+    public DbSet<Account> accounts { get; set; }
+    public DbSet<Goal> goals { get; set; }
+    public DbSet<Group> groups { get; set; }
 }
