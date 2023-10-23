@@ -6,5 +6,5 @@ public class Group
     [Key]
     public int ID { get; set; }
     public string Name { get; set; }
-    public List<Account> Members { get; set; }
+    public ICollection<Account>? Members { get; set; }
 }

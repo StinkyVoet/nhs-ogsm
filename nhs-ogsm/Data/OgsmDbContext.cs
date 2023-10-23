@@ -12,7 +12,18 @@ public class OgsmDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
         modelBuilder.UseSerialColumns();
+        // configures one-to-many relationship
+        // modelBuilder.Entity<Goal>()
+        //             .HasOne<OgsmItems>()
+        //             .WithMany(g => g.Goals)
+        //             .HasForeignKey(k => k.ID);
+        
+        // modelBuilder.Entity<OgsmItems>()
+        //     .HasOne<OgsmItems>()
+        //     .WithMany(g => g.Children)
+        //     .HasForeignKey(k => k.ID);
     }
     
     public DbSet<OgsmItems> ogsm_items { get; set; }

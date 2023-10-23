@@ -6,7 +6,7 @@ public class Goal
     [Key]
     public int ID { get; set; }
     public string Name { get; set; }
-    public Dictionary<int, string>? Stratagies { get; set; }
-    public List<Group>? AssignedGroups { get; set; }
-    public List<Account>? AssignedAccounts { get; set; }
+    public List<string>? Stratagies { get; set; }
+    public ICollection<Group>? AssignedGroups { get; set; }
+    public ICollection<Account>? AssignedAccounts { get; set; }
 }

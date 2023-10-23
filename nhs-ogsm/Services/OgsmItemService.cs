@@ -42,6 +42,16 @@ public class OgsmItemService
         }
     }
     
+    public OgsmItems GetOgsm(int OgsmID)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            OgsmItems ogsmItems = context.ogsm_items.First(c => c.ID == OgsmID);
+            return ogsmItems;
+        }
+    }
+
+
     
     public void UpdateOgsmitems(OgsmItems ogsmItems)
     {

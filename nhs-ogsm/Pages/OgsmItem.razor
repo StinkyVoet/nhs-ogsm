@@ -21,6 +21,7 @@
 <table class="table">
     <thead>
     <tr>
+        <th>ID</th>
         <th>Title</th>
         <th>Delete</th>
         <th>Edit</th>
@@ -30,9 +31,10 @@
     @foreach (var ogsmItems in _ogsmItemsArray)
     {
         <tr>
+            <td>@ogsmItems.ID</td>
             <td>@ogsmItems.Title</td>
-            <td><input type="button" value="Delete" onclick="@(() => HandleDelete(ogsmItems))" class="btn btn-default" /></td>
-            <td><input type="button" value="Edit" onclick="@(() => EditForm(ogsmItems))" class="btn btn-default" /></td>
+            <td><input type="button" value="Delete" onclick="@(() => HandleDelete(ogsmItems))" class="btn btn-default"/></td>
+            <td><input type="button" value="Edit" onclick="@(() => EditForm(ogsmItems))" class="btn btn-default"/></td>
         </tr>
     }
     </tbody>
@@ -42,7 +44,6 @@
 
 @code
 {
-    public int userId { get; set; }
     public List<OgsmItems> _ogsmItemsArray;
     private bool isEdit = false;
     
