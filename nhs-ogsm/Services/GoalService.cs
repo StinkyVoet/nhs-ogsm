@@ -11,7 +11,7 @@ public class GoalService
         _dbContextFactory = dbContextFactory;
     }
     
-    public bool AddGoal(Goal goal)
+    public bool AddGoal(Goal goal, OgsmItems ogsmItems)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
@@ -31,12 +31,12 @@ public class GoalService
         }
     }
     
-    public List<Goal> GetGoals(OgsmItems ogsmItem)
-    {
-        using (var context = _dbContextFactory.CreateDbContext())
-        {
-            List<Goal> ogsmItems = context.ogsm_items.SelectMany(ogsm => ogsm.Goals).Where(ogsm => ogsm.ID == ogsmItem.ID).ToList();
-            return ogsmItems;
-        }
-    }
+    // public List<Goal>? GetGoals(OgsmItems ogsmItem)
+    // {
+    //     using (var context = _dbContextFactory.CreateDbContext())
+    //     {
+    //         List<Goal>? ogsmItems = context.goals.Where(ogsm => ogsm.ID == ogsmItem.ID).Include(c => c.Goals).FirstOrDefault();
+    //         return ogsmItems;
+    //     }
+    // }
 }

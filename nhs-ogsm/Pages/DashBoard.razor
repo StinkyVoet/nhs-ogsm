@@ -1,5 +1,5 @@
 ﻿@page "/DashBoard/{OgsmId:int}"
-@page "/DashBoard"
+@* @page "/DashBoard" *@
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
 @inject OgsmItemService OgsmItemService;
@@ -8,14 +8,14 @@
 @code{
     [Parameter]
     public int OgsmId { get; set; }
-    public OgsmItems Ogsm { get; set; }
-    public List<Goal> _GoalsList { get; set; }
+    
+    public OgsmItems CurrentOgsm { get; set; }
     public Goal currentGoal { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        Ogsm = OgsmItemService.GetOgsm(OgsmId);
-        _GoalsList = GoalService.GetGoals(Ogsm);
+        CurrentOgsm = OgsmItemService.GetOgsm(OgsmId);
+        // _GoalsList = GoalService.GetGoals(CurrentOgsm);
     }
 }
 
@@ -23,7 +23,7 @@
 
 <html>
 <head>
-    <title>OGSM: @Ogsm.Title</title>
+    <title>OGSM: @CurrentOgsm.Title</title>
 </head>
 <body>
 
@@ -40,15 +40,17 @@
     public void HandleSubmit(EditContext editContext)
     {
         var newGoal = (Goal)editContext.Model;
-        GoalService.AddGoal(newGoal);
-        _GoalsList = GoalService.GetGoals(Ogsm);
+        newGoal.OgsmItemID = CurrentOgsm.ID;
+        GoalService.AddGoal(newGoal, CurrentOgsm);
+        CurrentOgsm.Goals?.Add(newGoal);
         currentGoal = new Goal();
         StateHasChanged();
     }
 }
 
 <div>
-    <h1>Goals for @OgsmId - @Ogsm.Title</h1>
+    
+    <h1>Goals for @OgsmId - @CurrentOgsm.Title</h1>
     <table class="table">
         <thead>
         <tr>
@@ -59,13 +61,15 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var goal in _GoalsList)
-        {
-            <tr>
-                <td>@goal.ID</td>
-                <td>@goal.Name</td>
-                <td><input type="button" value="Delete" onclick="@(() => HandleDelete(goal))" class="btn btn-default"/></td>
-            </tr>
+        @if(CurrentOgsm.Goals != null) {
+            @foreach (var goal in CurrentOgsm.Goals)
+            {
+                <tr>
+                    <td>@goal.ID</td>
+                    <td>@goal.Name</td>
+                    <td><input type="button" value="Delete" onclick="@(() => HandleDelete(goal))" class="btn btn-default"/></td>
+                </tr>
+            }
         }
         </tbody>
     </table>
@@ -76,6 +80,7 @@
     public void HandleDelete(Goal goal)
     {
         GoalService.DeleteGoal(goal.ID);
+        CurrentOgsm.Goals.Remove(goal);
         StateHasChanged();
     }
 }
