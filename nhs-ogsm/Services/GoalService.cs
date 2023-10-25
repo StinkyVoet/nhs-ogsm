@@ -31,6 +31,15 @@ public class GoalService
         }
     }
     
+    public void UpdateGoal(Goal goal)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            context.Entry(goal).State = EntityState.Modified;
+            context.SaveChanges();
+        }
+    }
+    
     // public List<Goal>? GetGoals(OgsmItems ogsmItem)
     // {
     //     using (var context = _dbContextFactory.CreateDbContext())

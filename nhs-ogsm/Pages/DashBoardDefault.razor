@@ -1,0 +1,58 @@
+﻿@page "/DashBoard"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject OgsmItemService OgsmItemService;
+@inject NavigationManager NavigationManager
+
+
+@code
+{
+    public List<OgsmItems> _ogsmItemsArray;
+    
+    //get Ogsm items on load
+    protected override async Task OnInitializedAsync()
+    {
+        _ogsmItemsArray = OgsmItemService.GetOgsmitems();
+    }
+    
+}
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>DashBoard</title>
+</head>
+<body>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Select</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @foreach (var ogsm in _ogsmItemsArray)
+        {
+            <tr>
+                <td>@ogsm.ID</td>
+                <td>@ogsm.Title</td>
+                <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+ogsm.ID))" class="btn btn-default"/></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+@code
+{
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
+}
+</body>
+</html>

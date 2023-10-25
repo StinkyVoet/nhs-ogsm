@@ -1,22 +1,30 @@
 ﻿@page "/DashBoard/{OgsmId:int}"
-@* @page "/DashBoard" *@
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
 @inject GoalService GoalService;
+
 
 @code{
     [Parameter]
     public int OgsmId { get; set; }
-    
-    public OgsmItems CurrentOgsm { get; set; }
+
+    public OgsmItems? CurrentOgsm { get; set; }
     public Goal currentGoal { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        CurrentOgsm = OgsmItemService.GetOgsm(OgsmId);
-        // _GoalsList = GoalService.GetGoals(CurrentOgsm);
+        try
+        {
+            CurrentOgsm = OgsmItemService.GetOgsm(OgsmId);
+        }
+        catch (Exception e)
+        {
+            NavigationManager.NavigateTo("DashBoard");
+        }
     }
+    
 }
 
 <!DOCTYPE html>
@@ -33,16 +41,34 @@
         <InputText id="NameInput" @bind-Value="@currentGoal.Name"></InputText>
         <button type="submit" class="btn-primary">Save</button>
     </EditForm>
+    
+    @* @if (currentGoal.Stratagies != null) *@
+    @* { *@
+    @*     @foreach (var stratagy in currentGoal.Stratagies) *@
+    @*     { *@
+    @*         <tr> *@
+    @*             <td>@stratagy</td> *@
+    @*         </tr> *@
+    @*     } *@
+    @* } *@
 </div>
 
 @code
 {
     public void HandleSubmit(EditContext editContext)
     {
+        
         var newGoal = (Goal)editContext.Model;
-        newGoal.OgsmItemID = CurrentOgsm.ID;
-        GoalService.AddGoal(newGoal, CurrentOgsm);
-        CurrentOgsm.Goals?.Add(newGoal);
+        if (currentGoal != new Goal())
+        {
+            GoalService.UpdateGoal(newGoal);
+        }
+        else
+        {
+            newGoal.OgsmItemID = CurrentOgsm.ID;
+            GoalService.AddGoal(newGoal, CurrentOgsm);
+            CurrentOgsm.Goals?.Add(newGoal);
+        }
         currentGoal = new Goal();
         StateHasChanged();
     }
@@ -68,6 +94,7 @@
                     <td>@goal.ID</td>
                     <td>@goal.Name</td>
                     <td><input type="button" value="Delete" onclick="@(() => HandleDelete(goal))" class="btn btn-default"/></td>
+                    <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
                 </tr>
             }
         }
@@ -83,6 +110,13 @@
         CurrentOgsm.Goals.Remove(goal);
         StateHasChanged();
     }
+    
+    public void ActivateEdit(Goal goal)
+    {
+        currentGoal = goal;
+        StateHasChanged();
+    }
+    
 }
 </body>
 </html>

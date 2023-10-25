@@ -42,11 +42,11 @@ public class OgsmItemService
         }
     }
     
-    public OgsmItems GetOgsm(int OgsmID)
+    public OgsmItems GetOgsm(int ogsmId)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            OgsmItems ogsmItems = context.ogsm_items.Where(ogsm => ogsm.ID == OgsmID).Include(c => c.Goals).First();
+            OgsmItems ogsmItems = context.ogsm_items.Where(ogsm => ogsm.ID == ogsmId).Include(c => c.Goals).First();
             return ogsmItems;
         }
     }
