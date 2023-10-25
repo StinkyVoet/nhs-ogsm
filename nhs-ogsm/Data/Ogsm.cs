@@ -8,8 +8,8 @@ public class Ogsm
     [Key]
     public int ID { get; set; }
     public string Title { get; set; }
-    public OgsmItems? Parent { get; set; }
+    public Ogsm? Parent { get; set; }
     public int? ParentID { get; set; }
     public ICollection<Goal> Goals { get; set; }
-    public ICollection<OgsmItems> Children { get; set; }
+    public ICollection<Ogsm> Children { get; set; }
 }
