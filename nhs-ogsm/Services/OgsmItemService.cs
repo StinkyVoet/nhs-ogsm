@@ -12,11 +12,11 @@ public class OgsmItemService
         _dbContextFactory = dbContextFactory;
     }
 
-    public bool AddOgsmItem(OgsmItems ogsmItems)
+    public bool AddOgsmItem(Ogsm ogsm)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.ogsm_items.Add(ogsmItems);
+            context.ogsm_items.Add(ogsm);
             context.SaveChanges();
         }
         
@@ -27,37 +27,37 @@ public class OgsmItemService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            OgsmItems entity = context.ogsm_items.First(t => t.ID == id);
+            Ogsm entity = context.ogsm_items.First(t => t.ID == id);
             context.ogsm_items.Remove(entity);
             context.SaveChanges();
         }
     }
 
-    public List<OgsmItems> GetOgsmitems()
+    public List<Ogsm> GetOgsmitems()
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            List<OgsmItems> ogsmItems = context.ogsm_items.ToList();
+            List<Ogsm> ogsmItems = context.ogsm_items.ToList();
             return ogsmItems;
         }
     }
     
-    public OgsmItems GetOgsm(int ogsmId)
+    public Ogsm GetOgsm(int ogsmId)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            OgsmItems ogsmItems = context.ogsm_items.Where(ogsm => ogsm.ID == ogsmId).Include(c => c.Goals).First();
-            return ogsmItems;
+            Ogsm ogsm = context.ogsm_items.Where(o => o.ID.Equals(ogsmId)).Include(c => c.Goals).First();
+            return ogsm;
         }
     }
 
 
     
-    public void UpdateOgsmitems(OgsmItems ogsmItems)
+    public void UpdateOgsmitems(Ogsm ogsm)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.Entry(ogsmItems).State = EntityState.Modified;
+            context.Entry(ogsm).State = EntityState.Modified;
             context.SaveChanges();
         }
     }
