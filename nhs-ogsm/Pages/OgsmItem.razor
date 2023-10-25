@@ -6,9 +6,9 @@
 
 <h3>@pageTitle</h3>
 
-<EditForm Model="@OgsmItems" OnValidSubmit="HandleSubmit">
+<EditForm Model="@_ogsm" OnValidSubmit="HandleSubmit">
     <label for="TitleInput">Title</label>
-    <InputText id="TitleInput" @bind-Value="@OgsmItems.Title"></InputText>
+    <InputText id="TitleInput" @bind-Value="@_ogsm.Title"></InputText>
     
     <button type="submit" class="btn-primary">Save</button>
 </EditForm>
@@ -44,47 +44,47 @@
 
 @code
 {
-    public List<OgsmItems> _ogsmItemsArray;
+    public List<Ogsm> _ogsmItemsArray;
     private bool isEdit = false;
     
     //Save new OGSM item
-    OgsmItems OgsmItems = new();
+    Ogsm _ogsm = new();
     public void HandleSubmit(EditContext editContext)
     {
-        var newOgsmItem = (OgsmItems)editContext.Model;
+        var newOgsmItem = (Ogsm)editContext.Model;
         if (isEdit)
         {
-            OgsmItemService.UpdateOgsmitems(OgsmItems);
+            OgsmItemService.UpdateOgsm(_ogsm);
         }
         else
         {
-            OgsmItemService.AddOgsmItem(newOgsmItem);
+            OgsmItemService.AddOgsm(newOgsmItem);
         }
-        OgsmItems = new OgsmItems();
-        _ogsmItemsArray = OgsmItemService.GetOgsmitems();
+        _ogsm = new Ogsm();
+        _ogsmItemsArray = OgsmItemService.GetAllOgsm();
         StateHasChanged();
     }
     
     //Save new OGSM item
-    public void HandleDelete(OgsmItems item)
+    public void HandleDelete(Ogsm item)
     {
-        OgsmItemService.DeleteOgsmItem(item.ID);
+        OgsmItemService.DeleteOgsm(item.ID);
         _ogsmItemsArray.Remove(item);
         StateHasChanged();
     }
 
-    public void EditForm(OgsmItems item)
+    public void EditForm(Ogsm item)
     {
         isEdit = true;
         pageTitle = "Editing: "+item.ID;
-        OgsmItems = item;
+        _ogsm = item;
         StateHasChanged();
     }
     
     //get Ogsm items on load
     protected override async Task OnInitializedAsync()
     {
-        _ogsmItemsArray = OgsmItemService.GetOgsmitems();
+        _ogsmItemsArray = OgsmItemService.GetAllOgsm();
     }
     
 }

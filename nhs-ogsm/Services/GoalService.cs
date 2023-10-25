@@ -11,11 +11,11 @@ public class GoalService
         _dbContextFactory = dbContextFactory;
     }
     
-    public bool AddGoal(Goal goal, OgsmItems ogsmItems)
+    public bool AddGoal(Goal goal, Ogsm ogsm)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.goals.Add(goal);
+            context.Goals.Add(goal);
             context.SaveChanges();
         }
         return true;
@@ -25,8 +25,8 @@ public class GoalService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            Goal entity = context.goals.First(t => t.ID == id);
-            context.goals.Remove(entity);
+            Goal entity = context.Goals.First(t => t.ID == id);
+            context.Goals.Remove(entity);
             context.SaveChanges();
         }
     }

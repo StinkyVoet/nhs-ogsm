@@ -7,12 +7,12 @@
 
 @code
 {
-    public List<OgsmItems> _ogsmItemsArray;
+    public List<Ogsm> _ogsmItemsArray;
     
     //get Ogsm items on load
     protected override async Task OnInitializedAsync()
     {
-        _ogsmItemsArray = OgsmItemService.GetOgsmitems();
+        _ogsmItemsArray = OgsmItemService.GetAllOgsm();
     }
     
 }

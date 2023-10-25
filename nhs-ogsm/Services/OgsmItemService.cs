@@ -12,52 +12,52 @@ public class OgsmItemService
         _dbContextFactory = dbContextFactory;
     }
 
-    public bool AddOgsmItem(OgsmItems ogsmItems)
+    public bool AddOgsm(Ogsm ogsm)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.ogsm_items.Add(ogsmItems);
+            context.Ogsms.Add(ogsm);
             context.SaveChanges();
         }
         
         return true;
     }
     
-    public void DeleteOgsmItem(int id)  
+    public void DeleteOgsm(int id)  
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            OgsmItems entity = context.ogsm_items.First(t => t.ID == id);
-            context.ogsm_items.Remove(entity);
+            Ogsm entity = context.Ogsms.First(t => t.ID == id);
+            context.Ogsms.Remove(entity);
             context.SaveChanges();
         }
     }
 
-    public List<OgsmItems> GetOgsmitems()
+    public List<Ogsm> GetAllOgsm()
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            List<OgsmItems> ogsmItems = context.ogsm_items.ToList();
+            List<Ogsm> ogsmItems = context.Ogsms.ToList();
             return ogsmItems;
         }
     }
     
-    public OgsmItems GetOgsm(int ogsmId)
+    public Ogsm GetSingleOgsm(int ogsmId)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            OgsmItems ogsmItems = context.ogsm_items.Where(ogsm => ogsm.ID == ogsmId).Include(c => c.Goals).First();
-            return ogsmItems;
+            Ogsm ogsm = context.Ogsms.Where(ogsm => ogsm.ID == ogsmId).Include(c => c.Goals).First();
+            return ogsm;
         }
     }
 
 
     
-    public void UpdateOgsmitems(OgsmItems ogsmItems)
+    public void UpdateOgsm(Ogsm ogsm)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.Entry(ogsmItems).State = EntityState.Modified;
+            context.Entry(ogsm).State = EntityState.Modified;
             context.SaveChanges();
         }
     }

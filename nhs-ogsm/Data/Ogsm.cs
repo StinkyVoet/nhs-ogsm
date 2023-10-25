@@ -2,7 +2,7 @@
 
 namespace nhs_ogsm.Data;
 
-public class OgsmItems
+public class Ogsm
 {
     [Key]
     public int ID { get; set; }

@@ -10,14 +10,14 @@
     [Parameter]
     public int OgsmId { get; set; }
 
-    public OgsmItems? CurrentOgsm { get; set; }
+    public Ogsm? CurrentOgsm { get; set; }
     public Goal currentGoal { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            CurrentOgsm = OgsmItemService.GetOgsm(OgsmId);
+            CurrentOgsm = OgsmItemService.GetSingleOgsm(OgsmId);
         }
         catch (Exception e)
         {
@@ -29,7 +29,7 @@
 
 <!DOCTYPE html>
 
-<html>
+<html xmlns="http://www.w3.org/1999/html">
 <head>
     <title>OGSM: @CurrentOgsm.Title</title>
 </head>
@@ -38,7 +38,11 @@
 <div>
     <EditForm Model="@currentGoal" OnValidSubmit="HandleSubmit">
         <label for="NameInput">Name:</label>
-        <InputText id="NameInput" @bind-Value="@currentGoal.Name"></InputText>
+        <InputText id="NameInput" @bind-Value="@currentGoal.Name"></InputText><br/>
+        @* <label for="dueDate">Due Date</label> *@
+        @* <InputDate id="dueDate" @bind-Value="currentGoal.EndDate" class="form-control" /> *@
+        <label for="NameInput">Description:</label>
+        <InputText id="NameInput" @bind-Value="@currentGoal.Description"></InputText><br/>
         <button type="submit" class="btn-primary">Save</button>
     </EditForm>
     
@@ -65,7 +69,7 @@
         }
         else
         {
-            newGoal.OgsmItemID = CurrentOgsm.ID;
+            newGoal.ParentOgsmID = CurrentOgsm.ID;
             GoalService.AddGoal(newGoal, CurrentOgsm);
             CurrentOgsm.Goals?.Add(newGoal);
         }
@@ -82,6 +86,7 @@
         <tr>
             <th>ID</th>
             <th>Title</th>
+            <th>End date</th>
             <th>Delete</th>
             <th>Edit</th>
         </tr>
@@ -93,6 +98,7 @@
                 <tr>
                     <td>@goal.ID</td>
                     <td>@goal.Name</td>
+                    <td>@goal.EndDate</td>
                     <td><input type="button" value="Delete" onclick="@(() => HandleDelete(goal))" class="btn btn-default"/></td>
                     <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
                 </tr>
