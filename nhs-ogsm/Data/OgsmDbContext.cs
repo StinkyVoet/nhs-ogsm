@@ -10,6 +10,7 @@ public class OgsmDbContext : DbContext
     public OgsmDbContext(DbContextOptions<OgsmDbContext> options) : base(options)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        // AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -39,6 +40,7 @@ public class OgsmDbContext : DbContext
     
     public DbSet<Ogsm> Ogsms { get; set; }
     public DbSet<Goal> Goals { get; set; }
+    public DbSet<Strategy> Strategies { get; set; }
     // public DbSet<Account> accounts { get; set; }
     //
     // public DbSet<Group> groups { get; set; }
