@@ -4,6 +4,7 @@
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
 @inject GoalService GoalService;
+@inject StrategyService StrategyService;
 
 
 @code{
@@ -12,6 +13,7 @@
 
     public Ogsm? CurrentOgsm { get; set; }
     public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
+    public Strategy CurrentStrategy { get; set; } = new();
 
     public bool isEdit = false;
 
@@ -38,7 +40,7 @@
 <body>
 
 <div>
-    <EditForm Model="@currentGoal" OnValidSubmit="HandleSubmit">
+    <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
         <DataAnnotationsValidator/>
         <table>
             <tr>
@@ -63,20 +65,79 @@
         </table>
     </EditForm>
     
-    @* @if (currentGoal.Stratagies != null) *@
-    @* { *@
-    @*     @foreach (var stratagy in currentGoal.Stratagies) *@
-    @*     { *@
-    @*         <tr> *@
-    @*             <td>@stratagy</td> *@
-    @*         </tr> *@
-    @*     } *@
-    @* } *@
+
+    @if (isEdit)
+    {
+        <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
+            <DataAnnotationsValidator/>
+            <table>
+                <tr>
+                    <td><label for="NameInput">Name:</label></td>
+                    <td><InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/></td>
+                    <td><ValidationMessage For="() => CurrentStrategy.Name"/></td>
+                </tr>
+                <tr>
+                    <td><button type="submit" class="btn-primary">Save</button></td>
+                    <td><button type="button" onclick="@(() => CancelEdit())" class="btn-primary">Cancel</button></td>
+
+                </tr>
+            </table>
+        </EditForm>
+        @if (currentGoal.Strategies != null)
+        {
+            <table class="table">
+            @foreach (var strategy in currentGoal.Strategies)
+            {
+                <tr>
+                    <td>@strategy.Name</td>
+
+                    <td><input type="checkbox" value="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="btn btn-default"/></td>
+                    <td><input type="button" value="x" onclick="@(() => HandleStrategyDelete(strategy))" class="btn btn-default"/></td>
+                </tr>
+            }
+            </table>
+        }
+    }
+
+
+    
 </div>
 
 @code
 {
-    public void HandleSubmit(EditContext editContext)
+    public void HandleStrategySubmit(EditContext editContext)
+    {
+        var newStrategy = (Strategy)editContext.Model;
+        newStrategy.ParentGoalID = currentGoal.ID;
+        StrategyService.AddStrategy(newStrategy);
+        currentGoal.Strategies?.Add(newStrategy);
+        CurrentStrategy = new Strategy();
+        StateHasChanged();
+    }
+    
+    public void HandleStrategyDelete(Strategy strategy)
+    {
+        StrategyService.DeleteStrategy(strategy.ID);
+        currentGoal.Strategies?.Remove(strategy);
+        StateHasChanged();
+    }
+    // TODO: Fix IsDone should save on change
+    public void HandleStrategyIsDone(Strategy strategy)
+    {
+        Console.WriteLine("test.");
+        if (strategy.IsDone)
+        {
+            strategy.IsDone = false;
+        }
+        else
+        {
+            strategy.IsDone = true;
+        }
+        StrategyService.UpdateStrategy(strategy);
+        StateHasChanged();
+    }
+    
+    public void HandleGoalSubmit(EditContext editContext)
     {
         
         var newGoal = (Goal)editContext.Model;
@@ -125,7 +186,7 @@
                     <td>@goal.Name</td>
                     <td>@goal.EndDate</td>
                     <td>@goal.Description</td>
-                    <td><input type="button" value="Delete" onclick="@(() => HandleDelete(goal))" class="btn btn-default"/></td>
+                    <td><input type="button" value="Delete" onclick="@(() => HandleGoalDelete(goal))" class="btn btn-default"/></td>
                     <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
                 </tr>
             }
@@ -136,7 +197,7 @@
 
 @code
 {
-    public void HandleDelete(Goal goal)
+    public void HandleGoalDelete(Goal goal)
     {
         GoalService.DeleteGoal(goal.ID);
         CurrentOgsm.Goals.Remove(goal);

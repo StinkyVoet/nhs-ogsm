@@ -9,10 +9,11 @@ public class Goal
     public int ID { get; set; }
     [Required]
     public string Name { get; set; } 
-    public string? Description { get; set; } 
+    public string? Description { get; set; }
+    public bool IsDone { get; set; } = false;
     [Required]
     public DateTimeOffset EndDate { get; set; }
-    public ICollection<Strategy> Strategies { get; set; }
+    public ICollection<Strategy>? Strategies { get; set; }
     
     // Parent OGSM
     public int ParentOgsmID { get; set; }
