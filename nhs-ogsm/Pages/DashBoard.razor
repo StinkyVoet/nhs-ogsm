@@ -10,8 +10,8 @@
 @code{
     [Parameter]
     public int OgsmId { get; set; }
-
-    public Ogsm? CurrentOgsm { get; set; }
+    
+    public Ogsm CurrentOgsm { get; set; }
     public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
     public Strategy CurrentStrategy { get; set; } = new();
 
@@ -19,6 +19,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("Started");
         try
         {
             CurrentOgsm = OgsmItemService.GetSingleOgsm(OgsmId);
@@ -38,7 +39,11 @@
     <title>OGSM: @CurrentOgsm.Title</title>
 </head>
 <body>
-
+@code
+{
+    public string PageHeaderTitle = "Add Goal";
+}
+<h1>@PageHeaderTitle</h1>
 <div>
     <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
         <DataAnnotationsValidator/>
@@ -68,6 +73,7 @@
 
     @if (isEdit)
     {
+        <h3>Strategies:</h3>
         <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
             <DataAnnotationsValidator/>
             <table>
@@ -90,8 +96,7 @@
             {
                 <tr>
                     <td>@strategy.Name</td>
-
-                    <td><input type="checkbox" value="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="btn btn-default"/></td>
+                    <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="btn btn-default"/></td>
                     <td><input type="button" value="x" onclick="@(() => HandleStrategyDelete(strategy))" class="btn btn-default"/></td>
                 </tr>
             }
@@ -124,15 +129,7 @@
     // TODO: Fix IsDone should save on change
     public void HandleStrategyIsDone(Strategy strategy)
     {
-        Console.WriteLine("test.");
-        if (strategy.IsDone)
-        {
-            strategy.IsDone = false;
-        }
-        else
-        {
-            strategy.IsDone = true;
-        }
+        strategy.IsDone = !strategy.IsDone;
         StrategyService.UpdateStrategy(strategy);
         StateHasChanged();
     }
@@ -153,6 +150,7 @@
             CurrentOgsm.Goals?.Add(newGoal);
         }
         currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
+        PageHeaderTitle = "Add Goal";
         StateHasChanged();
     }
 
@@ -160,12 +158,14 @@
     {
         currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
         isEdit = false;
+        PageHeaderTitle = "Add Goal";
+        StateHasChanged();
     }
 }
 
 <div>
-    
-    <h1>Goals for @OgsmId - @CurrentOgsm.Title</h1>
+
+    <h1>Goals for OGSM: @OgsmId - @CurrentOgsm.Title</h1>
     <table class="table">
         <thead>
         <tr>
@@ -178,18 +178,16 @@
         </tr>
         </thead>
         <tbody>
-        @if(CurrentOgsm.Goals != null) {
-            @foreach (var goal in CurrentOgsm.Goals)
-            {
-                <tr>
-                    <td>@goal.ID</td>
-                    <td>@goal.Name</td>
-                    <td>@goal.EndDate</td>
-                    <td>@goal.Description</td>
-                    <td><input type="button" value="Delete" onclick="@(() => HandleGoalDelete(goal))" class="btn btn-default"/></td>
-                    <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
-                </tr>
-            }
+        @foreach (var goal in CurrentOgsm.Goals)
+        {
+            <tr>
+                <td>@goal.ID</td>
+                <td>@goal.Name</td>
+                <td>@goal.EndDate</td>
+                <td>@goal.Description</td>
+                <td><input type="button" value="Delete" onclick="@(() => HandleGoalDelete(goal))" class="btn btn-default"/></td>
+                <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
+            </tr>
         }
         </tbody>
     </table>
@@ -206,6 +204,7 @@
     
     public void ActivateEdit(Goal goal)
     {
+        PageHeaderTitle = "Editing Goal:"+goal.ID+" - "+goal.Name;
         isEdit = true;
         currentGoal = goal;
         StateHasChanged();
