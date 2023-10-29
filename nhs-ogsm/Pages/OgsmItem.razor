@@ -8,7 +8,16 @@
 
 <EditForm Model="@_ogsm" OnValidSubmit="HandleSubmit">
     <label for="TitleInput">Title</label>
-    <InputText id="TitleInput" @bind-Value="@_ogsm.Title"></InputText>
+    <InputText id="TitleInput" @bind-Value="@_ogsm.Title" required></InputText>
+    
+    <label for="parent">Parent OGSM</label>
+    <InputSelect id="parent" @bind-Value="@_ogsm.ParentID">
+        <option></option>
+        @foreach (var ogsm in _ogsmItemsArray)
+        {
+            <option value="@ogsm.ID">@ogsm.Title</option>
+        }
+    </InputSelect>
     
     <button type="submit" class="btn-primary">Save</button>
 </EditForm>
@@ -23,6 +32,7 @@
     <tr>
         <th>ID</th>
         <th>Title</th>
+        <th>Parent</th>
         <th>Delete</th>
         <th>Edit</th>
     </tr>
@@ -33,6 +43,7 @@
         <tr>
             <td>@ogsmItems.ID</td>
             <td>@ogsmItems.Title</td>
+            <td>@ogsmItems.Parent?.Title</td>
             <td><input type="button" value="Delete" onclick="@(() => HandleDelete(ogsmItems))" class="btn btn-default"/></td>
             <td><input type="button" value="Edit" onclick="@(() => EditForm(ogsmItems))" class="btn btn-default"/></td>
         </tr>
