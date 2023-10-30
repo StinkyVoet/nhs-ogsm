@@ -36,6 +36,8 @@
 
 <html lang="en">
 <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="css/DashBoard.css" rel="stylesheet"/>
     <title>OGSM: @CurrentOgsm.Title</title>
 </head>
 <body>
@@ -96,7 +98,7 @@
             {
                 <tr>
                     <td>@strategy.Name</td>
-                    <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="btn btn-default"/></td>
+                    <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input" /></td>
                     <td><input type="button" value="x" onclick="@(() => HandleStrategyDelete(strategy))" class="btn btn-default"/></td>
                 </tr>
             }
@@ -126,7 +128,7 @@
         currentGoal.Strategies?.Remove(strategy);
         StateHasChanged();
     }
-    // TODO: Fix IsDone should save on change
+    
     public void HandleStrategyIsDone(Strategy strategy)
     {
         strategy.IsDone = !strategy.IsDone;
@@ -163,35 +165,48 @@
     }
 }
 
-<div>
+@* *@
+@* <div> *@
+@*     <h1>Goals for OGSM: @OgsmId - @CurrentOgsm.Title</h1> *@
+@*     <table class="table"> *@
+@*         <thead> *@
+@*         <tr> *@
+@*             <th>ID</th> *@
+@*             <th>Title</th> *@
+@*             <th>End date</th> *@
+@*             <th>Description</th> *@
+@*             <th>Delete</th> *@
+@*             <th>Edit</th> *@
+@*         </tr> *@
+@*         </thead> *@
+@*         <tbody> *@
+@*         @foreach (var goal in CurrentOgsm.Goals) *@
+@*         { *@
+@*             <tr> *@
+@*                 <td class="testclass">@goal.ID</td> *@
+@*                 <td>@goal.Name</td> *@
+@*                 <td>@goal.EndDate</td> *@
+@*                 <td>@goal.Description</td> *@
+@*                 <td><input type="button" value="Delete" onclick="@(() => HandleGoalDelete(goal))" class="btn btn-default"/></td> *@
+@*                 <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td> *@
+@*             </tr> *@
+@*         } *@
+@*         </tbody> *@
+@*     </table> *@
+@* </div> *@
 
-    <h1>Goals for OGSM: @OgsmId - @CurrentOgsm.Title</h1>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>End date</th>
-            <th>Description</th>
-            <th>Delete</th>
-            <th>Edit</th>
-        </tr>
-        </thead>
-        <tbody>
+<div class="goalList">
         @foreach (var goal in CurrentOgsm.Goals)
         {
-            <tr>
-                <td>@goal.ID</td>
-                <td>@goal.Name</td>
-                <td>@goal.EndDate</td>
-                <td>@goal.Description</td>
-                <td><input type="button" value="Delete" onclick="@(() => HandleGoalDelete(goal))" class="btn btn-default"/></td>
-                <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
-            </tr>
+            <div>
+                @goal.Name
+                <span onclick="@(() => ActivateEdit(goal))" class="material-symbols-outlined">Edit</span>
+                <span onclick="@(() => HandleGoalDelete(goal))" class="material-symbols-outlined remove-button">Delete</span>
+            </div>
         }
-        </tbody>
-    </table>
 </div>
+
+
 
 @code
 {

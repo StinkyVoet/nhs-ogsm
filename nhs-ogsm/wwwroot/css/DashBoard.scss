@@ -1,0 +1,32 @@
+﻿.testclass {
+  color: red;
+}
+
+
+.goalList {
+  border-radius: 5px;
+  padding: 1%;
+  background-color: green;
+
+  overflow-y: scroll;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 30%;
+}
+
+.goalList div {
+  padding: 2px;
+  border-radius: 3px;
+  margin-bottom: 10px;
+  background-color: white;
+  display:grid;
+  box-shadow: 3px 4px 23px -5px rgba(61,231,63,0.75);
+  height: 100%;
+}
+
+.remove-button:hover {
+  //background-color: hsl();
+  color: red;
+  transition-duration: 300ms;
+}
