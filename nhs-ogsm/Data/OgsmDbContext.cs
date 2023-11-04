@@ -32,10 +32,10 @@ public class OgsmDbContext : DbContext
         
         // Goal -> Strategy
         modelBuilder.Entity<Goal>()
-            .HasMany(e => e.Strategies)
-            .WithOne(g => g.ParentGoal)
-            .HasForeignKey(k => k.ParentGoalID)
-            .IsRequired();
+                    .HasMany(e => e.Strategies)
+                    .WithOne(g => g.ParentGoal)
+                    .HasForeignKey(k => k.ParentGoalID)
+                    .IsRequired();
     }
     
     public DbSet<Ogsm> Ogsms { get; set; }
