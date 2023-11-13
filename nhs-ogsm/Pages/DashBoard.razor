@@ -41,12 +41,13 @@
     <title>OGSM: @CurrentOgsm.Title</title>
 </head>
 <body>
-@code
-{
-    public string PageHeaderTitle = "Add Goal";
-}
 <h1>@PageHeaderTitle</h1>
 <div>
+    @code
+    {
+        public string PageHeaderTitle = "Add Goal";
+    }
+    <h1>@PageHeaderTitle</h1>
     <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
         <DataAnnotationsValidator/>
         <table>
@@ -91,6 +92,19 @@
                 </tr>
             </table>
         </EditForm>
+        @if (currentGoal.Strategies != null)
+        {
+            <table class="table">
+            @foreach (var strategy in currentGoal.Strategies)
+            {
+                <tr>
+                    <td>@strategy.Name</td>
+                    <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input" /></td>
+                    <td><input type="button" value="x" onclick="@(() => HandleStrategyDelete(strategy))" class="btn btn-default"/></td>
+                </tr>
+            }
+            </table>
+        }
     }
 </div>
 
