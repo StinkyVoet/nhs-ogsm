@@ -1,0 +1,21 @@
+<button class="@string.Join(' ', Classes)">@ChildContent</button>
+
+@code {
+
+    public enum BtnType
+    {
+        Submit,
+        Button,
+        Reset,
+    }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public BtnType Type { get; set; }
+
+    [Parameter]
+    public List<string> Classes { get; set; } = new() { "button" };
+
+}
