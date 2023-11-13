@@ -7,10 +7,13 @@ public class Goal
 {
     [Key]
     public int ID { get; set; }
+    [Required]
     public string Name { get; set; } 
-    public string Description { get; set; } 
-    public DateTime EndDate { get; set; }
-    public ICollection<Stratagy> Strategies { get; set; }
+    public string? Description { get; set; }
+    public bool IsDone { get; set; } = false;
+    [Required]
+    public DateTimeOffset EndDate { get; set; }
+    public ICollection<Strategy>? Strategies { get; set; }
     
     // Parent OGSM
     public int ParentOgsmID { get; set; }

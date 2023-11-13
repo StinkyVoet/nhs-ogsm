@@ -3,10 +3,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace nhs_ogsm.Data;
 
-public class Stratagy
+public class Strategy
 {
     [Key]
     public int ID { get; set; }
+    [Required]
     public string Name { get; set; }
     public bool IsDone { get; set; } = false;
     
