@@ -19,6 +19,32 @@
   width: 100%;
 }
 
+.stratList {
+  border-radius: 5px;
+  padding: 1%;
+  background-color: green;
+  float: left;
+  overflow-y: scroll;
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+  width: 30%;
+}
+
+.stratList table {
+  border-radius: 5px;
+  border-collapse: separate;
+  border-spacing: 0 3px;
+
+}
+
+.stratList table tr {
+
+  padding: 5px;
+  background-color: white;
+  border-bottom: solid 1px black;
+}
+
 .remove-button {
   background-color: hsl(0, 100%, 62%);
   box-shadow: rgb(255, 60, 60) 0px 3px 8px;

@@ -14,7 +14,7 @@
     public Ogsm CurrentOgsm { get; set; }
     public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
     public Strategy CurrentStrategy { get; set; } = new();
-
+    
     public bool isEdit = false;
 
     protected override async Task OnInitializedAsync()
@@ -73,27 +73,6 @@
             </table>
         </EditForm>
     </div>
-    
-
-    @if (isEdit)
-    {
-        <h3>Strategies:</h3>
-        <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
-            <DataAnnotationsValidator/>
-            <table>
-                <tr>
-                    <td><label for="NameInput">Name:</label></td>
-                    <td><InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/></td>
-                    <td><ValidationMessage For="() => CurrentStrategy.Name"/></td>
-                </tr>
-                <tr>
-                    <td><button type="submit" class="btn-primary">Save</button></td>
-                    <td><button type="button" onclick="@(() => CancelEdit())" class="btn-primary">Cancel</button></td>
-
-                </tr>
-            </table>
-        </EditForm>
-    }
 </div>
 
 @code
@@ -176,24 +155,46 @@
 </div>
 
 
-<div class="goalList">
+<div class="stratList">
     <h2>Strategies</h2>
     @if (currentGoal.Strategies != null)
     {
-        @foreach (var strategy in currentGoal.Strategies)
-        {
-            <div>
-                @strategy.Name
-                <input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/>
-                <span onclick="@(() => HandleStrategyDelete(strategy))" class="material-symbols-outlined remove-button">Delete</span>
-            </div>
-        }
+        <table>
+            @foreach (Strategy strategy in currentGoal.Strategies)
+            {
+                <tr>
+                    <td>
+                        @strategy.Name
+                    </td>
+                    <td>
+                        <input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/>
+                        <span onclick="@(() => HandleStrategyDelete(strategy))" class="material-symbols-outlined remove-button">Delete</span>
+                    </td>
+                </tr>
+            }
+
+        </table>
+        <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
+            <DataAnnotationsValidator/>
+            <table>
+                <tr>
+                    <td>
+                        <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
+                    </td>
+                    <td>
+                        <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
+                        <button type="button" onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</button>
+                    </td>
+                </tr>
+            </table>
+        </EditForm>
     }
 </div>
 
 
 @code
 {
+    
     public void HandleGoalDelete(Goal goal)
     {
         GoalService.DeleteGoal(goal.ID);
