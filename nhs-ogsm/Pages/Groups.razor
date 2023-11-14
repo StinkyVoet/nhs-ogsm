@@ -1,0 +1,64 @@
+﻿@page "/Groups"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject GroupService GroupService;
+@inject NavigationManager NavigationManager;
+@inject StrategyService StrategyService;
+
+
+@code
+{
+    public List<Group> _groups;
+    
+    //get Groups on load
+    protected override async Task OnInitializedAsync()
+    {
+        _groups = GroupService.GetAllGroups();
+    }
+    
+}
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Groups</title>
+</head>
+<body>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Assigned People</th>
+            <th>Assigned OGSM's</th>
+            <th>Statistics</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @foreach (var group in _groups)
+        {
+            <tr>
+                <td>@group.ID</td>
+                <td>@group.Name</td>
+                <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+group.ID))" class="btn btn-default"/></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+@code
+{
+    public void HandleAddPersonToGroup(Account user, Group group)
+    {
+        group.Members.Add(user);
+        StateHasChanged();
+    }
+    
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
+}
+</body>
+</html>
