@@ -37,10 +37,10 @@ public class OgsmDbContext : DbContext
                     .HasForeignKey(k => k.ParentGoalID)
                     .IsRequired();
     }
-    
-    public DbSet<Ogsm> Ogsms { get; set; }
-    public DbSet<Goal> Goals { get; set; }
-    public DbSet<Strategy> Strategies { get; set; }
+
+    public virtual DbSet<Ogsm> Ogsms { get; set; } = null!;
+    public virtual DbSet<Goal> Goals { get; set; } = null!;
+    public virtual DbSet<Strategy> Strategies { get; set; } = null!;
     // public DbSet<Account> accounts { get; set; }
     //
     // public DbSet<Group> groups { get; set; }
