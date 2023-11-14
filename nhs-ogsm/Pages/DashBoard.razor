@@ -109,6 +109,13 @@
 <div class="goalList">
     @* form for creating and editing goals *@
     <div>
+        <table>
+            <tr>
+                <td>Hide done:</td>
+                <td><input type="checkbox" onchange="@(() => {})" class="form-check-input"/></td>
+            </tr>
+        </table>
+        <hr/>
         <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
             <DataAnnotationsValidator/>
             <table>
@@ -136,7 +143,6 @@
     </div>
     @* list with goals *@
     <h2 class="ListTitle">Goals</h2>
-
     @foreach (var goal in CurrentOgsm.Goals.OrderBy(goal => goal.EndDate))
     {
         <div class="@(currentGoal.ID == goal.ID?"active-item":"" )">
@@ -146,11 +152,15 @@
                     <td>@goal.Name</td>
                 </tr>
                 <tr>
+                    <td>Date:</td>
+                    <td>@goal.EndDate.DateTime</td>
+                </tr>
+                <tr>
                     <td>Done:</td>
                     <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
                 </tr>
                 <tr>
-                    <span onclick="@(() => ActivateEdit(goal))" class="material-symbols-outlined">Edit</span>
+                    <span onclick="@(() => ActivateEdit(goal))" class="material-symbols-outlined edit-button">Edit</span>
                     <span onclick="@(() => HandleGoalDelete(goal))" class="material-symbols-outlined remove-button">Delete</span>
                 </tr>
             </table>

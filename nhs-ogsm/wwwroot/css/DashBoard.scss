@@ -55,12 +55,17 @@
   box-shadow: rgb(255, 60, 60) 0px 3px 8px;
 }
 
+.remove-button:hover {
+  scale: 1.01;
+  transition-duration: 300ms;
+}
+
 .edit-button {
   background-color: hsl(55, 100%, 50%);
   box-shadow: rgb(255, 236, 2) 0px 3px 8px;
 }
 
-.remove-button:hover {
+.edit-button:hover {
   scale: 1.01;
   transition-duration: 300ms;
 }
