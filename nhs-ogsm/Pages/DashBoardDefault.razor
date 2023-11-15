@@ -26,7 +26,7 @@
     <title>DashBoard</title>
 </head>
 <style>
-    .button {
+    .dashboardButton {
         border: 2px solid #04AA6D;
         padding: 24px 32px;
         text-align: center;
@@ -35,9 +35,11 @@
         box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 16px 0 rgba(0,0,0,0.19);
         float: right;
         transition-duration: 0.4s;
+        position: sticky;
+        bottom: 10px;
     }
     
-    .button:hover {
+    .dashboardButton:hover {
         background-color: #04AA6D;
           color: white;
     }
@@ -67,7 +69,7 @@
             </tbody>
         </table>
         
-        <button class="button" onclick="@(() => Redirect("OgsmItem/"))">+</button>
+        <button class="dashboardButton" onclick="@(() => Redirect("OgsmItem/"))">+</button>
     </div>
     
 
