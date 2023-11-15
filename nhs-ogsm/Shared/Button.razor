@@ -1,13 +1,6 @@
-<button type="@_type" class="@string.Join(' ', Classes)">@ChildContent</button>
+<button type="@Type" class="@string.Join(' ', Classes)" onclick="@OnClick">@ChildContent</button>
 
 @code {
-
-    public enum BtnType
-    {
-        Submit,
-        Button,
-        Reset,
-    }
 
     public enum BtnColor
     {
@@ -21,7 +14,7 @@
     public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public BtnType Type { get; set; }
+    public string Type { get; set; } = "button";
 
     [Parameter]
     public List<string> Classes { get; set; } = new() { "button" };
@@ -29,26 +22,21 @@
     [Parameter]
     public BtnColor Color { get; set; }
 
+    [Parameter]
+    public EventCallback OnClick { get; set; }
 
-    private string _type { get; set; }
-    private string _style { get; set; } = "button-";
+    private string Style { get; set; } = "button-";
 
     protected override void OnInitialized()
     {
-        _type = Type switch {
-            BtnType.Reset => "reset",
-            BtnType.Submit => "submit",
-            _ => "button"
-            };
-
-        _style += Color switch {
+        Style += Color switch {
             BtnColor.Secondary => "secondary",
             BtnColor.Warning => "warning",
             BtnColor.Danger => "danger",
             BtnColor.Primary => "primary",
             _ => ""
             };
-        if (!_style.Equals("button-")) Classes.Add(_style);
+        if (!Style.Equals("button-")) Classes.Add(Style);
     }
 
 }
