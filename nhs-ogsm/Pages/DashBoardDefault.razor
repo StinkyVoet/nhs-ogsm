@@ -24,6 +24,23 @@
 <head>
     <title>DashBoard</title>
 </head>
+<style>
+    .button {
+        border: 2px solid #04AA6D;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 24px;
+        border-radius: 8px;   
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 16px 0 rgba(0,0,0,0.19);
+        float: right;
+        transition-duration: 0.4s;
+    }
+    
+    .button:hover {
+        background-color: #04AA6D;
+          color: white;
+    }
+</style>
 <body>
     <h3>Your OGSMs</h3>
     <div style="height: 20px"></div>
@@ -48,6 +65,8 @@
             }
             </tbody>
         </table>
+        
+        <button class="button">+</button>
     </div>
     
 
