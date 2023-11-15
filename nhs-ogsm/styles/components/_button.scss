@@ -9,6 +9,16 @@
       background-color: darken($color, 10%);
     }
   }
+  
+  &-#{$name}-inverted {
+    background-color: #fff;
+    color: $color;
+    border: 2px solid $color;
+    
+    &:hover {
+      background-color: rgba(#000, 10%);
+    }
+  }
 }
 
 .button {
@@ -18,9 +28,14 @@
   background-color: transparent;
   color: $centric-black;
   transition: background-color 200ms ease-out;
+  
+  &:hover {
+    background-color: rgba(#000, 10%);
+  }
 
   @include button-color("primary", $centric-green-1);
-  @include button-color("secondary", $centric-green-2);
-  @include button-color("warning", $centric-orange);
+  @include button-color("secondary", $centric-green-3);
+  @include button-color("warning", $centric-yellow);
   @include button-color("danger", $centric-red);
+  @include button-color("info", $centric-blue-2);
 }

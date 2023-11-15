@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @page "/DashBoard"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
@@ -61,7 +61,7 @@
                 <tr>
                     <td>@ogsm.ID</td>
                     <td>@ogsm.Title</td>
-                    <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + ogsm.ID))" class="btn btn-default"/></td>
+                    <td><Button type="button" OnClick="@(() => Redirect("DashBoard/" + ogsm.ID))" Color="Button.BtnColor.Primary">Select</Button></td>
                 </tr>
             }
             </tbody>

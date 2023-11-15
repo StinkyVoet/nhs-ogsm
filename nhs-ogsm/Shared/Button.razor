@@ -8,6 +8,12 @@
         Secondary,
         Warning,
         Danger,
+        Info,
+        PrimaryInverted,
+        SecondaryInverted,
+        WarningInverted,
+        DangerInverted,
+        InfoInverted,
     }
 
     [Parameter]
@@ -20,7 +26,7 @@
     public List<string> Classes { get; set; } = new() { "button" };
 
     [Parameter]
-    public BtnColor Color { get; set; }
+    public BtnColor? Color { get; set; }
 
     [Parameter]
     public EventCallback OnClick { get; set; }
@@ -30,10 +36,16 @@
     protected override void OnInitialized()
     {
         Style += Color switch {
+            BtnColor.Primary => "primary",
             BtnColor.Secondary => "secondary",
             BtnColor.Warning => "warning",
             BtnColor.Danger => "danger",
-            BtnColor.Primary => "primary",
+            BtnColor.Info => "info",
+            BtnColor.PrimaryInverted => "primary-inverted",
+            BtnColor.SecondaryInverted => "secondary-inverted",
+            BtnColor.WarningInverted => "warning-inverted",
+            BtnColor.DangerInverted => "danger-inverted",
+            BtnColor.InfoInverted => "info-inverted",
             _ => ""
             };
         if (!Style.Equals("button-")) Classes.Add(Style);

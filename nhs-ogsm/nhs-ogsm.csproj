@@ -23,4 +23,11 @@
       <PackageReference Include="PSC.Blazor.Components.Chartjs" Version="6.0.43" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Update="styles\main.scss">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>
