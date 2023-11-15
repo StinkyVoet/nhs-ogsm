@@ -1,4 +1,5 @@
-﻿@page "/DashBoard"
+@page "/"
+@page "/DashBoard"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
 @inject OgsmItemService OgsmItemService;
@@ -20,38 +21,63 @@
 
 <!DOCTYPE html>
 <html>
+<PageTitle>Overview</PageTitle>
 <head>
     <title>DashBoard</title>
 </head>
-<body>
-<div>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Select</th>
-        </tr>
-        </thead>
-        <tbody>
-
-        @foreach (var ogsm in _ogsmItemsArray)
-        {
-            <tr>
-                <td>@ogsm.ID</td>
-                <td>@ogsm.Title</td>
-                <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+ogsm.ID))" class="btn btn-default"/></td>
-            </tr>
-        }
-        </tbody>
-    </table>
-</div>
-@code
-{
-    public void Redirect(string uri)
-    {
-        NavigationManager.NavigateTo(uri);
+<style>
+    .button {
+        border: 2px solid #04AA6D;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 24px;
+        border-radius: 8px;   
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 16px 0 rgba(0,0,0,0.19);
+        float: right;
+        transition-duration: 0.4s;
     }
-}
+    
+    .button:hover {
+        background-color: #04AA6D;
+          color: white;
+    }
+</style>
+<body>
+    <h3>Your OGSMs</h3>
+    <div style="height: 20px"></div>
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Select</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            @foreach (var ogsm in _ogsmItemsArray)
+            {
+                <tr>
+                    <td>@ogsm.ID</td>
+                    <td>@ogsm.Title</td>
+                    <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + ogsm.ID))" class="btn btn-default"/></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        
+        <button class="button">+</button>
+    </div>
+    
+
+    @code
+    {
+        public void Redirect(string uri)
+        {
+            NavigationManager.NavigateTo(uri);
+        }
+    }
+
 </body>
 </html>
