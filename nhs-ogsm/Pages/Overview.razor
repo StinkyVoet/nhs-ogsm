@@ -3,8 +3,33 @@
 
 <PageTitle>Overview</PageTitle>
 <h1>Overview</h1>
+<br/>
+<br/>
+
+<div class="dropdown">
+    <button>←</button>Month<button>→</button>
+    <button class="dropbtn">OGSM</button>
+    @*<div class="dropdown-content">
+        <a href="#">Link 1</a>
+        <a href="#">Link 2</a>
+        <a href="#">Link 3</a>
+    </div>*@
+</div>
 
 <Chart Config="_config1" @ref="_chart1"></Chart>
+<br/>
+<table>
+    <tr>
+        <th>Goals</th>
+        <th>Completed Goals</th>
+        <th>Weight</th>
+    </tr>
+    <tr>
+        <td>20</td>
+        <td>18</td>
+        <td>80%</td>
+    </tr>
+</table>
 
 @code {
     private BarChartConfig? _config1;
