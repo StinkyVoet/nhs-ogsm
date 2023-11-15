@@ -11,7 +11,7 @@ public class GoalService
         _dbContextFactory = dbContextFactory;
     }
     
-    public bool AddGoal(Goal goal, Ogsm ogsm)
+    public bool AddGoal(Goal goal)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
@@ -39,6 +39,15 @@ public class GoalService
             context.SaveChanges();
         }
     }
+    
+    // public List<Goal> GetAllGoal()
+    // {
+    //     using (var context = _dbContextFactory.CreateDbContext())
+    //     {
+    //         List<Goal> goals = context.Goals.ToList();
+    //         return goals;
+    //     }
+    // }
     
     // public List<Goal>? GetGoals(OgsmItems ogsmItem)
     // {

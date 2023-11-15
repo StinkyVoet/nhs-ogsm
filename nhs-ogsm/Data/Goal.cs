@@ -21,4 +21,16 @@ public class Goal
     
     // public ICollection<Group>? AssignedGroups { get; set; }
     // public ICollection<Account>? AssignedAccounts { get; set; }
+    
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        Goal other = (Goal)obj;
+        return
+            ID == other.ID &&
+            Name == other.Name &&
+            Description == other.Description &&
+            IsDone == other.IsDone;
+    }
 }

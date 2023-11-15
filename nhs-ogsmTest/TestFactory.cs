@@ -14,4 +14,15 @@ public class TestFactory : IDbContextFactory<OgsmDbContext>
         
         return new OgsmDbContext(options);
     }
+
+    public static void CleanDbContext()
+    {
+        DbContextOptions<OgsmDbContext> options;
+        var builder = new DbContextOptionsBuilder<OgsmDbContext>();
+        builder.UseInMemoryDatabase("TestDatabase");
+
+        options = builder.Options;
+        var context = new OgsmDbContext(options);
+        context.Database.EnsureDeleted();
+    }
 }
