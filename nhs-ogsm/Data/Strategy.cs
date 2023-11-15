@@ -11,7 +11,8 @@ public class Strategy
     public string Name { get; set; }
     public bool IsDone { get; set; } = false;
     
-    // Parent Goal
-    public int ParentGoalID { get; set; }
-    public Goal ParentGoal { get; set; } = null!;
+    // Parent Goals
+    public ICollection<Goal> Goals { get; set; }
+    // Child Action
+    public ICollection<Action>? Actions { get; set; }
 }

@@ -18,7 +18,6 @@
     public bool isEdit;
     protected override async Task OnInitializedAsync()
     {
-        Console.WriteLine("Started");
         try
         {
             currentOgsm = OgsmItemService.GetSingleOgsm(OgsmId);
@@ -53,18 +52,19 @@
 {
     public void HandleStrategySubmit(EditContext editContext)
     {
+        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
         var newStrategy = (Strategy)editContext.Model;
-        newStrategy.ParentGoalID = currentGoal.ID;
-        StrategyService.AddStrategy(newStrategy);
-        currentGoal.Strategies?.Add(newStrategy);
+        currentGoal.Strategies.Add(newStrategy);
+        GoalService.UpdateGoal(currentGoal);
         CurrentStrategy = new Strategy();
         StateHasChanged();
     }
     
     public void HandleStrategyDelete(Strategy strategy)
     {
+        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
         StrategyService.DeleteStrategy(strategy.ID);
-        currentGoal.Strategies?.Remove(strategy);
+        currentGoal.Strategies.Remove(strategy);
         StateHasChanged();
     }
     
@@ -115,7 +115,7 @@
     }
 }
 <div class="goalList">
-    @* form for creating and editing goals *@
+
     <div>
         <table>
             <tr>
@@ -128,6 +128,7 @@
             </tr>
         </table>
         <hr/>
+        @* form for creating and editing goals *@
         <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
             <DataAnnotationsValidator/>
             <table>
@@ -137,7 +138,7 @@
                     <td><ValidationMessage For="() => currentGoal.Name"/></td>
                 </tr>
                 <tr>
-                    <td><label for="DateInput">Date:</label></td>
+                    <td><label for="DateInput">Due:</label></td>
                     <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@currentGoal.EndDate"/><br/></td>
                     <td><ValidationMessage For="() => currentGoal.EndDate"/></td>
                 </tr>
@@ -164,7 +165,7 @@
                     <td>@goal.Name</td>
                 </tr>
                 <tr>
-                    <td>Date:</td>
+                    <td>Due:</td>
                     <td>@goal.EndDate.DateTime</td>
                 </tr>
                 <tr>
@@ -236,7 +237,7 @@
     {
         goal.IsDone = !goal.IsDone;
         GoalService.UpdateGoal(goal);
-        StateHasChanged();
+        // StateHasChanged();
     }
     
     

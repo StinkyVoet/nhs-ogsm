@@ -13,6 +13,7 @@ public class Goal
     public bool IsDone { get; set; } = false;
     [Required]
     public DateTimeOffset EndDate { get; set; }
+    // Child Strategy
     public ICollection<Strategy>? Strategies { get; set; }
     
     // Parent OGSM

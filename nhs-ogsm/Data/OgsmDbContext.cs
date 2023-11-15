@@ -24,25 +24,31 @@ public class OgsmDbContext : DbContext
                     .WithOne(g => g.Ogsm)
                     .HasForeignKey(k => k.ParentOgsmID)
                     .IsRequired();
+        
+        // Goal <-> Strategy
         modelBuilder.Entity<Goal>()
-                    .HasOne(e => e.Ogsm)
-                    .WithMany(e => e.Goals)
-                    .HasForeignKey(e => e.ParentOgsmID)
+                    .HasMany(goal => goal.Strategies)
+                    .WithMany(strategy => strategy.Goals);
+        
+        // Strategy -> Action
+        modelBuilder.Entity<Strategy>()
+                    .HasMany(strategy => strategy.Actions)
+                    .WithOne(action => action.Strategy)
+                    .HasForeignKey(action => action.ParentStrategyID)
                     .IsRequired();
         
-        // Goal -> Strategy
-        modelBuilder.Entity<Goal>()
-                    .HasMany(e => e.Strategies)
-                    .WithOne(g => g.ParentGoal)
-                    .HasForeignKey(k => k.ParentGoalID)
-                    .IsRequired();
+        // User <-> Action
+        modelBuilder.Entity<User>()
+                    .HasMany(user => user.Actions)
+                    .WithMany(action => action.Users);
     }
     
     public DbSet<Ogsm> Ogsms { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<Strategy> Strategies { get; set; }
-    // public DbSet<Account> accounts { get; set; }
-    //
+    public DbSet<Action> Actions { get; set; }
+    public DbSet<User> Users { get; set; }
+    
     // public DbSet<Group> groups { get; set; }
 
 }

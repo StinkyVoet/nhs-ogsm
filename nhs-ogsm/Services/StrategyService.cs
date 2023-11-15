@@ -11,16 +11,6 @@ public class StrategyService
         _dbContextFactory = dbContextFactory;
     }
     
-    public bool AddStrategy(Strategy strategy)
-    {
-        using (var context = _dbContextFactory.CreateDbContext())
-        {
-            context.Strategies.Add(strategy);
-            context.SaveChanges();
-        }
-        return true;
-    }
-    
     public void DeleteStrategy(int id)  
     {
         using (var context = _dbContextFactory.CreateDbContext())
