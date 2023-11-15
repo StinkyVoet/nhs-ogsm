@@ -46,7 +46,7 @@ public class OgsmItemService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            Ogsm ogsm = context.Ogsms.Where(ogsm => ogsm.ID == ogsmId).Include(c => c.Goals).First();
+            Ogsm ogsm = context.Ogsms.Where(ogsm => ogsm.ID == ogsmId).Include(c => c.Goals).ThenInclude(c => c.Strategies).First();
             return ogsm;
         }
     }

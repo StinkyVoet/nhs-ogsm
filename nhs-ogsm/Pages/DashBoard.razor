@@ -4,17 +4,22 @@
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
 @inject GoalService GoalService;
+@inject StrategyService StrategyService;
 
 
 @code{
     [Parameter]
     public int OgsmId { get; set; }
+    
+    public Ogsm CurrentOgsm { get; set; }
+    public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
+    public Strategy CurrentStrategy { get; set; } = new();
 
-    public Ogsm? CurrentOgsm { get; set; }
-    public Goal currentGoal { get; set; } = new();
+    public bool isEdit = false;
 
     protected override async Task OnInitializedAsync()
     {
+        Console.WriteLine("Started");
         try
         {
             CurrentOgsm = OgsmItemService.GetSingleOgsm(OgsmId);
@@ -29,43 +34,102 @@
 
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/html">
+<html lang="en">
 <head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link href="css/DashBoard.css" rel="stylesheet"/>
     <title>OGSM: @CurrentOgsm.Title</title>
 </head>
 <body>
-
 <div>
-    <EditForm Model="@currentGoal" OnValidSubmit="HandleSubmit">
-        <label for="NameInput">Name:</label>
-        <InputText id="NameInput" @bind-Value="@currentGoal.Name"></InputText><br/>
-        @* <label for="dueDate">Due Date</label> *@
-        @* <InputDate id="dueDate" @bind-Value="currentGoal.EndDate" class="form-control" /> *@
-        <label for="NameInput">Description:</label>
-        <InputText id="NameInput" @bind-Value="@currentGoal.Description"></InputText><br/>
-        <button type="submit" class="btn-primary">Save</button>
-    </EditForm>
+    @code
+    {
+        public string PageHeaderTitle = "Add Goal";
+    }
+    <h1>@PageHeaderTitle</h1>
+    <div>
+        <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
+            <DataAnnotationsValidator/>
+            <table>
+                <tr>
+                    <td><label for="NameInput">Name:</label></td>
+                    <td><InputText id="NameInput" @bind-Value="@currentGoal.Name"></InputText><br/></td>
+                    <td><ValidationMessage For="() => currentGoal.Name"/></td>
+                </tr>
+                <tr>
+                    <td><label for="DateInput">Date:</label></td>
+                    <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@currentGoal.EndDate"/><br/></td>
+                    <td><ValidationMessage For="() => currentGoal.EndDate"/></td>
+                </tr>
+                <tr>
+                    <td><label for="NameInput">Description:</label></td>
+                    <td><InputText id="NameInput" @bind-Value="@currentGoal.Description"></InputText><br/></td>
+                    <td><ValidationMessage For="() => currentGoal.Description"/></td>
+                </tr>
+                <tr>
+                    <td><button type="submit" class="btn-primary">Save</button></td>
+                    <td><button type="button" onclick="@(() => CancelEdit())" class="btn-primary">Cancel</button></td>
+                </tr>
+            </table>
+        </EditForm>
+    </div>
     
-    @* @if (currentGoal.Stratagies != null) *@
-    @* { *@
-    @*     @foreach (var stratagy in currentGoal.Stratagies) *@
-    @*     { *@
-    @*         <tr> *@
-    @*             <td>@stratagy</td> *@
-    @*         </tr> *@
-    @*     } *@
-    @* } *@
+
+    @if (isEdit)
+    {
+        <h3>Strategies:</h3>
+        <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
+            <DataAnnotationsValidator/>
+            <table>
+                <tr>
+                    <td><label for="NameInput">Name:</label></td>
+                    <td><InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/></td>
+                    <td><ValidationMessage For="() => CurrentStrategy.Name"/></td>
+                </tr>
+                <tr>
+                    <td><button type="submit" class="btn-primary">Save</button></td>
+                    <td><button type="button" onclick="@(() => CancelEdit())" class="btn-primary">Cancel</button></td>
+
+                </tr>
+            </table>
+        </EditForm>
+    }
 </div>
 
 @code
 {
-    public void HandleSubmit(EditContext editContext)
+    public void HandleStrategySubmit(EditContext editContext)
+    {
+        var newStrategy = (Strategy)editContext.Model;
+        newStrategy.ParentGoalID = currentGoal.ID;
+        StrategyService.AddStrategy(newStrategy);
+        currentGoal.Strategies?.Add(newStrategy);
+        CurrentStrategy = new Strategy();
+        StateHasChanged();
+    }
+    
+    public void HandleStrategyDelete(Strategy strategy)
+    {
+        StrategyService.DeleteStrategy(strategy.ID);
+        currentGoal.Strategies?.Remove(strategy);
+        StateHasChanged();
+    }
+    
+    public void HandleStrategyIsDone(Strategy strategy)
+    {
+        strategy.IsDone = !strategy.IsDone;
+        StrategyService.UpdateStrategy(strategy);
+        StateHasChanged();
+    }
+    
+    public void HandleGoalSubmit(EditContext editContext)
     {
         
         var newGoal = (Goal)editContext.Model;
-        if (currentGoal != new Goal())
+        if (isEdit)
         {
             GoalService.UpdateGoal(newGoal);
+            isEdit = false;
         }
         else
         {
@@ -73,52 +137,82 @@
             GoalService.AddGoal(newGoal, CurrentOgsm);
             CurrentOgsm.Goals?.Add(newGoal);
         }
-        currentGoal = new Goal();
+        currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
+        PageHeaderTitle = "Add Goal";
+        StateHasChanged();
+    }
+
+    public void CancelEdit()
+    {
+        currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
+        isEdit = false;
+        PageHeaderTitle = "Add Goal";
         StateHasChanged();
     }
 }
 
-<div>
-    
-    <h1>Goals for @OgsmId - @CurrentOgsm.Title</h1>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>End date</th>
-            <th>Delete</th>
-            <th>Edit</th>
-        </tr>
-        </thead>
-        <tbody>
-        @if(CurrentOgsm.Goals != null) {
-            @foreach (var goal in CurrentOgsm.Goals)
-            {
+
+<div class="goalList">
+    <h2 class="ListTitle">Goals</h2>
+    @foreach (var goal in CurrentOgsm.Goals.OrderBy(goal => goal.EndDate))
+    {
+        <div>
+            <table>
                 <tr>
-                    <td>@goal.ID</td>
+                    <td>Title:</td>
                     <td>@goal.Name</td>
-                    <td>@goal.EndDate</td>
-                    <td><input type="button" value="Delete" onclick="@(() => HandleDelete(goal))" class="btn btn-default"/></td>
-                    <td><input type="button" value="Edit" onclick="@(() => ActivateEdit(goal))" class="btn btn-default"/></td>
                 </tr>
-            }
-        }
-        </tbody>
-    </table>
+                <tr>
+                    <td>Done:</td>
+                    <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
+                </tr>
+                <tr>
+                    <span onclick="@(() => ActivateEdit(goal))" class="material-symbols-outlined">Edit</span>
+                    <span onclick="@(() => HandleGoalDelete(goal))" class="material-symbols-outlined remove-button">Delete</span>
+                </tr>
+            </table>
+        </div>
+    }
 </div>
+
+
+<div class="goalList">
+    <h2>Strategies</h2>
+    @if (currentGoal.Strategies != null)
+    {
+        @foreach (var strategy in currentGoal.Strategies)
+        {
+            <div>
+                @strategy.Name
+                <input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/>
+                <span onclick="@(() => HandleStrategyDelete(strategy))" class="material-symbols-outlined remove-button">Delete</span>
+            </div>
+        }
+    }
+</div>
+
 
 @code
 {
-    public void HandleDelete(Goal goal)
+    public void HandleGoalDelete(Goal goal)
     {
         GoalService.DeleteGoal(goal.ID);
         CurrentOgsm.Goals.Remove(goal);
         StateHasChanged();
     }
     
+    public void HandleGoalIsDone(Goal goal)
+    {
+        goal.IsDone = !goal.IsDone;
+        GoalService.UpdateGoal(goal);
+        StateHasChanged();
+    }
+    
+    
     public void ActivateEdit(Goal goal)
     {
+        PageHeaderTitle = "Editing Goal:"+goal.ID+" - "+goal.Name;
+        isEdit = true;
         currentGoal = goal;
         StateHasChanged();
     }

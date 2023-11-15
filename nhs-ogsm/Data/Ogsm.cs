@@ -7,6 +7,7 @@ public class Ogsm
 {
     [Key]
     public int ID { get; set; }
+    [Required]
     public string Title { get; set; }
     public Ogsm? Parent { get; set; }
     public int? ParentID { get; set; }
