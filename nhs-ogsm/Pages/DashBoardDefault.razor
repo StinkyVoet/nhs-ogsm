@@ -1,9 +1,9 @@
 ﻿@page "/DashBoard"
+@page "/"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
 @inject OgsmItemService OgsmItemService;
 @inject NavigationManager NavigationManager
-
 
 @code
 {
@@ -20,38 +20,44 @@
 
 <!DOCTYPE html>
 <html>
+<PageTitle>Overview</PageTitle>
 <head>
     <title>DashBoard</title>
 </head>
 <body>
-<div>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Select</th>
-        </tr>
-        </thead>
-        <tbody>
-
-        @foreach (var ogsm in _ogsmItemsArray)
-        {
+    <h3>Your OGSMs</h3>
+    <div style="height: 20px"></div>
+    <div>
+        <table class="table">
+            <thead>
             <tr>
-                <td>@ogsm.ID</td>
-                <td>@ogsm.Title</td>
-                <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+ogsm.ID))" class="btn btn-default"/></td>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Select</th>
             </tr>
-        }
-        </tbody>
-    </table>
-</div>
-@code
-{
-    public void Redirect(string uri)
+            </thead>
+            <tbody>
+
+            @foreach (var ogsm in _ogsmItemsArray)
+            {
+                <tr>
+                    <td>@ogsm.ID</td>
+                    <td>@ogsm.Title</td>
+                    <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + ogsm.ID))" class="btn btn-default"/></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    
+
+    @code
     {
-        NavigationManager.NavigateTo(uri);
+        public void Redirect(string uri)
+        {
+            NavigationManager.NavigateTo(uri);
+        }
     }
-}
+
 </body>
 </html>
