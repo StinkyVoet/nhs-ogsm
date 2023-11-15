@@ -124,7 +124,7 @@
             </tr>
             <tr>
                 <td></td>
-                <td><button @onclick="filterGoals">filter</button></td>
+                <td><Button OnClick="@filterGoals">filter</Button></td>
             </tr>
         </table>
         <hr/>
@@ -147,8 +147,8 @@
                     <td><ValidationMessage For="() => currentGoal.Description"/></td>
                 </tr>
                 <tr>
-                    <td><button type="submit" class="btn-primary">Save</button></td>
-                    <td><button type="button" onclick="@(() => CancelEdit())" class="btn-primary">Cancel</button></td>
+                    <td><Button type="submit" Color="Button.BtnColor.Primary">Save</Button></td>
+                    <td><Button type="button" OnClick="@CancelEdit" Color="Button.BtnColor.Warning">Cancel</Button></td>
                 </tr>
             </table>
         </EditForm>
@@ -172,8 +172,8 @@
                     <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
                 </tr>
                 <tr>
-                    <span onclick="@(() => ActivateEdit(goal))" class="material-symbols-outlined edit-button">Edit</span>
-                    <span onclick="@(() => HandleGoalDelete(goal))" class="material-symbols-outlined remove-button">Delete</span>
+                    <Button OnClick="@(() => ActivateEdit(goal))" Color="Button.BtnColor.PrimaryInverted"><span class="material-symbols-outlined">Edit</span></Button>
+                    <Button OnClick="@(() => HandleGoalDelete(goal))" Color="Button.BtnColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                 </tr>
             </table>
         </div>

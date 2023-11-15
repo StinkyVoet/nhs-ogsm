@@ -1,0 +1,54 @@
+<button type="@Type" class="@string.Join(' ', Classes)" onclick="@OnClick">@ChildContent</button>
+
+@code {
+
+    public enum BtnColor
+    {
+        Primary,
+        Secondary,
+        Warning,
+        Danger,
+        Info,
+        PrimaryInverted,
+        SecondaryInverted,
+        WarningInverted,
+        DangerInverted,
+        InfoInverted,
+    }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string Type { get; set; } = "button";
+
+    [Parameter]
+    public List<string> Classes { get; set; } = new() { "button" };
+
+    [Parameter]
+    public BtnColor? Color { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string Style { get; set; } = "button-";
+
+    protected override void OnInitialized()
+    {
+        Style += Color switch {
+            BtnColor.Primary => "primary",
+            BtnColor.Secondary => "secondary",
+            BtnColor.Warning => "warning",
+            BtnColor.Danger => "danger",
+            BtnColor.Info => "info",
+            BtnColor.PrimaryInverted => "primary-inverted",
+            BtnColor.SecondaryInverted => "secondary-inverted",
+            BtnColor.WarningInverted => "warning-inverted",
+            BtnColor.DangerInverted => "danger-inverted",
+            BtnColor.InfoInverted => "info-inverted",
+            _ => ""
+            };
+        if (!Style.Equals("button-")) Classes.Add(Style);
+    }
+
+}

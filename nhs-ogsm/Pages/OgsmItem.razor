@@ -19,7 +19,7 @@
         }
     </InputSelect>
     
-    <button type="submit" class="btn-primary">Save</button>
+    <Button type="submit" Color="Button.BtnColor.Primary">Save</Button>
 </EditForm>
 
 @code
@@ -44,8 +44,8 @@
             <td>@ogsmItems.ID</td>
             <td>@ogsmItems.Title</td>
             <td>@ogsmItems.Parent?.Title</td>
-            <td><input type="button" value="Delete" onclick="@(() => HandleDelete(ogsmItems))" class="btn btn-default"/></td>
-            <td><input type="button" value="Edit" onclick="@(() => EditForm(ogsmItems))" class="btn btn-default"/></td>
+            <td><Button type="button" OnClick="@(() => HandleDelete(ogsmItems))" Color="Button.BtnColor.DangerInverted">Delete</Button></td>
+            <td><Button type="button" OnClick="@(() => EditForm(ogsmItems))" Color="Button.BtnColor.SecondaryInverted">Edit</Button></td>
         </tr>
     }
     </tbody>
