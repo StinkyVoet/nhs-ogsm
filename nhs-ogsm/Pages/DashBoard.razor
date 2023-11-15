@@ -11,34 +11,33 @@
     [Parameter]
     public int OgsmId { get; set; }
     
-    public Ogsm CurrentOgsm { get; set; }
+    public Ogsm currentOgsm { get; set; }
+    public IQueryable<Goal> _filterGoalList { get; set; }
     public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
     public Strategy CurrentStrategy { get; set; } = new();
-    
-    public bool isEdit = false;
-
+    public bool isEdit;
     protected override async Task OnInitializedAsync()
     {
         Console.WriteLine("Started");
         try
         {
-            CurrentOgsm = OgsmItemService.GetSingleOgsm(OgsmId);
+            currentOgsm = OgsmItemService.GetSingleOgsm(OgsmId);
         }
         catch (Exception e)
         {
             NavigationManager.NavigateTo("DashBoard");
         }
+        filterGoals();
     }
-    
-}
 
+}
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="css/DashBoard.css" rel="stylesheet"/>
-    <title>OGSM: @CurrentOgsm.Title</title>
+    <title>OGSM: @currentOgsm.Title</title>
 </head>
 <body>
 <div>
@@ -87,9 +86,9 @@
         }
         else
         {
-            newGoal.ParentOgsmID = CurrentOgsm.ID;
-            GoalService.AddGoal(newGoal, CurrentOgsm);
-            CurrentOgsm.Goals?.Add(newGoal);
+            newGoal.ParentOgsmID = currentOgsm.ID;
+            GoalService.AddGoal(newGoal, currentOgsm);
+            currentOgsm.Goals?.Add(newGoal);
         }
         currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
         PageHeaderTitle = "Add Goal";
@@ -103,16 +102,29 @@
         PageHeaderTitle = "Add Goal";
         StateHasChanged();
     }
+
+    bool goalFilterIsDone;
+    public void filterGoals()
+    {
+        _filterGoalList = currentOgsm.Goals.AsQueryable();
+        if (goalFilterIsDone)
+        {
+            _filterGoalList = _filterGoalList.Where(goal => !goal.IsDone);
+        }
+        StateHasChanged();
+    }
 }
-
-
 <div class="goalList">
     @* form for creating and editing goals *@
     <div>
         <table>
             <tr>
                 <td>Hide done:</td>
-                <td><input type="checkbox" onchange="@(() => {})" class="form-check-input"/></td>
+                <td><input type="checkbox" @bind-value="goalFilterIsDone" class="form-check-input"/>@goalFilterIsDone</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button @onclick="filterGoals">filter</button></td>
             </tr>
         </table>
         <hr/>
@@ -143,7 +155,7 @@
     </div>
     @* list with goals *@
     <h2 class="ListTitle">Goals</h2>
-    @foreach (var goal in CurrentOgsm.Goals.OrderBy(goal => goal.EndDate))
+    @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
     {
         <div class="@(currentGoal.ID == goal.ID?"active-item":"" )">
             <table>
@@ -216,7 +228,7 @@
     public void HandleGoalDelete(Goal goal)
     {
         GoalService.DeleteGoal(goal.ID);
-        CurrentOgsm.Goals.Remove(goal);
+        currentOgsm.Goals.Remove(goal);
         StateHasChanged();
     }
     
