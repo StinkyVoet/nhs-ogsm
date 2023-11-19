@@ -8,12 +8,7 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.ExampleTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.OgsmItemServiceTests.AddOgsmTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.OgsmItemServiceTests.DeleteOgsmTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.OgsmItemServiceTests.GetAllOgsmTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.OgsmItemServiceTests.GetSingleOgsmTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.OgsmItemServiceTests.UpdateOgsmTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.OgsmItemServiceTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.GoalServiceTest.AddGoalTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.GoalServiceTest.DeleteGoalTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;MSTest::7A23EF17-2611-497F-9F66-1483520C98A6::net7.0::nhs_ogsmTest.GoalServiceTest.UpdateGoalTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

@@ -40,15 +40,6 @@ public class GoalService
         }
     }
     
-    // public List<Goal> GetAllGoal()
-    // {
-    //     using (var context = _dbContextFactory.CreateDbContext())
-    //     {
-    //         List<Goal> goals = context.Goals.ToList();
-    //         return goals;
-    //     }
-    // }
-    
     // public List<Goal>? GetGoals(OgsmItems ogsmItem)
     // {
     //     using (var context = _dbContextFactory.CreateDbContext())
