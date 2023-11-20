@@ -1,11 +1,50 @@
 ﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using System.ComponentModel
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 
 <PageTitle>Login</PageTitle>
 
 <h3>Login</h3>
 <div style="height: 20px"></div>
 
-<label for="email">Email:</label>
-<input type="email" id="email" name="email"><br><br>
-<label for="password">Password:</label>
-<input type="password" id="password" name="password"><br><br>
+@code
+{
+    public class InputModel
+    {
+        [Required]
+        [EmailAddress]
+        public string UserEmail { get; set; }
+        [Required]
+        [DataType(DataType.Password)]
+        public string UserPassword { get; set; }
+    }
+
+    public InputModel _InputModel = new();
+
+    public void HandleLogin()
+    {
+        
+    }
+}
+
+<EditForm Model="@_InputModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator/>
+    <table>
+        <tr>
+            <td><label for="NameInput">Email:</label></td>
+            <td><InputText id="NameInput" @bind-Value="@_InputModel.UserEmail"></InputText><br/></td>
+
+            <td><ValidationMessage For="() => _InputModel.UserEmail"/></td>
+        </tr>
+        <tr>
+            <td><label for="NameInput">Password:</label></td>
+            <td><InputText id="NameInput" @bind-Value="@_InputModel.UserPassword"></InputText><br/></td>
+            <input type="password" />
+            <td><ValidationMessage For="() => _InputModel.UserPassword"/></td>
+        </tr>
+        <tr>
+            <td><Button type="submit" Color="Button.BtnColor.Primary">login</Button></td>
+        </tr>
+    </table>
+</EditForm>

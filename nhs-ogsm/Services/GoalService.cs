@@ -40,12 +40,15 @@ public class GoalService
         }
     }
     
-    // public List<Goal>? GetGoals(OgsmItems ogsmItem)
-    // {
-    //     using (var context = _dbContextFactory.CreateDbContext())
-    //     {
-    //         List<Goal>? ogsmItems = context.goals.Where(ogsm => ogsm.ID == ogsmItem.ID).Include(c => c.Goals).FirstOrDefault();
-    //         return ogsmItems;
-    //     }
-    // }
+    
+    public bool AddStratToGoal(Strategy strategy, Goal goal)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Goal parentGoal = context.Goals.Include(goal1 => goal1.Strategies).First(goal1 => goal1.ID == goal.ID);
+            if (parentGoal.Strategies != null) parentGoal.Strategies.Add(strategy);
+            context.SaveChanges();
+        }
+        return true;
+    }
 }

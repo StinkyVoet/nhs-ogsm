@@ -29,4 +29,15 @@ public class StrategyService
             context.SaveChanges();
         }
     }
+    
+    public bool AddStrategy(Strategy strategy)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            context.Strategies.Add(strategy);
+            context.SaveChanges();
+        }
+        return true;
+    }
+
 }

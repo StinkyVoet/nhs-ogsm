@@ -18,7 +18,7 @@ public class User
     public string LastName { get; set; }
     public bool IsAdmin { get; set; } = false;
     // parent groups
-    public ICollection<Group> Groups { get; set; }
+    public ICollection<Group>? Groups { get; set; }
     // child Actions
-    public ICollection<Action> Actions { get; set; }
+    public ICollection<Action>? Actions { get; set; }
 }

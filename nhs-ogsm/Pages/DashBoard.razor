@@ -1,6 +1,7 @@
 ﻿@page "/DashBoard/{OgsmId:int}"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@using Action = nhs_ogsm.Data.Action
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
 @inject GoalService GoalService;
@@ -50,30 +51,7 @@
 
 @code
 {
-    public void HandleStrategySubmit(EditContext editContext)
-    {
-        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
-        var newStrategy = (Strategy)editContext.Model;
-        currentGoal.Strategies.Add(newStrategy);
-        GoalService.UpdateGoal(currentGoal);
-        CurrentStrategy = new Strategy();
-        StateHasChanged();
-    }
-    
-    public void HandleStrategyDelete(Strategy strategy)
-    {
-        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
-        StrategyService.DeleteStrategy(strategy.ID);
-        currentGoal.Strategies.Remove(strategy);
-        StateHasChanged();
-    }
-    
-    public void HandleStrategyIsDone(Strategy strategy)
-    {
-        strategy.IsDone = !strategy.IsDone;
-        StrategyService.UpdateStrategy(strategy);
-        StateHasChanged();
-    }
+
     
     public void HandleGoalSubmit(EditContext editContext)
     {
@@ -94,6 +72,29 @@
         PageHeaderTitle = "Add Goal";
         StateHasChanged();
     }
+    
+    public void HandleGoalDelete(Goal goal)
+    {
+        GoalService.DeleteGoal(goal.ID);
+        currentOgsm.Goals.Remove(goal);
+        StateHasChanged();
+    }
+    
+    public void HandleGoalIsDone(Goal goal)
+    {
+        goal.IsDone = !goal.IsDone;
+        GoalService.UpdateGoal(goal);
+    // StateHasChanged();
+    }
+    
+    public void ActivateEdit(Goal goal)
+    {
+        PageHeaderTitle = "Editing Goal:"+goal.ID+" - "+goal.Name;
+        isEdit = true;
+        currentGoal = goal;
+        CurrentStrategy = new Strategy();
+        StateHasChanged();
+    }
 
     public void CancelEdit()
     {
@@ -103,11 +104,11 @@
         StateHasChanged();
     }
 
-    bool goalFilterIsDone;
+    bool _goalFilterIsDone;
     public void filterGoals()
     {
         _filterGoalList = currentOgsm.Goals.AsQueryable();
-        if (goalFilterIsDone)
+        if (_goalFilterIsDone)
         {
             _filterGoalList = _filterGoalList.Where(goal => !goal.IsDone);
         }
@@ -120,7 +121,7 @@
         <table>
             <tr>
                 <td>Hide done:</td>
-                <td><input type="checkbox" @bind-value="goalFilterIsDone" class="form-check-input"/>@goalFilterIsDone</td>
+                <td><input type="checkbox" @bind-value="_goalFilterIsDone" class="form-check-input"/>@_goalFilterIsDone</td>
             </tr>
             <tr>
                 <td></td>
@@ -181,6 +182,34 @@
     }
 </div>
 
+@code
+{
+    public void HandleStrategySubmit(EditContext editContext)
+    {
+        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
+        var newStrategy = (Strategy)editContext.Model;
+        GoalService.AddStratToGoal(newStrategy, currentGoal);
+        currentGoal.Strategies.Add(newStrategy);
+        CurrentStrategy = new Strategy();
+        StateHasChanged();
+    }
+    
+    public void HandleStrategyDelete(Strategy strategy)
+    {
+        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
+        StrategyService.DeleteStrategy(strategy.ID);
+        currentGoal.Strategies.Remove(strategy);
+        StateHasChanged();
+    }
+    
+    public void HandleStrategyIsDone(Strategy strategy)
+    {
+        strategy.IsDone = !strategy.IsDone;
+        StrategyService.UpdateStrategy(strategy);
+        StateHasChanged();
+    }
+}
+
 
 <div class="stratList">
     <h2>Strategies</h2>
@@ -189,7 +218,7 @@
         <table>
             @foreach (Strategy strategy in currentGoal.Strategies)
             {
-                <tr>
+                <tr class="stratItem">
                     <td>
                         @strategy.Name
                     </td>
@@ -200,7 +229,6 @@
                     </td>
                 </tr>
             }
-
         </table>
     }
     @if (currentGoal.ID != 0)
@@ -225,30 +253,78 @@
 
 @code
 {
+    public Action CurrentAction = new();
+    private Goal _currentSelectedActionGoal = new();
     
-    public void HandleGoalDelete(Goal goal)
+    public void HandleMeasuresSubmit(EditContext editContext)
     {
-        GoalService.DeleteGoal(goal.ID);
-        currentOgsm.Goals.Remove(goal);
+        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
+        var newStrategy = (Strategy)editContext.Model;
+        GoalService.AddStratToGoal(newStrategy, currentGoal);
+        currentGoal.Strategies.Add(newStrategy);
+        CurrentStrategy = new Strategy();
         StateHasChanged();
     }
-    
-    public void HandleGoalIsDone(Goal goal)
-    {
-        goal.IsDone = !goal.IsDone;
-        GoalService.UpdateGoal(goal);
-        // StateHasChanged();
-    }
-    
-    
-    public void ActivateEdit(Goal goal)
-    {
-        PageHeaderTitle = "Editing Goal:"+goal.ID+" - "+goal.Name;
-        isEdit = true;
-        currentGoal = goal;
-        StateHasChanged();
-    }
+
     
 }
+
+
+<div class="MeasureList">
+    <h2>Measures</h2>
+    
+    @if (currentGoal.Strategies != null)
+    {
+        foreach (Strategy strategy in currentGoal.Strategies)
+        {
+            if (strategy.Actions != null)
+            {
+                foreach (Action action in strategy.Actions)
+                {
+                    <div>
+                        @action.Name
+                    </div>
+                }
+            }
+        }
+    }
+    
+    @if (currentGoal.ID != 0)
+    {
+        <div>
+            <EditForm Model="@CurrentAction" OnValidSubmit="HandleStrategySubmit">
+                <DataAnnotationsValidator/>
+                <table>
+                    <tr>
+                        <td>
+                            <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <InputSelect @bind-Value="@_currentSelectedActionGoal.ID">
+                                @if (currentGoal.Strategies != null)
+                                {
+                                    foreach (Goal goal in currentOgsm.Goals)
+                                    {
+                                        <option value="@goal.ID">@goal.Name</option>
+                                    }
+                                }
+                            </InputSelect>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
+                            <button type="button" onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</button>
+                        </td>
+                    </tr>
+                </table>
+            </EditForm>
+        </div>
+    }
+
+</div>
+
 </body>
 </html>
