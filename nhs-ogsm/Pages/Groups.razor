@@ -6,6 +6,8 @@
 @inject StrategyService StrategyService;
 
 
+<h3>Groups overview</h3>
+
 @code
 {
     public List<Group> _groups;
@@ -15,7 +17,29 @@
     {
         _groups = GroupService.GetAllGroups();
     }
+
+    public void CreatePerson()
+    {
+        Account user1 = new Account
+        {
+            Name = "John"
+        };
+        
+        Account user2 = new Account
+        {
+            Name = "Jane"
+        };
+        
+        Group group1 = new Group
+        {
+            Name = "Group 1"
+        };
+
+        GroupService.AddUserToGroup(user1, group1);
+        GroupService.AddUserToGroup(user2, group1);
+    }
     
+    CreatePerson();
 }
 
 
@@ -39,9 +63,9 @@
         @foreach (var group in _groups)
         {
             <tr>
-                <td>@group.ID</td>
+                <td>@group.Members</td>
                 <td>@group.Name</td>
-                <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+group.ID))" class="btn btn-default"/></td>
+                @*<td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+group.ID))" class="btn btn-default"/></td>*@
             </tr>
         }
         </tbody>
