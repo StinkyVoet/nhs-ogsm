@@ -1,0 +1,41 @@
+@use "../abstracts" as *;
+
+@mixin button-color($name, $color) {
+  &-#{$name} {
+    background-color: $color;
+    color: contrast-color($color, $centric-black, #fff);
+
+    &:hover {
+      background-color: darken($color, 10%);
+    }
+  }
+  
+  &-#{$name}-inverted {
+    background-color: #fff;
+    color: $color;
+    border: 2px solid $color;
+    
+    &:hover {
+      background-color: rgba(#000, 10%);
+    }
+  }
+}
+
+.button {
+  padding: 0.6rem 0.5rem;
+  border-radius: 0.7rem;
+  border: none;
+  background-color: transparent;
+  color: $centric-black;
+  transition: background-color 200ms ease-out;
+  
+  &:hover {
+    background-color: rgba(#000, 10%);
+  }
+
+  @include button-color("primary", $centric-green-1);
+  @include button-color("secondary", $centric-green-3);
+  @include button-color("warning", $centric-yellow);
+  @include button-color("danger", $centric-red);
+  @include button-color("info", $centric-blue-2);
+}
