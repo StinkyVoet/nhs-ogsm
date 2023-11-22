@@ -11,37 +11,13 @@
 @code
 {
     public List<Group> _groups;
-    
+
     //get Groups on load
-    protected override async Task OnInitializedAsync()
+    protected async Task OnInitializedAsync()
     {
         _groups = GroupService.GetAllGroups();
     }
-
-    public void CreatePerson()
-    {
-        Account user1 = new Account
-        {
-            Name = "John"
-        };
-        
-        Account user2 = new Account
-        {
-            Name = "Jane"
-        };
-        
-        Group group1 = new Group
-        {
-            Name = "Group 1"
-        };
-
-        GroupService.AddUserToGroup(user1, group1);
-        GroupService.AddUserToGroup(user2, group1);
-    }
-    
-    CreatePerson();
 }
-
 
 <!DOCTYPE html>
 <html>
