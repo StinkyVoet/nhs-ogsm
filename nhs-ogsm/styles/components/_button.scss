@@ -32,10 +32,17 @@
   &:hover {
     background-color: rgba(#000, 10%);
   }
-
+  
+  // Colors
   @include button-color("primary", $centric-green-1);
   @include button-color("secondary", $centric-green-3);
   @include button-color("warning", $centric-yellow);
   @include button-color("danger", $centric-red);
   @include button-color("info", $centric-blue-2);
+  
+  // Sizes
+  &-sm {
+    padding: 0.1rem 0.3rem !important;
+    border-radius: 0.5rem;
+  }
 }

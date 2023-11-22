@@ -1,0 +1,20 @@
+.sidebar {
+  flex-basis: 15vw;
+  justify-content: center;
+  height: calc(100vh - 3.5rem);
+  height: calc(100lvh - 3.5rem);
+  
+  &-top {
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    display: flex;
+    height: 2.5em;
+    
+    > .sidebar-title {
+      flex-grow: 1;
+      vertical-align: middle;
+      line-height: 2em;
+      margin: 0;
+    }
+  }
+}

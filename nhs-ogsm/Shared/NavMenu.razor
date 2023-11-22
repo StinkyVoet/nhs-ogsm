@@ -1,36 +1,25 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">nhs-ogsm</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+﻿<nav>
+    <div>
+        <NavLink href="login">
+            Login
+        </NavLink>
     </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="login">
-                <span class="oi oi-account-login" aria-hidden="true"></span> Login
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="DashBoard">
-                <span class="oi oi-plus" aria-hidden="true"></span> DashBoard
-            </NavLink>
-            </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="Overview">
-                <span class="oi oi-bar-chart" aria-hidden="true"></span> Overview
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="OgsmItem">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Ogsm crud
-            </NavLink>
-        </div>
-    </nav>
-</div>
+    <div>
+        <NavLink href="DashBoard">
+            Dashboard
+        </NavLink>
+    </div>
+    <div>
+        <NavLink href="Overview">
+            OGSM Board
+        </NavLink>
+    </div>
+    <div>
+        <NavLink href="OgsmItem">
+            Ogsm crud
+        </NavLink>
+    </div>
+</nav>
 
 @code {
     private bool collapseNavMenu = true;
