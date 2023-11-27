@@ -25,6 +25,13 @@ public class OgsmDbContext : DbContext
                     .HasForeignKey(k => k.ParentOgsmID)
                     .IsRequired();
         
+        // Ogsm -> Strategy
+        modelBuilder.Entity<Ogsm>()
+                    .HasMany(e => e.Strategies)
+                    .WithOne(g => g.Ogsm)
+                    .HasForeignKey(k => k.ParentOgsmID)
+                    .IsRequired();
+        
         // Goal <-> Strategy
         modelBuilder.Entity<Goal>()
                     .HasMany(goal => goal.Strategies)

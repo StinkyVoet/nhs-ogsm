@@ -51,8 +51,6 @@
 
 @code
 {
-
-    
     public void HandleGoalSubmit(EditContext editContext)
     {
         
@@ -77,6 +75,7 @@
     {
         GoalService.DeleteGoal(goal.ID);
         currentOgsm.Goals.Remove(goal);
+        if (currentGoal == goal) CancelEdit();
         StateHasChanged();
     }
     
@@ -99,6 +98,7 @@
     public void CancelEdit()
     {
         currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
+        _selectedStrat = new Strategy();
         isEdit = false;
         PageHeaderTitle = "Add Goal";
         StateHasChanged();
@@ -184,21 +184,23 @@
 
 @code
 {
+    private Goal _currentSelectedGoalForStrategy = new();
+    private Strategy _selectedStrat = new();
+    
     public void HandleStrategySubmit(EditContext editContext)
     {
-        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
         var newStrategy = (Strategy)editContext.Model;
-        GoalService.AddStratToGoal(newStrategy, currentGoal);
-        currentGoal.Strategies.Add(newStrategy);
+        newStrategy.ParentOgsmID = currentOgsm.ID;
+        StrategyService.AddStrategy(newStrategy);
+        currentOgsm.Strategies.Add(newStrategy);
         CurrentStrategy = new Strategy();
         StateHasChanged();
     }
     
     public void HandleStrategyDelete(Strategy strategy)
     {
-        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
         StrategyService.DeleteStrategy(strategy.ID);
-        currentGoal.Strategies.Remove(strategy);
+        currentGoal.Strategies?.Remove(strategy);
         StateHasChanged();
     }
     
@@ -208,31 +210,64 @@
         StrategyService.UpdateStrategy(strategy);
         StateHasChanged();
     }
+    
+
+    public void AddGoalToStrategy(Strategy strategy)
+    {
+        GoalService.AddStratToGoal(strategy, _currentSelectedGoalForStrategy);
+        strategy.Goals.Add(GoalService.GetSingleGoal(_currentSelectedGoalForStrategy.ID));
+        _currentSelectedGoalForStrategy = new Goal();
+        StateHasChanged();
+    }
 }
 
 
 <div class="stratList">
     <h2>Strategies</h2>
-    @if (currentGoal.Strategies != null)
+
+    @foreach (Strategy strategy in currentOgsm.Strategies)
     {
-        <table>
-            @foreach (Strategy strategy in currentGoal.Strategies)
-            {
-                <tr class="stratItem">
-                    <td>
-                        @strategy.Name
-                    </td>
-                    <td>
-                        <label>Done:</label>
-                        <input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/>
-                        <span onclick="@(() => HandleStrategyDelete(strategy))" class="material-symbols-outlined remove-button">Delete</span>
-                    </td>
-                </tr>
-            }
-        </table>
+        <div class="stratItem @(_selectedStrat.ID == strategy.ID?"active-item":"" )">
+            <div class="Header">
+                @strategy.Name
+            </div>
+            <div class="info">
+                <table>
+                    <tr>
+                        <td>Goals:</td>
+                        <td>
+                            @foreach (Goal goal in strategy.Goals)
+                            {
+                                @goal.Name<br/>
+                            }
+                            @if (_selectedStrat.ID == strategy.ID && currentOgsm.Goals.Except(strategy.Goals).Any())
+                            {
+                                <InputSelect @bind-Value="@_currentSelectedGoalForStrategy.ID">
+                                    @foreach (Goal goal in currentOgsm.Goals)
+                                    {
+                                        if (strategy.Goals.Contains(@goal)) continue;
+                                        <option value="@goal.ID">@goal.Name</option>
+                                    }
+                                </InputSelect>
+                                <Button OnClick="@(() => AddGoalToStrategy(strategy))" Color="Button.BtnColor.Primary"><span class="material-symbols-outlined">Add</span></Button>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Done:</td>
+                        <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="footer">
+                <Button OnClick="@(() => _selectedStrat = strategy)" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                <Button OnClick="@(() => HandleStrategyDelete(strategy))" Color="Button.BtnColor.DangerInverted"><span class="material-symbols-outlined">Delete</span></Button>
+            </div>
+        </div>
     }
-    @if (currentGoal.ID != 0)
-    {
+    
+
+    <div>
         <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
             <DataAnnotationsValidator/>
             <table>
@@ -241,29 +276,35 @@
                         <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
                     </td>
                     <td>
+                        <InputSelect @bind-Value="@_currentSelectedGoalForStrategy.ID">
+                            @if (currentGoal.Strategies != null)
+                            {
+                                foreach (Goal goal in currentOgsm.Goals)
+                                {
+                                    <option value="@goal.ID">@goal.Name</option>
+                                }
+                            }
+                        </InputSelect>
+                    </td>
+                    <td>
                         <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
                         <button type="button" onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</button>
                     </td>
                 </tr>
             </table>
         </EditForm>
-    }
+    </div>
+    
 </div>
 
 
 @code
 {
     public Action CurrentAction = new();
-    private Goal _currentSelectedActionGoal = new();
     
     public void HandleMeasuresSubmit(EditContext editContext)
     {
-        if (currentGoal.Strategies == null) return; // Can't run function if currentGoal is null
-        var newStrategy = (Strategy)editContext.Model;
-        GoalService.AddStratToGoal(newStrategy, currentGoal);
-        currentGoal.Strategies.Add(newStrategy);
-        CurrentStrategy = new Strategy();
-        StateHasChanged();
+
     }
 
     
@@ -298,19 +339,6 @@
                     <tr>
                         <td>
                             <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <InputSelect @bind-Value="@_currentSelectedActionGoal.ID">
-                                @if (currentGoal.Strategies != null)
-                                {
-                                    foreach (Goal goal in currentOgsm.Goals)
-                                    {
-                                        <option value="@goal.ID">@goal.Name</option>
-                                    }
-                                }
-                            </InputSelect>
                         </td>
                     </tr>
                     <tr>

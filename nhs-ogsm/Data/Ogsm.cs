@@ -12,5 +12,6 @@ public class Ogsm
     public Ogsm? Parent { get; set; }
     public int? ParentID { get; set; }
     public ICollection<Goal> Goals { get; set; }
+    public ICollection<Strategy> Strategies { get; set; }
     public ICollection<Ogsm> Children { get; set; }
 }

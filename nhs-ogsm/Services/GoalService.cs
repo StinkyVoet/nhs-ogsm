@@ -40,15 +40,27 @@ public class GoalService
         }
     }
     
+    public Goal GetSingleGoal(int goalID)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Goal goal = context.Goals.First(g => g.ID == goalID);
+            return goal;
+        }
+    }
+    
     
     public bool AddStratToGoal(Strategy strategy, Goal goal)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
             Goal parentGoal = context.Goals.Include(goal1 => goal1.Strategies).First(goal1 => goal1.ID == goal.ID);
-            if (parentGoal.Strategies != null) parentGoal.Strategies.Add(strategy);
+            if (strategy.ID != 0) strategy = context.Strategies.First(strategy1 => strategy1.ID == strategy.ID);
+            if (parentGoal.Strategies == null) return false;
+            parentGoal.Strategies.Add(strategy);
             context.SaveChanges();
         }
         return true;
     }
+    
 }

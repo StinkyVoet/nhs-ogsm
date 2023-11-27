@@ -26,28 +26,48 @@
 
 .stratList {
   border-radius: 5px;
-  padding: 1%;
   background-color: green;
   float: left;
-  overflow-y: scroll;
-  display: flex;
-  flex-flow: column;
-  height: 100%;
+  padding: 10px;
   width: 30%;
+
+  display: grid;
+  row-gap: 10px;
 }
 
-.stratList table {
+.stratList .stratItem {
   border-radius: 5px;
-  border-collapse: separate;
-  border-spacing: 0 3px;
-
+  background-color: #ffffff;
+  
+  
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 0px 0px;
+  grid-template-areas: 
+    "Header Header Header"
+    "info info info"
+    "footer footer footer";
 }
 
-.stratList table tr {
+.stratItem .Header {
+  grid-area: Header;
 
   padding: 5px;
-  background-color: white;
-  border-bottom: solid 1px black;
+  background-color: rgba(12, 65, 40, 0.38);
+}
+
+.stratItem .info {
+  grid-area: info;
+
+  padding: 5px;
+}
+
+.stratItem .footer {
+  grid-area: footer;
+
+  padding: 5px;
+  background-color: rgba(128, 128, 128, 0.38);
 }
 
 .remove-button:hover {
