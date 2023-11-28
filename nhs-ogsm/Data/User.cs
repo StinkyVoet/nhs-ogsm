@@ -20,5 +20,5 @@ public class User
     // parent groups
     public ICollection<Group>? Groups { get; set; }
     // child Actions
-    public ICollection<Action>? Actions { get; set; }
+    public ICollection<ActionMeasure>? Actions { get; set; }
 }

@@ -12,9 +12,9 @@ public class Strategy
     public bool IsDone { get; set; } = false;
     
     // Parent Goals
-    public ICollection<Goal> Goals { get; set; }
+    public ICollection<Goal>? Goals { get; set; }
     // Child Action
-    public ICollection<Action>? Actions { get; set; }
+    public ICollection<ActionMeasure>? Actions { get; set; }
     // Parent OGSM
     public int ParentOgsmID { get; set; }
     public Ogsm Ogsm { get; set; } = null!;

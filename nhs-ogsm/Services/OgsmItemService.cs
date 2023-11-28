@@ -37,7 +37,7 @@ public class OgsmItemService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            List<Ogsm> ogsmItems = context.Ogsms.Include(ogsm => ogsm.Goals).ThenInclude(goal => goal.Strategies).ToList();
+            List<Ogsm> ogsmItems = context.Ogsms.Include(ogsm => ogsm.Goals).ThenInclude(goal => goal.Strategies).ThenInclude(strategy => strategy.Actions).ToList();
             return ogsmItems;
         }
     }

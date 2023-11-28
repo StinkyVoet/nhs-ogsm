@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace nhs_ogsm.Data;
 
-public class Action
+public class ActionMeasure
 {
     [Key]
     public int ID { get; set; }

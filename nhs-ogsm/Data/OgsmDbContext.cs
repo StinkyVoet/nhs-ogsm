@@ -53,7 +53,7 @@ public class OgsmDbContext : DbContext
     public DbSet<Ogsm> Ogsms { get; set; }
     public DbSet<Goal> Goals { get; set; }
     public DbSet<Strategy> Strategies { get; set; }
-    public DbSet<Action> Actions { get; set; }
+    public DbSet<ActionMeasure> Actions { get; set; }
     public DbSet<User> Users { get; set; }
     
     // public DbSet<Group> groups { get; set; }

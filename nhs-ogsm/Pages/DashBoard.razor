@@ -1,11 +1,12 @@
 ﻿@page "/DashBoard/{OgsmId:int}"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
-@using Action = nhs_ogsm.Data.Action
+@using ActionMeasure = nhs_ogsm.Data.ActionMeasure
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
 @inject GoalService GoalService;
 @inject StrategyService StrategyService;
+@inject ActionMeasureService ActionMeasureService;
 
 
 @code{
@@ -98,7 +99,7 @@
     public void CancelEdit()
     {
         currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
-        _selectedStrat = new Strategy();
+        CurrentStrategy = new Strategy();
         isEdit = false;
         PageHeaderTitle = "Add Goal";
         StateHasChanged();
@@ -185,7 +186,6 @@
 @code
 {
     private Goal _currentSelectedGoalForStrategy = new();
-    private Strategy _selectedStrat = new();
     
     public void HandleStrategySubmit(EditContext editContext)
     {
@@ -200,7 +200,7 @@
     public void HandleStrategyDelete(Strategy strategy)
     {
         StrategyService.DeleteStrategy(strategy.ID);
-        currentGoal.Strategies?.Remove(strategy);
+        currentOgsm.Strategies?.Remove(strategy);
         StateHasChanged();
     }
     
@@ -227,7 +227,7 @@
 
     @foreach (Strategy strategy in currentOgsm.Strategies)
     {
-        <div class="stratItem @(_selectedStrat.ID == strategy.ID?"active-item":"" )">
+        <div class="stratItem @(CurrentStrategy.ID == strategy.ID?"active-item":"" )">
             <div class="Header">
                 @strategy.Name
             </div>
@@ -236,21 +236,31 @@
                     <tr>
                         <td>Goals:</td>
                         <td>
-                            @foreach (Goal goal in strategy.Goals)
+                            @if (strategy.Goals != null)
                             {
-                                @goal.Name<br/>
+                                foreach (Goal goal in strategy.Goals)
+                                {
+                                    @goal.Name<br/>
+                                }
                             }
-                            @if (_selectedStrat.ID == strategy.ID && currentOgsm.Goals.Except(strategy.Goals).Any())
+                            @if (CurrentStrategy.ID == strategy.ID && currentOgsm.Goals.Except(strategy.Goals).Any())
                             {
                                 <InputSelect @bind-Value="@_currentSelectedGoalForStrategy.ID">
                                     @foreach (Goal goal in currentOgsm.Goals)
                                     {
-                                        if (strategy.Goals.Contains(@goal)) continue;
+                                        if (strategy.Goals.Contains(@goal))
+                                        {
+                                            continue;
+                                        }
                                         <option value="@goal.ID">@goal.Name</option>
                                     }
                                 </InputSelect>
-                                <Button OnClick="@(() => AddGoalToStrategy(strategy))" Color="Button.BtnColor.Primary"><span class="material-symbols-outlined">Add</span></Button>
+                                <Button OnClick="@(() => AddGoalToStrategy(strategy))" Color="@Button.BtnColor.Primary">
+                                    <span class="material-symbols-outlined">Add</span>
+                                </Button>
                             }
+
+                            
                         </td>
                     </tr>
                     <tr>
@@ -260,7 +270,7 @@
                 </table>
             </div>
             <div class="footer">
-                <Button OnClick="@(() => _selectedStrat = strategy)" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                <Button OnClick="@(() => CurrentStrategy = strategy)" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                 <Button OnClick="@(() => HandleStrategyDelete(strategy))" Color="Button.BtnColor.DangerInverted"><span class="material-symbols-outlined">Delete</span></Button>
             </div>
         </div>
@@ -277,7 +287,7 @@
                     </td>
                     <td>
                         <InputSelect @bind-Value="@_currentSelectedGoalForStrategy.ID">
-                            @if (currentGoal.Strategies != null)
+                            @if (currentOgsm.Goals != null)
                             {
                                 foreach (Goal goal in currentOgsm.Goals)
                                 {
@@ -300,11 +310,25 @@
 
 @code
 {
-    public Action CurrentAction = new();
+    public ActionMeasure CurrentActionMeasure = new();
     
-    public void HandleMeasuresSubmit(EditContext editContext)
+    public void HandleActionSubmit(EditContext editContext)
     {
-
+        if (CurrentStrategy.ID == 0) return;
+        var newAction = (ActionMeasure)editContext.Model;
+        newAction.ParentStrategyID = CurrentStrategy.ID;
+        newAction.Strategy = CurrentStrategy;
+        ActionMeasureService.AddAction(newAction);
+        if (CurrentStrategy.Actions != null)
+        {
+            CurrentStrategy.Actions.Add(newAction);
+        }
+        else
+        {
+            CurrentStrategy.Actions = new List<ActionMeasure>{newAction};
+        }
+        CurrentActionMeasure = new ActionMeasure();
+        StateHasChanged();
     }
 
     
@@ -313,38 +337,47 @@
 
 <div class="MeasureList">
     <h2>Measures</h2>
-    
-    @if (currentGoal.Strategies != null)
+    @if (CurrentStrategy.Actions != null)
+    {
+        foreach (ActionMeasure action in CurrentStrategy.Actions)
+        {
+            <div>
+                @action.Name<br/>
+                Parent: @action.Strategy.Name
+            </div>
+        }
+    }
+    else if (currentGoal.Strategies != null)
     {
         foreach (Strategy strategy in currentGoal.Strategies)
         {
-            if (strategy.Actions != null)
+            if (strategy.Actions == null) continue;
+            
+            foreach (ActionMeasure action in strategy.Actions)
             {
-                foreach (Action action in strategy.Actions)
-                {
-                    <div>
-                        @action.Name
-                    </div>
-                }
+                <div>
+                    @action.Name
+                </div>
             }
+            
         }
     }
     
-    @if (currentGoal.ID != 0)
+    @if (CurrentStrategy.ID != 0)
     {
         <div>
-            <EditForm Model="@CurrentAction" OnValidSubmit="HandleStrategySubmit">
+            <EditForm Model="@CurrentActionMeasure" OnValidSubmit="HandleActionSubmit">
                 <DataAnnotationsValidator/>
                 <table>
                     <tr>
                         <td>
-                            <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
+                            <InputText id="NameInput" @bind-Value="@CurrentActionMeasure.Name"></InputText><br/>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
-                            <button type="button" onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</button>
+                            <button type="button" onclick="@(() => { CurrentActionMeasure = new ActionMeasure();})" class="material-symbols-outlined btn-primary">Cancel</button>
                         </td>
                     </tr>
                 </table>
