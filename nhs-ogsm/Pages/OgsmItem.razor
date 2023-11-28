@@ -3,6 +3,7 @@
 @using nhs_ogsm.Services
 @using Microsoft.AspNetCore.Http.Extensions
 @inject OgsmItemService OgsmItemService;
+@inject NavigationManager NavigationManager
 
 <h3>@pageTitle</h3>
 
@@ -35,6 +36,7 @@
         <th>Parent</th>
         <th>Delete</th>
         <th>Edit</th>
+        <th>Select</th>
     </tr>
     </thead>
     <tbody>
@@ -46,6 +48,7 @@
             <td>@ogsmItems.Parent?.Title</td>
             <td><Button type="button" OnClick="@(() => HandleDelete(ogsmItems))" Color="Button.BtnColor.DangerInverted">Delete</Button></td>
             <td><Button type="button" OnClick="@(() => EditForm(ogsmItems))" Color="Button.BtnColor.SecondaryInverted">Edit</Button></td>
+            <td><Button type="button" OnClick="@(() => Redirect("DashBoard/" + ogsmItems.ID))" Color="Button.BtnColor.Primary">Select</Button></td>
         </tr>
     }
     </tbody>
@@ -96,6 +99,11 @@
     protected override async Task OnInitializedAsync()
     {
         _ogsmItemsArray = OgsmItemService.GetAllOgsm();
+    }
+    
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
     }
     
 }
