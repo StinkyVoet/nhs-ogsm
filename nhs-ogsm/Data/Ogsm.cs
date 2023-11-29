@@ -13,4 +13,15 @@ public class Ogsm
     public int? ParentID { get; set; }
     public ICollection<Goal> Goals { get; set; }
     public ICollection<Ogsm> Children { get; set; }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        Ogsm other = (Ogsm)obj;
+        return
+            ID == other.ID &&
+            Title == other.Title &&
+            ParentID == other.ParentID;
+    }
 }
