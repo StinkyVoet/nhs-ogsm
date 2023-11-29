@@ -13,10 +13,10 @@
     public List<Group> _groups;
 
     //get Groups on load
-    /*protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         _groups = GroupService.GetAllGroups();
-    }*/
+    }
 }
 
 <!DOCTYPE html>
@@ -35,15 +35,18 @@
         </tr>
         </thead>
         <tbody>
-
-        @*@foreach (var group in _groups)
+         
+        @if (_groups != null)
         {
-            <tr>
-                <td>@group.Members</td>
-                <td>@group.Name</td>
-                $1$<td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+group.ID))" class="btn btn-default"/></td>#1#
-            </tr>
-        }*@
+            @foreach (var group in _groups)
+            {
+                <tr>
+                    <td>@group.Members</td>
+                    <td>@group.Name</td>
+                    $1$<td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + group.ID))" class="btn btn-default"/></td>#1#
+                </tr>
+            }
+        }
         </tbody>
     </table>
 </div>

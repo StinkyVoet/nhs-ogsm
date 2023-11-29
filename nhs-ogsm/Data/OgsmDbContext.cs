@@ -40,12 +40,15 @@ public class OgsmDbContext : DbContext
         modelBuilder.Entity<Group>()
                     .HasMany(e => e.Members)
                     .WithMany(g => g.Groups);
+        modelBuilder.Entity<Account>()
+                    .HasMany(e => e.Groups)
+                    .WithMany(e => e.Members);
     }
     
-    public DbSet<Ogsm> Ogsms { get; set; }
-    public DbSet<Goal> Goals { get; set; }
-    public DbSet<Strategy> Strategies { get; set; }
-    public DbSet<Account> Accounts { get; set; }
-    public DbSet<Group> Groups { get; set; }
+    public DbSet<Ogsm> Ogsms { get; set; } = null!;
+    public DbSet<Goal> Goals { get; set; } = null!;
+    public DbSet<Strategy> Strategies { get; set; } = null!;
+    public DbSet<Group> Groups { get; set; } = null!;
+    public DbSet<Account> Accounts { get; set; } = null!;
 
 }
