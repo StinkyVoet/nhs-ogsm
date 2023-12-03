@@ -54,7 +54,7 @@ public class GoalService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            Goal parentGoal = context.Goals.Include(goal1 => goal1.Strategies).First(goal1 => goal1.ID == goal.ID);
+            Goal parentGoal = context.Goals.Include(g => g.Strategies).First(g => g.ID == goal.ID);
             if (strategy.ID != 0) strategy = context.Strategies.First(strategy1 => strategy1.ID == strategy.ID);
             if (parentGoal.Strategies == null) return false;
             parentGoal.Strategies.Add(strategy);
@@ -63,4 +63,16 @@ public class GoalService
         return true;
     }
     
+    
+    public bool RemoveStratFromGoal(Strategy strategy, Goal goal)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Goal goalFromDb = context.Goals.Include(g => g.Strategies).First(g => g.ID == goal.ID);
+            goalFromDb.Strategies.Remove(goalFromDb.Strategies.First(s => s.ID == strategy.ID));
+            context.SaveChanges();
+        }
+
+        return true;
+    }
 }
