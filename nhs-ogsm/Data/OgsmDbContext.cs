@@ -36,6 +36,7 @@ public class OgsmDbContext : DbContext
                     .WithOne(g => g.ParentGoal)
                     .HasForeignKey(k => k.ParentGoalID)
                     .IsRequired();
+
         // Group -> Account
         modelBuilder.Entity<Group>()
                     .HasMany(e => e.Members)
@@ -43,12 +44,19 @@ public class OgsmDbContext : DbContext
         modelBuilder.Entity<Account>()
                     .HasMany(e => e.Groups)
                     .WithMany(e => e.Members);
+        
+        // OGSM -> Group
+        modelBuilder.Entity<Ogsm>()
+            .HasMany(e => e.Groups)
+            .WithMany(g => g.Ogsms);
+        modelBuilder.Entity<Group>()
+            .HasMany(e => e.Ogsms)
+            .WithMany(g => g.Groups);
     }
     
-    public DbSet<Ogsm> Ogsms { get; set; } = null!;
-    public DbSet<Goal> Goals { get; set; } = null!;
-    public DbSet<Strategy> Strategies { get; set; } = null!;
-    public DbSet<Group> Groups { get; set; } = null!;
-    public DbSet<Account> Accounts { get; set; } = null!;
-
+    public virtual DbSet<Ogsm> Ogsms { get; set; } = null!;
+    public virtual DbSet<Goal> Goals { get; set; } = null!;
+    public virtual DbSet<Strategy> Strategies { get; set; } = null!;
+    public virtual DbSet<Account> Accounts { get; set; } = null!;
+    public virtual DbSet<Group> Groups { get; set; } = null!;
 }

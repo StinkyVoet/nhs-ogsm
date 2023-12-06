@@ -22,6 +22,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link href="css\main.css" rel="stylesheet"/>
     <title>Groups</title>
 </head>
 <body>
@@ -42,11 +43,15 @@
             {
                 <tr>
                     <td>@group.Members</td>
-                    <td>@group.Name</td>
-                    $1$<td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + group.ID))" class="btn btn-default"/></td>#1#
+                    <td>@group.Ogsms</td>
+                    <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + group.ID))" class="btn btn-default"/></td>
                 </tr>
             }
         }
+        <tr>
+            <td><Button Color="Button.BtnColor.Primary" OnClick="@(() => Redirect("AddPersonToGroup"))">+</Button></td>
+            <td><Button Color="Button.BtnColor.Primary" OnClick="@(() => Redirect("AddOGSMToGroup"))">+</Button></td>
+        </tr>
         </tbody>
     </table>
 </div>
