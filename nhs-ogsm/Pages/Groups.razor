@@ -42,7 +42,7 @@
             @foreach (var group in _groups)
             {
                 <tr>
-                    <td>@group.Members</td>
+                    <td>@group.Users</td>
                     <td>@group.Ogsms</td>
                     <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + group.ID))" class="btn btn-default"/></td>
                 </tr>

@@ -53,9 +53,9 @@ public class OgsmDbContext : DbContext
         modelBuilder.Entity<Group>()
                     .HasMany(e => e.Users)
                     .WithMany(g => g.Groups);
-        modelBuilder.Entity<Account>()
+        modelBuilder.Entity<User>()
                     .HasMany(e => e.Groups)
-                    .WithMany(e => e.Members);
+                    .WithMany(e => e.Users);
         
         // OGSM -> Group
         modelBuilder.Entity<Ogsm>()
