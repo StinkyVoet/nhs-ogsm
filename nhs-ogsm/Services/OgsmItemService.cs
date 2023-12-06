@@ -51,7 +51,11 @@ public class OgsmItemService
         }
     }
 
-
+    public List<Ogsm> GetOgsmsHierarchy()
+    {
+        using var context = _dbContextFactory.CreateDbContext();
+        return context.Ogsms.Where(o => o.Parent == null).ToList();
+    }
     
     public void UpdateOgsm(Ogsm ogsm)
     {
@@ -60,5 +64,15 @@ public class OgsmItemService
             context.Entry(ogsm).State = EntityState.Modified;
             context.SaveChanges();
         }
+    }
+
+    public List<Ogsm> LoadChildren(Ogsm ogsm)
+    {
+        using var context = _dbContextFactory.CreateDbContext();
+        context.Add(ogsm);
+        return context.Entry(ogsm)
+            .Collection(o => o.Children)
+            .Query()
+            .ToList();
     }
 }

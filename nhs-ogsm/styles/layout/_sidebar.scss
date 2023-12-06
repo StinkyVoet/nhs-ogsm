@@ -2,19 +2,76 @@
   flex-basis: 15vw;
   justify-content: center;
   height: calc(100vh - 3.5rem);
-  height: calc(100lvh - 3.5rem);
-  
+  height: calc(100svh - 3.5rem);
+  position: relative;
+
+  box-shadow: 5px 0 10px 0 rgba(#000, 20%);
+
   &-top {
     padding: 0.5rem 0.75rem;
     text-align: center;
     display: flex;
-    height: 2.5em;
-    
+    height: 3em;
+
     > .sidebar-title {
       flex-grow: 1;
       vertical-align: middle;
       line-height: 2em;
       margin: 0;
+    }
+  }
+
+  &-body {
+    padding: 0.5rem 0.75rem;
+    overflow: auto;
+
+    > ul {
+      padding: 0;
+
+      li {
+        margin-top: 0.2rem;
+        
+        a {
+          text-decoration: none;
+          display: inline-block;
+          padding: 0.2rem 0.5rem;
+          border-radius: 0.5em;
+          width: 100%;
+
+          &:hover {
+            background-color: darken(#fff, 5%);
+          }
+          
+          &.active,
+          &:focus {
+            background-color: darken(#fff, 10%);
+          }
+        }
+
+        span {
+          position: relative;
+          top: 7.5px;
+        }
+
+        ul {
+          padding-left: 1rem;
+        }
+      }
+    }
+  }
+  
+  &-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0.5rem 0.75rem;
+    
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
     }
   }
 }

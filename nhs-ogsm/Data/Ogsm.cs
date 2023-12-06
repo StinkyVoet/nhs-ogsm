@@ -13,4 +13,7 @@ public class Ogsm
     public int? ParentID { get; set; }
     public ICollection<Goal> Goals { get; set; }
     public ICollection<Ogsm> Children { get; set; }
+
+    [NotMapped]
+    public string Url => "dashboard/" + ID;
 }
