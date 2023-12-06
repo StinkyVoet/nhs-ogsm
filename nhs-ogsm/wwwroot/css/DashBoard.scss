@@ -1,76 +1,58 @@
 ﻿.active-item {
-  border: 4px greenyellow solid;
+  border-left: 8px #0093ff solid;
 }
 
-
-.goalList {
+.DashboardList {
   border-radius: 5px;
-  padding: 1%;
   background-color: green;
   float: left;
-  overflow-y: scroll;
-  display: flex;
-  flex-flow: column;
-  height: 100%;
+  padding: 10px;
   width: 30%;
+
+  display: grid;
+  row-gap: 10px;
 }
 
-.goalList div {
-  border-radius: 3px;
-  padding: 3px;
-  margin-bottom: 10px;
-  background-color: white;
-  box-shadow: 3px 4px 23px -5px rgba(61,231,63,0.75);
-  width: 100%;
-}
-
-.stratList {
+.DashboardList .DashboardItem {
   border-radius: 5px;
-  padding: 1%;
-  background-color: green;
-  float: left;
-  overflow-y: scroll;
-  display: flex;
-  flex-flow: column;
-  height: 100%;
-  width: 30%;
+  background-color: #ffffff;
+  
+  
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 0px 0px;
+  grid-template-areas: 
+    "Header Header Header"
+    "info info info"
+    "footer footer footer";
 }
 
-.stratList table {
-  border-radius: 5px;
-  border-collapse: separate;
-  border-spacing: 0 3px;
-
-}
-
-.stratList table tr {
+.DashboardItem .Header {
+  grid-area: Header;
 
   padding: 5px;
-  background-color: white;
-  border-bottom: solid 1px black;
+  background-color: rgba(12, 65, 40, 0.38);
 }
 
-.remove-button {
-  background-color: hsl(0, 100%, 62%);
-  box-shadow: rgb(255, 60, 60) 0px 3px 8px;
+.DashboardItem .info {
+  grid-area: info;
+
+  padding: 5px;
 }
 
-.remove-button:hover {
-  scale: 1.01;
-  transition-duration: 300ms;
+.DashboardItem .footer {
+  grid-area: footer;
+
+  padding: 5px;
+  background-color: rgba(128, 128, 128, 0.38);
 }
 
-.edit-button {
-  background-color: hsl(55, 100%, 50%);
-  box-shadow: rgb(255, 236, 2) 0px 3px 8px;
+.removable-item {
+  color: #0a53be;
 }
 
-.edit-button:hover {
-  scale: 1.01;
-  transition-duration: 300ms;
-}
-
-button {
-  border: none;
-  border-radius: 5px;
+.removable-item:hover {
+  color: red;
+  text-decoration: line-through;
 }
