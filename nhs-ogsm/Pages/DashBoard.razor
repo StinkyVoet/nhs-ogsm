@@ -123,7 +123,7 @@
         StateHasChanged();
     }
 }
-<div class="stratList">
+<div class="DashboardList">
 
     <div>
         <table>
@@ -167,9 +167,57 @@
     <h2>Goals</h2>
     @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
     {
-        
-        <div class="stratItem @(currentGoal.ID == goal.ID?"active-item":"" )">
-
+        if (currentGoal.ID == goal.ID)
+        {
+            <EditForm Model="@currentGoal" OnValidSubmit="HandleGoalSubmit">
+            <div class="DashboardItem @(currentGoal.ID == goal.ID ? "active-item" : "")">
+                <DataAnnotationsValidator/>
+                <div class="Header">
+                    <td><label for="NameInput">Name:</label></td>
+                    <td><InputTextArea id="NameInput" @bind-Value="@currentGoal.Name"></InputTextArea><br/></td>
+                </div>
+                <div class="info">
+                    <table>
+                        <tr>
+                            <td><label for="DateInput">Due:</label></td>
+                            <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@currentGoal.EndDate"/><br/></td>
+                            <td><ValidationMessage For="() => currentGoal.EndDate"/></td>
+                        </tr>
+                        <tr>
+                            <td>Strategies:</td>
+                            <td>
+                                @if (goal.Strategies.Any())
+                                {
+                                    Strategy lastStrat = goal.Strategies.Last();
+                                    @foreach (Strategy strategy in goal.Strategies)
+                                    {
+                                        // TODO: betere opmaak zodat ze weten dat ze er op kunnen drukken
+                                        <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
+                                        if (strategy != lastStrat)
+                                        {
+                                            <span> - </span>
+                                        }
+                                    }
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Done:</td>
+                            <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="footer">
+                    @* TODO: moet finish edit worden ipv Cancel *@
+                    <Button type="submit" Color="Button.BtnColor.Primary">Save</Button>
+                    <Button OnClick="@(() => HandleGoalDelete(goal))" Color="Button.BtnColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                </div>
+            </div>
+            </EditForm>
+            continue;
+        }
+        <div class="DashboardItem">
+            
             <div class="Header">
                 @goal.Name
             </div>
@@ -204,13 +252,11 @@
                 </table>
             </div>
             <div class="footer">
-                @if (currentGoal.ID == goal.ID){
-                    // TODO: moet finish edit worden ipv Cancel
-                    <Button OnClick="@(() => CancelEdit())" Color="Button.BtnColor.PrimaryInverted"><span class="material-symbols-outlined">Save</span></Button>
-                    <Button OnClick="@(() => HandleGoalDelete(goal))" Color="Button.BtnColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
-                } else {
-                    <Button OnClick="@(() => ActivateEdit(goal))" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
+                {
+                    <Button OnClick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="Button.BtnColor.Primary">add to goal</Button>
                 }
+                <Button OnClick="@(() => ActivateEdit(goal))" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
             </div>
         </div>
     }
@@ -245,32 +291,10 @@
         StateHasChanged();
     }
     
-
-    public void AddGoalToStrategy(Strategy strategy)
-    {
-        if (strategy.ID == 0 || _currentSelectedGoalForStrategy.ID == 0) return;
-        
-        GoalService.AddStratToGoal(strategy, _currentSelectedGoalForStrategy);
-
-        strategy.Goals.Add(GoalService.GetSingleGoal(_currentSelectedGoalForStrategy.ID));
-        currentOgsm.Goals.First(g => g.ID == _currentSelectedGoalForStrategy.ID).Strategies.Add(strategy);
-        
-        _goalsNotInStrat.RemoveAll(c => c.ID == _currentSelectedGoalForStrategy.ID);
-        _currentSelectedGoalForStrategy = _goalsNotInStrat.Any()? _goalsNotInStrat.First() : new Goal();
-        StateHasChanged();
-    }
-    
     public List<Goal> GetGoalsNotInStrategy(Strategy strategy)
     {
         if(!currentOgsm.Goals.Any()) return new List<Goal>();
         return currentOgsm.Goals.Except(strategy.Goals ?? new List<Goal>()).ToList();
-    }
-
-    public void RemoveGoalFromStrategy(Goal goal)
-    {
-        GoalService.RemoveStratFromGoal(CurrentStrategy, goal);
-        CurrentStrategy.Goals.Remove(goal);
-        _goalsNotInStrat.Add(goal);
     }
 
     public void AddStratToGoal(Strategy strategy, Goal goal)
@@ -282,13 +306,13 @@
 }
 
 
-<div class="stratList">
+<div class="DashboardList">
     <h2>Strategies</h2>
     
     @foreach (Strategy strategy in currentOgsm.Strategies)
     {
         
-        <div class="stratItem @(CurrentStrategy.ID == strategy.ID?"active-item":"" )">
+        <div class="DashboardItem @(CurrentStrategy.ID == strategy.ID?"active-item":"" )">
             <div class="Header">
                 @strategy.Name
             </div>
@@ -297,35 +321,19 @@
                     <tr>
                         <td>Goals:</td>
                         <td>
-                            @if (strategy.Goals.Any())
-                            {
-                                <ul>
-                                @foreach (Goal goal in strategy.Goals)
+                                @if (strategy.Goals.Any())
                                 {
-                                    <li>
-                                        @goal.Name
-                                        @if(CurrentStrategy.ID == strategy.ID)
+                                    Goal lastGoal = strategy.Goals.Last();
+                                    @foreach (Goal goal in strategy.Goals)
+                                    {
+                                        // TODO: betere opmaak zodat ze weten dat ze er op kunnen drukken
+                                        <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
+                                        if (goal != lastGoal)
                                         {
-                                            <Button OnClick="@(() => RemoveGoalFromStrategy(goal))" Color="Button.BtnColor.Danger">
-                                                <span class="material-symbols-outlined">Delete</span>
-                                            </Button>
+                                            <span> - </span>
                                         }
-                                    </li>
-                                }
-                                </ul>
-                            }
-                            @if (CurrentStrategy.ID == strategy.ID && _goalsNotInStrat.Any())
-                            {
-                                <select @bind="_currentSelectedGoalForStrategy.ID">
-                                    @foreach (Goal goal in _goalsNotInStrat)
-                                    {  
-                                        <option value="@goal.ID">@goal.Name</option>
                                     }
-                                </select>
-                                <Button OnClick="@(() => AddGoalToStrategy(strategy))" Color="@Button.BtnColor.Primary">
-                                    <span class="material-symbols-outlined">Add</span>
-                                </Button>
-                            }
+                                }
                         </td>
                     </tr>
                     <tr>
@@ -358,18 +366,6 @@
                         <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
                     </td>
                     <td>
-                        selected id: @_currentSelectedGoalForStrategy.ID
-                        @if (currentOgsm.Goals.Any())
-                        {
-                            <InputSelect @bind-Value="@_currentSelectedGoalForStrategy.ID">
-                                @foreach (Goal goal in currentOgsm.Goals)
-                                {
-                                    <option value="@goal.ID">@goal.Name</option>
-                                }
-                            </InputSelect>
-                        }
-                    </td>
-                    <td>
                         <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
                         <button type="button" onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</button>
                     </td>
@@ -383,7 +379,8 @@
 @code
 {
     public ActionMeasure CurrentActionMeasure = new();
-    
+    public List<ActionMeasure> ActionMeasuresList = new();
+
     public void HandleActionSubmit(EditContext editContext)
     {
         if (CurrentStrategy.ID == 0) return;
@@ -401,17 +398,12 @@
 }
 
 
-<div class="MeasureList">
+<div class="DashboardList">
     @if (CurrentStrategy.Actions.Any())
     {
         <h2>Measures: List from strat</h2>
-        foreach (ActionMeasure action in CurrentStrategy.Actions)
-        {
-            <div>
-                @action.Name<br/>
-                Parent: @action.Strategy.Name
-            </div>
-        }
+
+        ActionMeasuresList = CurrentStrategy.Actions.ToList();
     }
     else if (currentGoal.Strategies.Any())
     {
@@ -421,12 +413,10 @@
             if (!strategy.Actions.Any()) continue;
             foreach (ActionMeasure action in strategy.Actions)
             {
-                <div>
-                    @action.Name<br/>
-                    Parent: @action.Strategy.Name
-                </div>
+                ActionMeasuresList.Add(action);
             }
         }
+
     }
     else
     {
@@ -438,14 +428,31 @@
                 if (!strategy.Actions.Any()) continue;
                 foreach (ActionMeasure action in strategy.Actions)
                 {
-                    <div>
-                        @action.Name<br/>
-                        Parent: @action.Strategy.Name
-                    </div>
+                    ActionMeasuresList.Add(action);
                 }
-                
             }
         }
+    }
+    @foreach (ActionMeasure action in ActionMeasuresList)
+    {
+        <div class="DashboardItem @(CurrentStrategy.ID == action.ID?"active-item":"" )">
+            <div class="info">
+                @action.Name
+                <table>
+                    <tr>
+                        <td>Done:</td>
+                        <td><input type="checkbox" checked="@action.IsDone" class="form-check-input"/></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="footer">
+                <Button OnClick="@(() => { CurrentActionMeasure = action;})" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                @if (CurrentActionMeasure.ID == action.ID)
+                {
+                    <Button  Color="Button.BtnColor.DangerInverted"><span class="material-symbols-outlined">Delete</span></Button>
+                }
+            </div>
+        </div>
     }
     
     @if (CurrentStrategy.ID != 0)

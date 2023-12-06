@@ -9,6 +9,7 @@ public class ActionMeasure
     public int ID { get; set; }
     [Required]
     public string Name { get; set; } 
+    public bool IsDone { get; set; } = false;
     [Required]
     // Parent Strategy 
     public int ParentStrategyID { get; set; }

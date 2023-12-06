@@ -2,7 +2,7 @@
   border-left: 8px #0093ff solid;
 }
 
-.stratList {
+.DashboardList {
   border-radius: 5px;
   background-color: green;
   float: left;
@@ -13,7 +13,7 @@
   row-gap: 10px;
 }
 
-.stratList .stratItem {
+.DashboardList .DashboardItem {
   border-radius: 5px;
   background-color: #ffffff;
   
@@ -28,52 +28,24 @@
     "footer footer footer";
 }
 
-.stratItem .Header {
+.DashboardItem .Header {
   grid-area: Header;
 
   padding: 5px;
   background-color: rgba(12, 65, 40, 0.38);
 }
 
-.stratItem .info {
+.DashboardItem .info {
   grid-area: info;
 
   padding: 5px;
 }
 
-.stratItem .footer {
+.DashboardItem .footer {
   grid-area: footer;
 
   padding: 5px;
   background-color: rgba(128, 128, 128, 0.38);
-}
-
-.remove-button:hover {
-  scale: 1.01;
-  transition-duration: 300ms;
-}
-
-.edit-button:hover {
-  scale: 1.01;
-  transition-duration: 300ms;
-}
-
-.MeasureList {
-  border-radius: 5px;
-  background-color: green;
-  float: left;
-  padding: 10px;
-  width: 30%;
-  
-  display: grid;
-  row-gap: 10px;
-}
-
-.MeasureList div {
-  padding: 5px;
-  border: 1px solid black;
-  background-color: #ffffff;
-
 }
 
 .removable-item {
