@@ -11,7 +11,7 @@ public class GoalService
         _dbContextFactory = dbContextFactory;
     }
     
-    public bool AddGoal(Goal goal, Ogsm ogsm)
+    public bool AddGoal(Goal goal)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {

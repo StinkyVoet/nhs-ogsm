@@ -14,4 +14,15 @@ public class Ogsm
     public ICollection<Goal> Goals { get; set; } = new List<Goal>();
     public ICollection<Strategy> Strategies { get; set; } = new List<Strategy>();
     public ICollection<Ogsm> Children { get; set; } = new List<Ogsm>();
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        Ogsm other = (Ogsm)obj;
+        return
+            ID == other.ID &&
+            Title == other.Title &&
+            ParentID == other.ParentID;
+    }
 }

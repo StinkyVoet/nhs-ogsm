@@ -52,8 +52,6 @@ public class OgsmItemService
             return ogsm;
         }
     }
-
-
     
     public void UpdateOgsm(Ogsm ogsm)
     {

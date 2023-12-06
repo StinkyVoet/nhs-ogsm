@@ -48,6 +48,11 @@ public class OgsmDbContext : DbContext
         modelBuilder.Entity<User>()
                     .HasMany(user => user.Actions)
                     .WithMany(action => action.Users);
+        
+        // Group -> Account
+        modelBuilder.Entity<Group>()
+            .HasMany(e => e.Users)
+            .WithMany(g => g.Groups);
     }
     
     public DbSet<Ogsm> Ogsms { get; set; }
@@ -55,7 +60,6 @@ public class OgsmDbContext : DbContext
     public DbSet<Strategy> Strategies { get; set; }
     public DbSet<ActionMeasure> Actions { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Group> groups { get; set; }
     
-    // public DbSet<Group> groups { get; set; }
-
 }
