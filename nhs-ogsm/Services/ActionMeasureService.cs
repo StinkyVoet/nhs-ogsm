@@ -2,42 +2,42 @@
 using nhs_ogsm.Data;
 namespace nhs_ogsm.Services;
 
-public class StrategyService
+public class ActionMeasureService
 {
     private IDbContextFactory<OgsmDbContext> _dbContextFactory;
     
-    public StrategyService(IDbContextFactory<OgsmDbContext> dbContextFactory)
+    public ActionMeasureService(IDbContextFactory<OgsmDbContext> dbContextFactory)
     {
         _dbContextFactory = dbContextFactory;
     }
     
-    public void DeleteStrategy(int id)  
+    
+    public void DeleteAction(int id)  
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            Strategy entity = context.Strategies.First(t => t.ID == id);
-            context.Strategies.Remove(entity);
+            ActionMeasure entity = context.Actions.First(t => t.ID == id);
+            context.Actions.Remove(entity);
             context.SaveChanges();
         }
     }
     
-    public void UpdateStrategy(Strategy strategy)
+    public void UpdateAction(ActionMeasure actionMeasure)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.Entry(strategy).State = EntityState.Modified;
+            context.Entry(actionMeasure).State = EntityState.Modified;
             context.SaveChanges();
         }
     }
     
-    public bool AddStrategy(Strategy strategy)
+    public bool AddAction(ActionMeasure actionMeasure)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            context.Strategies.Add(strategy);
+            context.Actions.Add(actionMeasure);
             context.SaveChanges();
         }
         return true;
     }
-
 }

@@ -1,13 +1,114 @@
+@charset "UTF-8";
+/***
+    The new CSS reset - version 1.8.5 (last updated 14.6.2023)
+    GitHub page: https://github.com/elad2412/the-new-css-reset
+***/
+/*
+    Remove all the styles of the "User-Agent-Stylesheet", except for the 'display' property
+    - The "symbol *" part is to solve Firefox SVG sprite bug
+    - The "html" attribute is exclud, because otherwise a bug in Chrome breaks the CSS hyphens property (https://github.com/elad2412/the-new-css-reset/issues/36)
+ */
+*:where(:not(html, iframe, canvas, img, svg, video, audio):not(svg *, symbol *)) {
+  all: unset;
+  display: revert;
+}
+
+/* Preferred box-sizing value */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Reapply the pointer cursor for anchor tags */
+a, button {
+  cursor: revert;
+}
+
+/* Remove list styles (bullets/numbers) */
+ol, ul, menu {
+  list-style: none;
+}
+
+/* For images to not be able to exceed their container */
+img {
+  max-inline-size: 100%;
+  max-block-size: 100%;
+}
+
+/* removes spacing between cells in tables */
+table {
+  border-collapse: collapse;
+}
+
+/* Safari - solving issue when using user-select:none on the <body> text input doesn't working */
+input, textarea {
+  -webkit-user-select: auto;
+}
+
+/* revert the 'white-space' property for textarea elements on Safari */
+textarea {
+  white-space: revert;
+}
+
+/* minimum style to allow to style meter element */
+meter {
+  -webkit-appearance: revert;
+  appearance: revert;
+}
+
+/* preformatted text - use only for this feature */
+:where(pre) {
+  all: revert;
+}
+
+/* reset default text opacity of input placeholder */
+::placeholder {
+  color: unset;
+}
+
+/* remove default dot (•) sign */
+::marker {
+  content: initial;
+}
+
+/* fix the feature of 'hidden' attribute.
+   display:revert; revert to element instead of attribute */
+:where([hidden]) {
+  display: none;
+}
+
+/* revert for bug in Chromium browsers
+   - fix for the content editable attribute will work properly.
+   - webkit-user-select: auto; added for Safari in case of using user-select:none on wrapper element */
+:where([contenteditable]:not([contenteditable=false])) {
+  -moz-user-modify: read-write;
+  -webkit-user-modify: read-write;
+  overflow-wrap: break-word;
+  -webkit-line-break: after-white-space;
+  -webkit-user-select: auto;
+}
+
+/* apply back the draggable feature - exist only in Chromium and Safari */
+:where([draggable=true]) {
+  -webkit-user-drag: element;
+}
+
+/* Revert Modal native behavior */
+:where(dialog:modal) {
+  all: revert;
+}
+
 .button {
-  padding: 0.6rem 0.5rem;
-  border-radius: 0.7rem;
   border: none;
   background-color: transparent;
   color: #000;
-  transition: background-color 200ms ease-out;
+  transition: background-color 200ms ease-out, color 200ms ease-out;
+  display: block;
 }
 .button:hover {
   background-color: rgba(0, 0, 0, 0.1);
+  color: #000;
 }
 .button-primary {
   background-color: #007734;
@@ -15,6 +116,7 @@
 }
 .button-primary:hover {
   background-color: #00441e;
+  color: #fff;
 }
 .button-primary-inverted {
   background-color: #fff;
@@ -23,6 +125,7 @@
 }
 .button-primary-inverted:hover {
   background-color: rgba(0, 0, 0, 0.1);
+  color: #007734;
 }
 .button-secondary {
   background-color: #7ab51d;
@@ -30,6 +133,7 @@
 }
 .button-secondary:hover {
   background-color: #5c8916;
+  color: #fff;
 }
 .button-secondary-inverted {
   background-color: #fff;
@@ -38,6 +142,7 @@
 }
 .button-secondary-inverted:hover {
   background-color: rgba(0, 0, 0, 0.1);
+  color: #7ab51d;
 }
 .button-warning {
   background-color: #ffed00;
@@ -45,6 +150,7 @@
 }
 .button-warning:hover {
   background-color: #ccbe00;
+  color: #000;
 }
 .button-warning-inverted {
   background-color: #fff;
@@ -53,6 +159,7 @@
 }
 .button-warning-inverted:hover {
   background-color: rgba(0, 0, 0, 0.1);
+  color: #ffed00;
 }
 .button-danger {
   background-color: #e30045;
@@ -60,6 +167,7 @@
 }
 .button-danger:hover {
   background-color: #b00035;
+  color: #fff;
 }
 .button-danger-inverted {
   background-color: #fff;
@@ -68,6 +176,7 @@
 }
 .button-danger-inverted:hover {
   background-color: rgba(0, 0, 0, 0.1);
+  color: #e30045;
 }
 .button-info {
   background-color: #5ec5ed;
@@ -75,6 +184,7 @@
 }
 .button-info:hover {
   background-color: #30b4e8;
+  color: #000;
 }
 .button-info-inverted {
   background-color: #fff;
@@ -83,6 +193,123 @@
 }
 .button-info-inverted:hover {
   background-color: rgba(0, 0, 0, 0.1);
+  color: #5ec5ed;
+}
+.button-sm {
+  padding: 0.2rem 0.3rem;
+  border-radius: 0.5rem;
+}
+.button-md {
+  padding: 0.6rem 0.5rem;
+  border-radius: 0.7rem;
+}
+.button-lg {
+  padding: 0.9rem 0.8rem;
+  border-radius: 0.9rem;
+}
+
+.navigation {
+  width: 100vw;
+  text-align: center;
+  background-image: linear-gradient(90deg, #7ab51d, #dfdb00);
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.2);
+  flex: 1 0 100%;
+}
+.navigation nav {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+.navigation nav > div {
+  flex-grow: 1;
+}
+.navigation nav > div a {
+  padding: 1rem;
+  width: 100%;
+  display: inline-block;
+  color: #000;
+  text-decoration: none;
+}
+.navigation nav > div a:hover {
+  text-decoration: underline;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.navigation nav > div a.active {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+main {
+  padding: 1rem 2rem;
+  flex: 1;
+}
+
+body {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.sidebar {
+  flex-basis: 15vw;
+  justify-content: center;
+  height: calc(100vh - 3.5rem);
+  height: calc(100svh - 3.5rem);
+  position: relative;
+  box-shadow: 5px 0 10px 0 rgba(0, 0, 0, 0.2);
+}
+.sidebar-top {
+  padding: 0.5rem 0.75rem;
+  text-align: center;
+  display: flex;
+  height: 3em;
+}
+.sidebar-top > .sidebar-title {
+  flex-grow: 1;
+  vertical-align: middle;
+  line-height: 2em;
+  margin: 0;
+}
+.sidebar-body {
+  padding: 0.5rem 0.75rem;
+  overflow: auto;
+}
+.sidebar-body > ul {
+  padding: 0;
+}
+.sidebar-body > ul li {
+  margin-top: 0.2rem;
+}
+.sidebar-body > ul li a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5em;
+  width: 100%;
+}
+.sidebar-body > ul li a:hover {
+  background-color: #f2f2f2;
+}
+.sidebar-body > ul li a.active, .sidebar-body > ul li a:focus {
+  background-color: #e6e6e6;
+}
+.sidebar-body > ul li span {
+  position: relative;
+  top: 7.5px;
+}
+.sidebar-body > ul li ul {
+  padding-left: 1rem;
+}
+.sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+}
+.sidebar-footer a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
 /*# sourceMappingURL=main.css.map */

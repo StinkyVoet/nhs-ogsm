@@ -24,22 +24,34 @@ public class OgsmDbContext : DbContext
                     .WithOne(g => g.Ogsm)
                     .HasForeignKey(k => k.ParentOgsmID)
                     .IsRequired();
-        modelBuilder.Entity<Goal>()
-                    .HasOne(e => e.Ogsm)
-                    .WithMany(e => e.Goals)
-                    .HasForeignKey(e => e.ParentOgsmID)
+        
+        // Ogsm -> Strategy
+        modelBuilder.Entity<Ogsm>()
+                    .HasMany(e => e.Strategies)
+                    .WithOne(g => g.Ogsm)
+                    .HasForeignKey(k => k.ParentOgsmID)
                     .IsRequired();
         
-        // Goal -> Strategy
+        // Goal <-> Strategy
         modelBuilder.Entity<Goal>()
-                    .HasMany(e => e.Strategies)
-                    .WithOne(g => g.ParentGoal)
-                    .HasForeignKey(k => k.ParentGoalID)
+                    .HasMany(goal => goal.Strategies)
+                    .WithMany(strategy => strategy.Goals);
+        
+        // Strategy -> Action
+        modelBuilder.Entity<Strategy>()
+                    .HasMany(strategy => strategy.Actions)
+                    .WithOne(action => action.Strategy)
+                    .HasForeignKey(action => action.ParentStrategyID)
                     .IsRequired();
-
-        // Group -> Account
+        
+        // User <-> Action
+        modelBuilder.Entity<User>()
+                    .HasMany(user => user.Actions)
+                    .WithMany(action => action.Users);
+        
+        // Group <-> Account
         modelBuilder.Entity<Group>()
-                    .HasMany(e => e.Members)
+                    .HasMany(e => e.Users)
                     .WithMany(g => g.Groups);
         modelBuilder.Entity<Account>()
                     .HasMany(e => e.Groups)
@@ -54,9 +66,11 @@ public class OgsmDbContext : DbContext
             .WithMany(g => g.Groups);
     }
     
-    public virtual DbSet<Ogsm> Ogsms { get; set; } = null!;
-    public virtual DbSet<Goal> Goals { get; set; } = null!;
-    public virtual DbSet<Strategy> Strategies { get; set; } = null!;
-    public virtual DbSet<Account> Accounts { get; set; } = null!;
-    public virtual DbSet<Group> Groups { get; set; } = null!;
+    public DbSet<Ogsm> Ogsms { get; set; }
+    public DbSet<Goal> Goals { get; set; }
+    public DbSet<Strategy> Strategies { get; set; }
+    public DbSet<ActionMeasure> Actions { get; set; }
+    public DbSet<User> Users { get; set; }
+    public DbSet<Group> Groups { get; set; }
+    
 }

@@ -57,9 +57,9 @@
 </div>
 @code
 {
-    public void HandleAddPersonToGroup(Account user, Group group)
+    public void HandleAddPersonToGroup(User user, Group group)
     {
-        group.Members.Add(user);
+        group.Users.Add(user);
         StateHasChanged();
     }
     
