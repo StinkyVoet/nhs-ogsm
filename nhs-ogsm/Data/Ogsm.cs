@@ -16,4 +16,15 @@ public class Ogsm
 
     [NotMapped]
     public string Url => "dashboard/" + ID;
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        Ogsm other = (Ogsm)obj;
+        return
+            ID == other.ID &&
+            Title == other.Title &&
+            ParentID == other.ParentID;
+    }
 }
