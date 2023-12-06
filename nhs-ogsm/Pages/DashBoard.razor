@@ -31,14 +31,17 @@
         FilterGoals();
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
 }
 <!DOCTYPE html>
 
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link href="css/DashBoard.css" rel="stylesheet"/>
-    <title>OGSM: @currentOgsm.Title</title>
+    <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
 </head>
 <body>
 <div>
