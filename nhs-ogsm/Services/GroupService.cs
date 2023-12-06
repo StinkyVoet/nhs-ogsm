@@ -11,21 +11,21 @@ public class GroupService
         _dbContextFactory = dbContextFactory;
     }
     
-    public bool AddUserToGroup(Account account, Group group)
+    public bool AddUserToGroup(User account, Group group)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            group.Members.Add(account);
+            group.Users.Add(account);
             UpdateGroup(group);
         }
         return true;
     }
 
-    public bool RemoveUserFromGroup(Account account, Group group)
+    public bool RemoveUserFromGroup(User account, Group group)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            group.Members.Remove(account);
+            group.Users.Remove(account);
             UpdateGroup(group);
         }
         return true;

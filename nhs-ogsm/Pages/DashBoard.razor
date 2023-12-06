@@ -64,7 +64,7 @@
         else
         {
             newGoal.ParentOgsmID = currentOgsm.ID;
-            GoalService.AddGoal(newGoal, currentOgsm);
+            GoalService.AddGoal(newGoal);
             currentOgsm.Goals.Add(newGoal);
         }
         currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
