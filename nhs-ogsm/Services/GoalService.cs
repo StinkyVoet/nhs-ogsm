@@ -40,12 +40,39 @@ public class GoalService
         }
     }
     
-    // public List<Goal>? GetGoals(OgsmItems ogsmItem)
-    // {
-    //     using (var context = _dbContextFactory.CreateDbContext())
-    //     {
-    //         List<Goal>? ogsmItems = context.goals.Where(ogsm => ogsm.ID == ogsmItem.ID).Include(c => c.Goals).FirstOrDefault();
-    //         return ogsmItems;
-    //     }
-    // }
+    public Goal GetSingleGoal(int goalID)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Goal goal = context.Goals.First(g => g.ID == goalID);
+            return goal;
+        }
+    }
+    
+    
+    public bool AddStratToGoal(Strategy strategy, Goal goal)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Goal parentGoal = context.Goals.Include(g => g.Strategies).First(g => g.ID == goal.ID);
+            if (strategy.ID != 0) strategy = context.Strategies.First(strategy1 => strategy1.ID == strategy.ID);
+            if (parentGoal.Strategies == null) return false;
+            parentGoal.Strategies.Add(strategy);
+            context.SaveChanges();
+        }
+        return true;
+    }
+    
+    
+    public bool RemoveStratFromGoal(Strategy strategy, Goal goal)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Goal goalFromDb = context.Goals.Include(g => g.Strategies).First(g => g.ID == goal.ID);
+            goalFromDb.Strategies.Remove(goalFromDb.Strategies.First(s => s.ID == strategy.ID));
+            context.SaveChanges();
+        }
+
+        return true;
+    }
 }

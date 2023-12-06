@@ -11,7 +11,11 @@ public class Strategy
     public string Name { get; set; }
     public bool IsDone { get; set; } = false;
     
-    // Parent Goal
-    public int ParentGoalID { get; set; }
-    public Goal ParentGoal { get; set; } = null!;
+    // Parent Goals
+    public ICollection<Goal> Goals { get; set; } = new List<Goal>();
+    // Child Action
+    public ICollection<ActionMeasure> Actions { get; set; } = new List<ActionMeasure>();
+    // Parent OGSM
+    public int ParentOgsmID { get; set; }
+    public Ogsm Ogsm { get; set; } = null!;
 }

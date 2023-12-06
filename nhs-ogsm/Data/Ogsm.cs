@@ -11,8 +11,9 @@ public class Ogsm
     public string Title { get; set; }
     public Ogsm? Parent { get; set; }
     public int? ParentID { get; set; }
-    public ICollection<Goal> Goals { get; set; }
-    public ICollection<Ogsm> Children { get; set; }
+    public ICollection<Goal> Goals { get; set; } = new List<Goal>();
+    public ICollection<Strategy> Strategies { get; set; } = new List<Strategy>();
+    public ICollection<Ogsm> Children { get; set; } = new List<Ogsm>();
 
     public override bool Equals(object? obj)
     {
