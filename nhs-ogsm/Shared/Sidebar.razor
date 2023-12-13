@@ -1,0 +1,49 @@
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject OgsmItemService OgsmItemService;
+@inject NavigationManager NavigationManager;
+
+<div class="sidebar-top">
+    <Button Size="Button.BtnSize.Small">
+        <i class="material-symbols-outlined">
+            filter_list
+        </i>
+    </Button>
+    <p class="sidebar-title">OGSMs</p>
+    <Button Size="Button.BtnSize.Small">
+        <i class="material-symbols-outlined">
+            search
+        </i>        
+    </Button>
+</div>
+<div class="sidebar-body">
+    <ul>
+        @foreach (var ogsm in _ogsms)
+        {
+            <OgsmListItem Data="ogsm"/>
+        }
+    </ul>
+</div>
+<div class="sidebar-footer">
+    <a class="button button-primary-inverted button-md" href="ogsmitem">
+        <i class="material-symbols-outlined">
+            add_circle
+        </i>
+        Add Ogsm
+    </a>
+</div>
+
+@code {
+    private List<Ogsm> _ogsms = new();
+    
+    //get Ogsm items on load
+    protected override async Task OnInitializedAsync()
+    {
+        _ogsms = OgsmItemService.GetOgsmsHierarchy();
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
+}

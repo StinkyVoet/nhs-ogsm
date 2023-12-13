@@ -16,6 +16,13 @@
         InfoInverted,
     }
 
+    public enum BtnSize
+    {
+        Small,
+        Medium,
+        Large,
+    }
+
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
@@ -30,6 +37,9 @@
 
     [Parameter]
     public EventCallback OnClick { get; set; }
+    
+    [Parameter]
+    public BtnSize? Size { get; set; }
 
     private string Style { get; set; } = "button-";
 
@@ -49,6 +59,12 @@
             _ => ""
             };
         if (!Style.Equals("button-")) Classes.Add(Style);
+        
+        Classes.Add("button-" + Size switch{
+            BtnSize.Small => "sm",
+            BtnSize.Large => "lg",
+            _ => "md",
+        });
     }
 
 }

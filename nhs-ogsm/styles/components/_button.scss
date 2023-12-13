@@ -7,6 +7,7 @@
 
     &:hover {
       background-color: darken($color, 10%);
+      color: contrast-color($color, $centric-black, #fff);
     }
   }
   
@@ -17,25 +18,43 @@
     
     &:hover {
       background-color: rgba(#000, 10%);
+      color: $color;
     }
   }
 }
 
 .button {
-  padding: 0.6rem 0.5rem;
-  border-radius: 0.7rem;
   border: none;
   background-color: transparent;
   color: $centric-black;
-  transition: background-color 200ms ease-out;
+  transition: background-color 200ms ease-out, color 200ms ease-out;
+  display: block;
   
   &:hover {
     background-color: rgba(#000, 10%);
+    color: $centric-black;
   }
-
+  
+  // Colors
   @include button-color("primary", $centric-green-1);
   @include button-color("secondary", $centric-green-3);
   @include button-color("warning", $centric-yellow);
   @include button-color("danger", $centric-red);
   @include button-color("info", $centric-blue-2);
+  
+  // Sizes
+  &-sm {
+    padding: 0.2rem 0.3rem;
+    border-radius: 0.5rem;
+  }
+  
+  &-md {
+    padding: 0.6rem 0.5rem;
+    border-radius: 0.7rem;
+  }
+  
+  &-lg {
+    padding: 0.9rem 0.8rem;
+    border-radius: 0.9rem;
+  }
 }
