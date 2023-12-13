@@ -44,7 +44,6 @@ public class GoalService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            // Goal goal = context.Goals.First(g => g.ID == goalID);
             Goal goal = context.Goals.Where(goal => goal.ID == goalID)
                 .Include(goal => goal.Strategies)
                 .First();
