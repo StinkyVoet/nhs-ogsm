@@ -87,7 +87,7 @@
         GoalService.UpdateGoal(goal);
     }
     
-    public void ActivateEditGoal(Goal goal)
+    public void ActivateGoalEdit(Goal goal)
     {
         currentGoal = goal;
         editGoal = new Goal {ID = goal.ID, Name = goal.Name, Description = goal.Description, EndDate = goal.EndDate};
@@ -163,9 +163,9 @@
     <h2>Goals</h2>
     @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
     {
+        // EDIT CARD FOR GOALS
         if (currentGoal.ID == goal.ID)
         {
-            
             <EditForm Model="@editGoal" OnValidSubmit="HandleGoalEdit">
                 <div class="DashboardItem active-item">
                     <DataAnnotationsValidator/>
@@ -213,6 +213,7 @@
             </EditForm>
             continue;
         }
+        // NON EDIT CARD FOR GOALS
         <div class="DashboardItem">
             <div class="Header">
                 @goal.Name
@@ -253,7 +254,7 @@
                 }
                 @if (currentGoal.ID == 0)
                 {
-                    <Button OnClick="@(() => ActivateEditGoal(goal))" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                    <Button OnClick="@(() => ActivateGoalEdit(goal))" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                 }
             </div>
         </div>
@@ -262,8 +263,7 @@
 
 @code
 {
-    private Goal _currentSelectedGoalForStrategy = new();
-    private List<Goal> _goalsNotInStrat = new();
+    Strategy EditStrategy = new();
     
     public void HandleStrategySubmit(EditContext editContext)
     {
@@ -279,6 +279,28 @@
     {
         StrategyService.DeleteStrategy(strategy.ID);
         currentOgsm.Strategies?.Remove(strategy);
+        StateHasChanged();
+    }
+    
+    public void HandleStrategyEdit(EditContext editContext)
+    {
+        var newStrategy = (Strategy)editContext.Model;
+        Strategy realStrategy = currentOgsm.Strategies.First(s => s.ID == newStrategy.ID);
+        realStrategy.Name = newStrategy.Name;
+        StrategyService.UpdateStrategy(realStrategy);
+        
+    }
+    
+    public void ActivateStrategyEdit(Strategy strategy)
+    {
+        CurrentStrategy = strategy;
+        EditStrategy = new Strategy {ID = strategy.ID, Name = strategy.Name};
+        currentGoal = new Goal();
+        StateHasChanged();
+    }
+    
+    public void CancelStrategyEdit(){
+        CurrentStrategy = new Strategy();
         StateHasChanged();
     }
     
@@ -309,7 +331,50 @@
     
     @foreach (Strategy strategy in currentOgsm.Strategies)
     {
-        
+        if (CurrentStrategy.ID == strategy.ID)
+        {
+            <EditForm Model="@EditStrategy" OnValidSubmit="HandleStrategyEdit">
+                <DataAnnotationsValidator/>
+                <div class="DashboardItem active-item">
+                    <div class="Header">
+                        <td><label for="NameInput">Name:</label></td>
+                        <td><InputTextArea id="NameInput" @bind-Value="@EditStrategy.Name"></InputTextArea><br/></td>
+                    </div>
+                    <div class="info">
+                        <table>
+                            <tr>
+                                <td>Goals:</td>
+                                <td>
+                                        @if (strategy.Goals.Any())
+                                        {
+                                            Goal lastGoal = strategy.Goals.Last();
+                                            foreach (Goal goal in strategy.Goals)
+                                            {
+                                                <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
+                                                if (goal != lastGoal)
+                                                {
+                                                    <span> - </span>
+                                                }
+                                            }
+                                        }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Done:</td>
+                                <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="footer">
+                        <Button type="submit" Color="Button.BtnColor.Primary">Save</Button>
+                        @* this button should reset it to the old values *@
+                        <Button OnClick="@(CancelStrategyEdit)" Color="Button.BtnColor.Warning">Cancel edit</Button>
+                        <Button OnClick="@(() => HandleStrategyDelete(strategy))" Color="Button.BtnColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                    </div>
+                </div>
+            </EditForm>
+            continue;
+        }
         <div class="DashboardItem @(CurrentStrategy.ID == strategy.ID?"active-item":"" )">
             <div class="Header">
                 @strategy.Name
@@ -345,11 +410,7 @@
                 {
                     <Button OnClick="@(() => AddStratToGoal(strategy, currentGoal))" Color="Button.BtnColor.Primary">add to goal</Button>
                 }
-                <Button OnClick="@(() => { CurrentStrategy = strategy; _goalsNotInStrat = GetGoalsNotInStrategy(strategy); })" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                @if (CurrentStrategy.ID == strategy.ID)
-                {
-                    <Button OnClick="@(() => HandleStrategyDelete(strategy))" Color="Button.BtnColor.DangerInverted"><span class="material-symbols-outlined">Delete</span></Button>
-                }
+                <Button OnClick="@(() => { ActivateStrategyEdit(strategy); })" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
             </div>
         </div>
     }
