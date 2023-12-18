@@ -1,0 +1,34 @@
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject OgsmItemService OgsmItemService
+@inject NavigationManager NavigationManager
+
+<li>
+    <NavLink href="@Data.Url">@Data.Title</NavLink>
+
+    <ul>
+        @foreach (var child in Children)
+        {
+            <OgsmListItem Data="@child"/>
+        }
+    </ul>
+</li>
+
+@code {
+
+    [Parameter]
+    public Ogsm Data { get; set; } = new();
+
+    private List<Ogsm> Children { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Children = OgsmItemService.LoadChildren(Data);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
+
+}

@@ -15,6 +15,9 @@ public class Ogsm
     public ICollection<Strategy> Strategies { get; set; } = new List<Strategy>();
     public ICollection<Ogsm> Children { get; set; } = new List<Ogsm>();
 
+    [NotMapped]
+    public string Url => "dashboard/" + ID;
+
     public override bool Equals(object? obj)
     {
         if (obj == null || GetType() != obj.GetType()) return false;
