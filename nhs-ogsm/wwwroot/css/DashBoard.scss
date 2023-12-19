@@ -2,57 +2,70 @@
   border-left: 8px #0093ff solid;
 }
 
-.DashboardList {
-  border-radius: 5px;
-  background-color: green;
-  float: left;
-  padding: 10px;
-  width: 30%;
-
-  display: grid;
-  row-gap: 10px;
-}
-
-.DashboardList .DashboardItem {
-  border-radius: 5px;
-  background-color: #ffffff;
-  
-  
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  grid-template-rows: auto auto auto;
-  gap: 0px 0px;
-  grid-template-areas: 
-    "Header Header Header"
-    "info info info"
-    "footer footer footer";
-}
-
-.DashboardItem .Header {
-  grid-area: Header;
-
-  padding: 5px;
-  background-color: rgba(12, 65, 40, 0.38);
-}
-
-.DashboardItem .info {
-  grid-area: info;
-
-  padding: 5px;
-}
-
-.DashboardItem .footer {
-  grid-area: footer;
-
-  padding: 5px;
-  background-color: rgba(128, 128, 128, 0.38);
-}
-
 .removable-item {
   color: #0a53be;
+  &:hover {
+    color: red;
+    text-decoration: line-through;
+  }
 }
 
-.removable-item:hover {
-  color: red;
-  text-decoration: line-through;
+.DashBoardBody {
+  display: grid;
+  column-gap: 5px;
+  grid-template-columns: 1fr 1fr 1fr;
+
+  .DashboardList {
+    border-radius: 5px;
+    background-color: green;
+    
+    padding: 10px;
+    width: 100%;
+
+    display: grid;
+    row-gap: 10px;
+    
+    overflow: scroll;
+
+    h2 {
+      text-align: center;
+      height: fit-content;
+      
+      background-color: white;
+    }
+
+    .DashboardItem {
+      border-radius: 5px;
+      background-color: #ffffff;
+
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      grid-template-areas: 
+        "Header Header Header"
+        "info info info"
+        "footer footer footer";
+      
+      .Header {
+        grid-area: Header;
+  
+        padding: 5px;
+        background-color: rgba(12, 65, 40, 0.38);
+      }
+
+      .info {
+        grid-area: info;
+  
+        padding: 5px;
+      }
+  
+      .footer {
+        grid-area: footer;
+  
+        padding: 5px;
+        background-color: rgba(128, 128, 128, 0.38);
+      }
+      
+    }
+  }
 }
