@@ -71,7 +71,7 @@
             <tr>
                 <td><label>Name</label></td>
                 <td><label>OGSM</label></td>
-                <td><input class="input" type="text" @oninput="@(() => { FilterResults(); SearchQuery = })" placeholder="Find Person...">
+                <td><input class="input" type="text" @oninput="@(() => { FilterResults(); SearchQuery =  })" placeholder="Find Person...">
                 @foreach (string person in results)
                     {
                         <Button Type="button">@person</Button>
