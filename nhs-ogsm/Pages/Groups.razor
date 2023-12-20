@@ -6,7 +6,7 @@
 @inject StrategyService StrategyService;
 
 
-<h3>Groups overview</h3>
+<PageTitle>Groups overview</PageTitle>
 
 @code
 {
@@ -19,14 +19,8 @@
     }
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="css\main.css" rel="stylesheet"/>
-    <title>Groups</title>
-</head>
-<body>
 <div>
+    <h3>Group</h3>
     <table class="table">
         <thead>
         <tr>
@@ -36,7 +30,7 @@
         </tr>
         </thead>
         <tbody>
-         
+
         @if (_groups != null)
         {
             @foreach (var group in _groups)
@@ -51,6 +45,7 @@
         <tr>
             <td><Button Color="Button.BtnColor.Primary" OnClick="@(() => Redirect("AddPersonToGroup"))">+</Button></td>
             <td><Button Color="Button.BtnColor.Primary" OnClick="@(() => Redirect("AddOGSMToGroup"))">+</Button></td>
+            <td></td>
         </tr>
         </tbody>
     </table>
@@ -68,5 +63,3 @@
         NavigationManager.NavigateTo(uri);
     }
 }
-</body>
-</html>
