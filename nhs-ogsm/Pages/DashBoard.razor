@@ -130,7 +130,7 @@
                 </tr>
                 <tr>
                     <td></td>
-                    <td><Button OnClick="@FilterGoals">filter</Button></td>
+                    <td><Button @onclick="@FilterGoals">filter</Button></td>
                 </tr>
             </table>
             <hr/>
@@ -154,8 +154,8 @@
                         <td><ValidationMessage For="() => editGoal.Description"/></td>
                     </tr>
                     <tr>
-                        <td><Button type="submit" Color="Button.BtnColor.Primary">Save</Button></td>
-                        <td><Button type="button" OnClick="@CancelGoalEdit" Color="Button.BtnColor.Warning">Cancel</Button></td>
+                        <td><Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button></td>
+                        <td><Button @onclick="CancelGoalEdit" Color="ButtonColor.Warning">Cancel</Button></td>
                     </tr>
                 </table>
             </EditForm>
@@ -205,10 +205,10 @@
                             </table>
                         </div>
                         <div class="footer">
-                            <Button type="submit" Color="Button.BtnColor.Primary">Save</Button>
+                            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
                             @* this button should reset it to the old values *@
-                            <Button OnClick="@(() => CancelGoalEdit())" Color="Button.BtnColor.Warning">Cancel edit</Button>
-                            <Button OnClick="@(() => HandleGoalDelete(goal))" Color="Button.BtnColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                            <Button @onclick="@(() => CancelGoalEdit())" Color="ButtonColor.Warning">Cancel edit</Button>
+                            <Button @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                         </div>
                     </div>
                 </EditForm>
@@ -251,11 +251,11 @@
                 <div class="footer">
                     @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
                     {
-                        <Button OnClick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="Button.BtnColor.Primary">add to goal</Button>
+                        <Button @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
                     }
                     @if (currentGoal.ID == 0)
                     {
-                        <Button OnClick="@(() => ActivateGoalEdit(goal))" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        <Button @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     }
                 </div>
             </div>
@@ -311,12 +311,6 @@
             StrategyService.UpdateStrategy(strategy);
             StateHasChanged();
         }
-        
-        public List<Goal> GetGoalsNotInStrategy(Strategy strategy)
-        {
-            if(!currentOgsm.Goals.Any()) return new List<Goal>();
-            return currentOgsm.Goals.Except(strategy.Goals ?? new List<Goal>()).ToList();
-        }
 
         public void AddStratToGoal(Strategy strategy, Goal goal)
         {
@@ -367,10 +361,10 @@
                             </table>
                         </div>
                         <div class="footer">
-                            <Button type="submit" Color="Button.BtnColor.Primary">Save</Button>
+                            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
                             @* this button should reset it to the old values *@
-                            <Button OnClick="@(CancelStrategyEdit)" Color="Button.BtnColor.Warning">Cancel edit</Button>
-                            <Button OnClick="@(() => HandleStrategyDelete(strategy))" Color="Button.BtnColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                            <Button @onclick="@(CancelStrategyEdit)" Color="ButtonColor.Warning">Cancel edit</Button>
+                            <Button @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                         </div>
                     </div>
                 </EditForm>
@@ -413,9 +407,9 @@
                 <div class="footer">
                     @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
                     {
-                        <Button OnClick="@(() => AddStratToGoal(strategy, currentGoal))" Color="Button.BtnColor.Primary">add to goal</Button>
+                        <Button @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">add to goal</Button>
                     }
-                    <Button OnClick="@(() => { ActivateStrategyEdit(strategy); })" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                    <Button @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                 </div>
             </div>
         }
@@ -430,8 +424,8 @@
                             <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
                         </td>
                         <td>
-                            <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
-                            <button type="button" onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</button>
+                            <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
+                            <Button @onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</Button>
                         </td>
                     </tr>
                 </table>
@@ -520,10 +514,10 @@
                     </table>
                 </div>
                 <div class="footer">
-                    <Button OnClick="@(() => { CurrentActionMeasure = action; })" Color="Button.BtnColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                    <Button @onclick="@(() => { CurrentActionMeasure = action; })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     @if (CurrentActionMeasure.ID == action.ID)
                     {
-                        <Button OnClick="@(() => HandleActionDelete(action))" Color="Button.BtnColor.DangerInverted"><span class="material-symbols-outlined">Delete</span></Button>
+                        <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
                     }
                 </div>
             </div>
@@ -542,8 +536,8 @@
                         </tr>
                         <tr>
                             <td>
-                                <button type="submit" class="material-symbols-outlined btn-primary">Add</button>
-                                <button type="button" onclick="@(() => { CurrentActionMeasure = new ActionMeasure();})" class="material-symbols-outlined btn-primary">Cancel</button>
+                                <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
+                                <Button @onclick="@(() => { CurrentActionMeasure = new ActionMeasure();})" class="material-symbols-outlined btn-primary">Cancel</Button>
                             </td>
                         </tr>
                     </table>

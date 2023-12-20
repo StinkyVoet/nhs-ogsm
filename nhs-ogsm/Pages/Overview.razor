@@ -8,7 +8,7 @@
 
 <div class="dropdown">
     <Button>←</Button>Month<Button>→</Button>
-    <Button Color="Button.BtnColor.Info">OGSM</Button>
+    <Button Color="ButtonColor.Info">OGSM</Button>
     @*<div class="dropdown-content">
         <a href="#">Link 1</a>
         <a href="#">Link 2</a>
@@ -16,72 +16,4 @@
     </div>*@
 </div>
 
-<Chart Config="_config1" @ref="_chart1"></Chart>
-<br/>
-<table>
-    <tr>
-        <th>Goals</th>
-        <th>Completed Goals</th>
-        <th>Weight</th>
-    </tr>
-    <tr>
-        <td>20</td>
-        <td>18</td>
-        <td>80%</td>
-    </tr>
-</table>
 
-@code {
-    private BarChartConfig? _config1;
-    private Chart? _chart1;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _config1 = new BarChartConfig()
-        {
-            Options = new Options()
-            {
-                IndexAxis = "x",
-                Responsive = true,
-                MaintainAspectRatio = false,
-                Plugins = new Plugins()
-                {
-                    Legend = new Legend()
-                    {
-                        Align = Align.Center,
-                        Display = false,
-                        Position = LegendPosition.Right
-                    }
-                },
-                Scales = new Dictionary<string, Axis>()
-                {
-                    {
-                        Scales.XAxisId, new Axis()
-                        {
-                            Stacked = true,
-                            Ticks = new Ticks()
-                            {
-                                MaxRotation = 0,
-                                MinRotation = 0
-                            }
-                        }
-                    },
-                    {
-                        Scales.YAxisId, new Axis()
-                        {
-                            Stacked = true
-                        }
-                    }
-                }
-            }
-        };
-
-        _config1.Data.Labels = ChartTestData.Text;
-        _config1.Data.Datasets.Add(new BarDataset()
-        {
-            Label = "Value",
-            Data = ChartTestData.SimpleBar.Select(l => l.Value).ToList(),
-            BorderWidth = 1
-        });
-    }
-}
