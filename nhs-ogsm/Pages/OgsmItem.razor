@@ -8,11 +8,11 @@
 
 <EditForm Model="@_ogsm" OnValidSubmit="HandleSubmit">
     <label for="TitleInput">Title</label>
-    <InputText id="TitleInput" @bind-Value="@_ogsm.Title" required></InputText>
+    <InputText id="TitleInput" @bind-Value="@_ogsm.Title" class="input" required></InputText>
     
     <label for="parent">Parent OGSM</label>
-    <InputSelect id="parent" @bind-Value="@_ogsm.ParentID">
-        <option></option>
+    <InputSelect id="parent" @bind-Value="@_ogsm.ParentID" class="input">
+        <option>None</option>
         @foreach (var ogsm in _ogsmItemsArray)
         {
             <option value="@ogsm.ID">@ogsm.Title</option>
