@@ -121,7 +121,7 @@
         }
     }
     <div class="DashboardList">
-        
+        <h2>Goals</h2>
         <div>
             <table>
                 <tr>
@@ -164,7 +164,7 @@
             </EditForm>
         </div>
         @* list with goals *@
-        <h2>Goals</h2>
+
         @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
         {
             // EDIT CARD FOR GOALS
