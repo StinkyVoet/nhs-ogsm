@@ -18,4 +18,15 @@ public class Strategy
     // Parent OGSM
     public int ParentOgsmID { get; set; }
     public Ogsm Ogsm { get; set; } = null!;
+
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        Strategy other = (Strategy)obj;
+        return
+            ID == other.ID &&
+            Name == other.Name &&
+            IsDone == other.IsDone;
+    }
 }
