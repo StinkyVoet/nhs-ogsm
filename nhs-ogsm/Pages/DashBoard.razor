@@ -60,7 +60,7 @@
             GoalService.AddGoal(newGoal);
             currentOgsm.Goals.Add(newGoal);
         
-            currentGoal = new Goal() { EndDate = DateTimeOffset.Now };
+            _formGoal = new Goal() { EndDate = DateTimeOffset.Now };
             StateHasChanged();
         }
         
@@ -135,27 +135,30 @@
             </table>
             <hr/>
             @* form for creating and editing goals *@
-            <EditForm Model="@editGoal" OnValidSubmit="HandleGoalSubmit">
+            @code{
+                Goal _formGoal = new(){EndDate = DateTimeOffset.Now};
+            }
+            <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
                 <DataAnnotationsValidator/>
                 <table>
                     <tr>
                         <td><label for="NameInput">Name:</label></td>
-                        <td><InputText id="NameInput" @bind-Value="@editGoal.Name"></InputText><br/></td>
-                        <td><ValidationMessage For="() => currentGoal.Name"/></td>
+                        <td><InputText id="NameInput" @bind-Value="@_formGoal.Name"></InputText><br/></td>
+                        <td><ValidationMessage For="() => _formGoal.Name"/></td>
                     </tr>
                     <tr>
                         <td><label for="DateInput">Due:</label></td>
-                        <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
-                        <td><ValidationMessage For="() => editGoal.EndDate"/></td>
+                        <td><InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
+                        <td><ValidationMessage For="() => _formGoal.EndDate"/></td>
                     </tr>
                     <tr>
                         <td><label for="NameInput">Description:</label></td>
-                        <td><InputText id="NameInput" @bind-Value="@editGoal.Description"></InputText><br/></td>
-                        <td><ValidationMessage For="() => editGoal.Description"/></td>
+                        <td><InputText id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
+                        <td><ValidationMessage For="() => _formGoal.Description"/></td>
                     </tr>
                     <tr>
                         <td><Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button></td>
-                        <td><Button @onclick="CancelGoalEdit" Color="ButtonColor.Warning">Cancel</Button></td>
+                        <td><Button @onclick="() => _formGoal = new Goal{EndDate = DateTimeOffset.Now}" Color="ButtonColor.Warning">Cancel</Button></td>
                     </tr>
                 </table>
             </EditForm>
