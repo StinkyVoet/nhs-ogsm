@@ -5,9 +5,12 @@
 @inject NavigationManager NavigationManager;
 @inject StrategyService StrategyService;
 
+@*alles wat met personen te maken heeft werken nu met strings ipv de goede class*@
 @code
 {
+    public bool Creating;
     public List<Group> _groups;
+    public List<String> _people = new() { "Henrik", "Kees", "Marco", "Geert", "Frank" };
 
     //get Groups on load
     protected override async Task OnInitializedAsync()
@@ -41,11 +44,13 @@
 <div>
     <h3>Group Overview</h3>
     <div style="height: 20px"></div>
-    <table class="table">
+    <table class="table" style="table-layout:fixed">
         <thead>
         <tr>
             <th>Name</th>
             <th>Assigned OGSM's</th>
+            <th></th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -61,15 +66,61 @@
                 </tr>
             }
         }
+        @if (Creating)
+        {
+            <tr>
+                <td><label>Name</label></td>
+                <td><label>OGSM</label></td>
+                <td><input class="input" type="text" @oninput="@(() => { FilterResults(); SearchQuery = })" placeholder="Find Person...">
+                @foreach (string person in results)
+                    {
+                        <Button Type="button">@person</Button>
+                        Console.WriteLine("Updated Results");
+                    }
+                </td>
+                    
+                
+                    
+                <td><Button Type="button" OnClick="@DoneCreating">Create</Button>
+                    <Button Type="button" OnClick="@DoneCreating">Cancel</Button></td>
+            </tr>
+        }
         </tbody>
     </table>
 
-    <button class="dashboardButton" onclick="@(() => Redirect("/"))">+</button>
+    <button type="button" class="dashboardButton" onclick="@(() => StartCreating())">+</button>
 </div>
 @code
 {
+    public string SearchQuery = "";
+    private List<string> results = new();
+    
     public void Redirect(string uri)
     {
         NavigationManager.NavigateTo(uri);
+    }
+
+    public void StartCreating()
+    {
+        Creating = true;
+    }
+
+    public void DoneCreating()
+    {
+        Creating = false;
+    }
+
+    private void FilterResults()
+    {
+        Console.WriteLine("Searching");
+        
+        results = new List<string>();
+        foreach (string person in _people.Where(p => p.StartsWith(SearchQuery)))
+        {
+            results.Add(person);
+        }
+
+        Console.WriteLine("Searched for:");
+        Console.WriteLine(SearchQuery);
     }
 }
