@@ -4,68 +4,46 @@
 
 .removable-item {
   color: #0a53be;
+
   &:hover {
     color: red;
     text-decoration: line-through;
   }
 }
 
-.DashBoardBody {
+.DashboardItem {
+  margin: 2%;
+  border-radius: 5px;
+  background-color: #ffffff;
+
+  height: fit-content;
+
   display: grid;
-  column-gap: 5px;
-  grid-template-columns: 1fr 1fr 1fr;
-  height: 80%;
-
-  .DashboardList {
-    border-radius: 5px;
-    border: 1px black solid;
-    background-color: green;
-    
-    overflow-y: auto;
-
-    h2 {
-      text-align: center;
-      height: fit-content;
-      
-      background-color: white;
-    }
-
-    .DashboardItem {
-      
-      margin: 2%;
-      border-radius: 5px;
-      background-color: #ffffff;
-      
-      height: fit-content;
-
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
-      grid-template-areas: 
+  grid-template-columns: 1fr;
+  grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
+  grid-template-areas: 
         "Header"
         "info"
         "footer";
-      
-      .Header {
-        grid-area: Header;
-  
-        padding: 5px;
-        background-color: rgba(12, 65, 40, 0.38);
-      }
 
-      .info {
-        grid-area: info;
-  
-        padding: 5px;
-      }
-  
-      .footer {
-        grid-area: footer;
-  
-        padding: 5px;
-        background-color: rgba(128, 128, 128, 0.38);
-      }
-      
-    }
+  .Header {
+    grid-area: Header;
+
+    padding: 5px;
+    background-color: rgba(12, 65, 40, 0.38);
+  }
+
+  .info {
+    grid-area: info;
+
+    padding: 5px;
+  }
+
+  .footer {
+    grid-area: footer;
+
+    padding: 5px;
+    background-color: rgba(128, 128, 128, 0.38);
   }
 }
+

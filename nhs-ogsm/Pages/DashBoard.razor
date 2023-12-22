@@ -39,12 +39,12 @@
 <link href="css/DashBoard.css" rel="stylesheet"/>
 <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
 
-<div>
-    <h1>OGSM: @currentOgsm.Title</h1>
+<div class="ogsm-objective">
+    <h1>Objective: @currentOgsm.Title</h1>
 </div>
 
 
-<div class="DashBoardBody">
+<div class="ogsm-dash">
     @code
     {
         
@@ -120,9 +120,8 @@
             StateHasChanged();
         }
     }
-    <div class="DashboardList">
-        <h2>Goals</h2>
-        <div>
+    <CardsList Title="Goals">
+        <CardBody>
             <table>
                 <tr>
                     <td>Hide done:</td>
@@ -162,108 +161,108 @@
                     </tr>
                 </table>
             </EditForm>
-        </div>
-        @* list with goals *@
+            @* list with goals *@
 
-        @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
-        {
-            // EDIT CARD FOR GOALS
-            if (currentGoal.ID == goal.ID)
+            @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
             {
-                <EditForm Model="@editGoal" OnValidSubmit="HandleGoalEdit">
-                    <div class="DashboardItem active-item">
-                        <DataAnnotationsValidator/>
-                        <div class="Header">
-                            <td><label for="NameInput">Name:</label></td>
-                            <td><InputTextArea id="NameInput" @bind-Value="@editGoal.Name"></InputTextArea><br/></td>
-                        </div>
-                        <div class="info">
-                            <table>
-                                <tr>
-                                    <td><label for="DateInput">Due:</label></td>
-                                    <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
-                                    <td><ValidationMessage For="() => editGoal.EndDate"/></td>
-                                </tr>
-                                <tr>
-                                    <td>Strategies:</td>
-                                    <td>
-                                        @if (goal.Strategies.Any())
-                                        {
-                                            Strategy lastStrat = goal.Strategies.Last();
-                                            @foreach (Strategy strategy in goal.Strategies)
+                // EDIT CARD FOR GOALS
+                if (currentGoal.ID == goal.ID)
+                {
+                    <EditForm Model="@editGoal" OnValidSubmit="HandleGoalEdit">
+                        <Card class="active-item">
+                            <DataAnnotationsValidator/>
+                            <CardHeader>
+                                <td><label for="NameInput">Name:</label></td>
+                                <td><InputTextArea id="NameInput" @bind-Value="@editGoal.Name"></InputTextArea><br/></td>
+                            </CardHeader>
+                            <CardBody>
+                                <table>
+                                    <tr>
+                                        <td><label for="DateInput">Due:</label></td>
+                                        <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
+                                        <td><ValidationMessage For="() => editGoal.EndDate"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Strategies:</td>
+                                        <td>
+                                            @if (goal.Strategies.Any())
                                             {
-                                                <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
-                                                if (strategy != lastStrat)
+                                                Strategy lastStrat = goal.Strategies.Last();
+                                                @foreach (Strategy strategy in goal.Strategies)
                                                 {
-                                                    <span> - </span>
+                                                    <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
+                                                    if (strategy != lastStrat)
+                                                    {
+                                                        <span> - </span>
+                                                    }
                                                 }
                                             }
-                                        }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Done:</td>
-                                    <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="footer">
-                            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
-                            @* this button should reset it to the old values *@
-                            <Button @onclick="@(() => CancelGoalEdit())" Color="ButtonColor.Warning">Cancel edit</Button>
-                            <Button @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
-                        </div>
-                    </div>
-                </EditForm>
-                continue;
-            }
-            // NON EDIT CARD FOR GOALS
-            <div class="DashboardItem">
-                <div class="Header">
-                    @goal.Name
-                </div>
-                <div class="info">
-                    <table>
-                        <tr>
-                            <td>Due:</td>
-                            <td>@goal.EndDate.DateTime</td>
-                        </tr>
-                        <tr>
-                            <td>Strategies:</td>
-                            <td>
-                                @if (goal.Strategies.Any())
-                                {
-                                    Strategy lastStrat = goal.Strategies.Last();
-                                    foreach (Strategy strategy in goal.Strategies)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Done:</td>
+                                        <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
+                                    </tr>
+                                </table>
+                            </CardBody>
+                            <CardFooter>
+                                <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
+                                @* this button should reset it to the old values *@
+                                <Button @onclick="@(() => CancelGoalEdit())" Color="ButtonColor.Warning">Cancel edit</Button>
+                                <Button @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                            </CardFooter>
+                        </Card>
+                    </EditForm>
+                    continue;
+                }
+                // NON EDIT CARD FOR GOALS
+                <Card>
+                    <CardHeader>
+                        @goal.Name
+                    </CardHeader>
+                    <CardBody>
+                        <table>
+                            <tr>
+                                <td>Due:</td>
+                                <td>@goal.EndDate.DateTime</td>
+                            </tr>
+                            <tr>
+                                <td>Strategies:</td>
+                                <td>
+                                    @if (goal.Strategies.Any())
                                     {
-                                        <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
-                                        if (strategy != lastStrat)
+                                        Strategy lastStrat = goal.Strategies.Last();
+                                        foreach (Strategy strategy in goal.Strategies)
                                         {
-                                            <span> - </span>
+                                            <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
+                                            if (strategy != lastStrat)
+                                            {
+                                                <span> - </span>
+                                            }
                                         }
                                     }
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Done:</td>
-                            <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="footer">
-                    @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
-                    {
-                        <Button @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
-                    }
-                    @if (currentGoal.ID == 0)
-                    {
-                        <Button @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                    }
-                </div>
-            </div>
-        }
-    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Done:</td>
+                                <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
+                            </tr>
+                        </table>
+                    </CardBody>
+                    <CardFooter>
+                        @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
+                        {
+                            <Button @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
+                        }
+                        @if (currentGoal.ID == 0)
+                        {
+                            <Button @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        }
+                    </CardFooter>
+                </Card>
+            }
+        </CardBody>
+    </CardsList>
 
     @code
     {
@@ -324,25 +323,24 @@
     }
 
 
-    <div class="DashboardList">
-        <h2>Strategies</h2>
-        
-        @foreach (Strategy strategy in currentOgsm.Strategies)
-        {
-            if (CurrentStrategy.ID == strategy.ID)
+    <CardsList Title="Strategies">
+        <CardBody>
+            @foreach (Strategy strategy in currentOgsm.Strategies)
             {
-                <EditForm Model="@EditStrategy" OnValidSubmit="HandleStrategyEdit">
-                    <DataAnnotationsValidator/>
-                    <div class="DashboardItem active-item">
-                        <div class="Header">
-                            <td><label for="NameInput">Name:</label></td>
-                            <td><InputTextArea id="NameInput" @bind-Value="@EditStrategy.Name"></InputTextArea><br/></td>
-                        </div>
-                        <div class="info">
-                            <table>
-                                <tr>
-                                    <td>Goals:</td>
-                                    <td>
+                if (CurrentStrategy.ID == strategy.ID)
+                {
+                    <EditForm Model="@EditStrategy" OnValidSubmit="HandleStrategyEdit">
+                        <DataAnnotationsValidator/>
+                        <Card class="active-item">
+                            <CardHeader>
+                                <td><label for="NameInput">Name:</label></td>
+                                <td><InputTextArea id="NameInput" @bind-Value="@EditStrategy.Name"></InputTextArea><br/></td>
+                            </CardHeader>
+                            <CardBody>
+                                <table>
+                                    <tr>
+                                        <td>Goals:</td>
+                                        <td>
                                             @if (strategy.Goals.Any())
                                             {
                                                 Goal lastGoal = strategy.Goals.Last();
@@ -355,70 +353,68 @@
                                                     }
                                                 }
                                             }
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Done:</td>
-                                    <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="footer">
-                            <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
-                            @* this button should reset it to the old values *@
-                            <Button @onclick="@(CancelStrategyEdit)" Color="ButtonColor.Warning">Cancel edit</Button>
-                            <Button @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
-                        </div>
-                    </div>
-                </EditForm>
-                continue;
-            }
-            <div class="DashboardItem">
-                @code {
-
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Done:</td>
+                                        <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
+                                    </tr>
+                                </table>
+                            </CardBody>
+                            <CardFooter>
+                                <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
+                                @* this button should reset it to the old values *@
+                                <Button @onclick="@(CancelStrategyEdit)" Color="ButtonColor.Warning">Cancel edit</Button>
+                                <Button @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                            </CardFooter>
+                        </Card>
+                    </EditForm>
+                    continue;
                 }
-                <div class="Header">
-                    @strategy.Name
-                </div>
+                
+                <Card>
+                    <CardHeader>
+                        @strategy.Name
+                    </CardHeader>
 
-                <div class="info">
-                    <table>
-                        <tr>
-                            <td>Goals:</td>
-                            <td>
-                                @if (strategy.Goals.Any())
-                                {
-                                    Goal lastGoal = strategy.Goals.Last();
-                                    foreach (Goal goal in strategy.Goals)
+                    <CardBody>
+                        <table>
+                            <tr>
+                                <td>Goals:</td>
+                                <td>
+                                    @if (strategy.Goals.Any())
                                     {
-                                        // TODO: betere opmaak zodat ze weten dat ze er op kunnen drukken
-                                        <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
-                                        if (goal != lastGoal)
+                                        Goal lastGoal = strategy.Goals.Last();
+                                        foreach (Goal goal in strategy.Goals)
                                         {
-                                            <span> - </span>
+                                            // TODO: betere opmaak zodat ze weten dat ze er op kunnen drukken
+                                            <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
+                                            if (goal != lastGoal)
+                                            {
+                                                <span> - </span>
+                                            }
                                         }
                                     }
-                                }
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Done:</td>
-                            <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="footer">
-                    @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
-                    {
-                        <Button @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">add to goal</Button>
-                    }
-                    <Button @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                </div>
-            </div>
-        }
-        
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Done:</td>
+                                <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
+                            </tr>
+                        </table>
+                    </CardBody>
+                    <CardFooter>
+                        @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
+                        {
+                            <Button @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">add to goal</Button>
+                        }
+                        <Button @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                    </CardFooter>
+                </Card>
+            }
+        </CardBody>
 
-        <div>
+        <CardFooter>
             <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
                 <DataAnnotationsValidator/>
                 <table>
@@ -428,13 +424,13 @@
                         </td>
                         <td>
                             <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
-                            <Button @onclick="@(() => { CurrentStrategy = new Strategy();})" class="material-symbols-outlined btn-primary">Cancel</Button>
+                            <Button @onclick="@(() => { CurrentStrategy = new Strategy(); })" class="material-symbols-outlined btn-primary">Cancel</Button>
                         </td>
                     </tr>
                 </table>
             </EditForm>
-        </div>
-    </div>
+        </CardFooter>
+    </CardsList>
 
 
     @code
@@ -463,38 +459,31 @@
             action.Strategy.Actions.Remove(action);
             StateHasChanged();
         }
+
+        private string GetMeasuresListTitle()
+        {
+            if (CurrentStrategy.Actions.Any())
+                return "Measures (Strategy: " + CurrentStrategy.Name + ")";
+            
+            if (currentGoal.Strategies.Any())
+                return "Measures (Goal: " + currentGoal.Name + ")";
+
+            return "Measures (All)";
+        }
     }
 
 
-    <div class="DashboardList">
-
-        @if (CurrentStrategy.Actions.Any())
-        {
-            ActionMeasuresList = new();
-            <h2>Measures: List from strat</h2>
-            ActionMeasuresList = CurrentStrategy.Actions.ToList();
-        }
-        else if (currentGoal.Strategies.Any())
-        {
-            ActionMeasuresList = new();
-            <h2>Measures: List from goal</h2>
-            foreach (Strategy strategy in currentGoal.Strategies)
+    <CardsList Title="@GetMeasuresListTitle()">
+        <CardBody>
+            @if (CurrentStrategy.Actions.Any())
             {
-                if (!strategy.Actions.Any()) continue;
-                foreach (ActionMeasure action in strategy.Actions)
-                {
-                    ActionMeasuresList.Add(action);
-                }
+                ActionMeasuresList = new();
+                ActionMeasuresList = CurrentStrategy.Actions.ToList();
             }
-
-        }
-        else
-        {
-            ActionMeasuresList = new();
-            <h2>Measures: List from Ogsm</h2>
-            if (currentOgsm.Goals.Any())
+            else if (currentGoal.Strategies.Any())
             {
-                foreach (var strategy in currentOgsm.Strategies)
+                ActionMeasuresList = new();
+                foreach (Strategy strategy in currentGoal.Strategies)
                 {
                     if (!strategy.Actions.Any()) continue;
                     foreach (ActionMeasure action in strategy.Actions)
@@ -502,51 +491,70 @@
                         ActionMeasuresList.Add(action);
                     }
                 }
+
             }
-        }
-        @foreach (ActionMeasure action in ActionMeasuresList)
-        {
-            <div class="DashboardItem @(CurrentActionMeasure.ID == action.ID ? "active-item" : "")">
-                <div class="info">
-                    @action.Name
-                    <table>
-                        <tr>
-                            <td>Done:</td>
-                            <td><input type="checkbox" checked="@action.IsDone" class="form-check-input"/></td>
-                        </tr>
-                    </table>
-                </div>
-                <div class="footer">
-                    <Button @onclick="@(() => { CurrentActionMeasure = action; })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                    @if (CurrentActionMeasure.ID == action.ID)
+            else
+            {
+                ActionMeasuresList = new();
+                if (currentOgsm.Goals.Any())
+                {
+                    foreach (var strategy in currentOgsm.Strategies)
                     {
-                        <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
+                        if (!strategy.Actions.Any()) continue;
+                        foreach (ActionMeasure action in strategy.Actions)
+                        {
+                            ActionMeasuresList.Add(action);
+                        }
                     }
-                </div>
-            </div>
-        }
-        
+                }
+            }
+            
+            @foreach (ActionMeasure action in ActionMeasuresList)
+            {
+                <Card class="@(CurrentActionMeasure.ID == action.ID ? "active-item" : "")">
+                    <CardBody>
+                        @action.Name
+                        <table>
+                            <tr>
+                                <td>Done:</td>
+                                <td><input type="checkbox" checked="@action.IsDone" class="form-check-input"/></td>
+                            </tr>
+                        </table>
+                    </CardBody>
+                    <CardFooter>
+                        <Button @onclick="@(() => { CurrentActionMeasure = action; })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        @if (CurrentActionMeasure.ID == action.ID)
+                        {
+                            <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
+                        }
+                    </CardFooter>
+                </Card>
+            }
+
+            
+        </CardBody>
         @if (CurrentStrategy.ID != 0)
         {
-            <div>
-                <EditForm Model="@CurrentActionMeasure" OnValidSubmit="HandleActionSubmit">
-                    <DataAnnotationsValidator/>
-                    <table>
-                        <tr>
-                            <td>
-                                <InputText id="NameInput" @bind-Value="@CurrentActionMeasure.Name"></InputText><br/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
-                                <Button @onclick="@(() => { CurrentActionMeasure = new ActionMeasure();})" class="material-symbols-outlined btn-primary">Cancel</Button>
-                            </td>
-                        </tr>
-                    </table>
-                </EditForm>
-            </div>
+            <CardFooter>
+                <div>
+                    <EditForm Model="@CurrentActionMeasure" OnValidSubmit="HandleActionSubmit">
+                        <DataAnnotationsValidator/>
+                        <table>
+                            <tr>
+                                <td>
+                                    <InputText id="NameInput" @bind-Value="@CurrentActionMeasure.Name"></InputText><br/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
+                                    <Button @onclick="@(() => { CurrentActionMeasure = new ActionMeasure(); })" class="material-symbols-outlined btn-primary">Cancel</Button>
+                                </td>
+                            </tr>
+                        </table>
+                    </EditForm>
+                </div>
+            </CardFooter>
         }
-
-    </div>
+    </CardsList>
 </div>
