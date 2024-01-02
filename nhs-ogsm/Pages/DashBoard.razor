@@ -28,12 +28,15 @@
             NavigationManager.NavigateTo("DashBoard");
         }
         FilterGoals();
+
     }
 
     protected override async Task OnParametersSetAsync()
     {
         await OnInitializedAsync();
     }
+    
+
 }
 
 <link href="css/DashBoard.css" rel="stylesheet"/>
@@ -68,12 +71,6 @@
         _editOgsm = new Ogsm {ID = currentOgsm.ID, Title = currentOgsm.Title};
         await OgsmEditModal.ShowAsync();
     }
-
-    private async Task OnHideModalClick()
-    {
-        await OgsmEditModal.HideAsync();
-    }
-    
 }
 <div class="ogsm-objective">
     <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined">Settings</span></h1>
@@ -167,51 +164,67 @@
             }
             StateHasChanged();
         }
+
+        Collapse goalFiltersCollapse = default!;
+        Collapse GoalAddCollapse = default!;
     }
     <CardsList Title="Goals">
         <CardHeader>
-            <table>
-                <tr>
-                    <td>Hide done:</td>
-                    <td><input type="checkbox" @bind-value="_goalFilterIsDone" class="form-check-input"/>@_goalFilterIsDone</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td><Button @onclick="@FilterGoals">filter</Button></td>
-                </tr>
-            </table>
+            <Collapse @ref="goalFiltersCollapse">
+                <table>
+                    <tr>
+                        <td>Hide done:</td>
+                        <td><input type="checkbox" @bind-value="_goalFilterIsDone" class="form-check-input"/>@_goalFilterIsDone</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><Button @onclick="@FilterGoals">filter</Button></td>
+                    </tr>
+                </table>
+            </Collapse>
+            <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()"> Toggle Settings </Button>
+            
         </CardHeader>
+        <Collapse @ref="GoalAddCollapse">
+            <CardHeader>
+            <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
+                <Card>
+                    <DataAnnotationsValidator/>
+                    <CardHeader>
+                        <td><label for="NameInput">Name:</label></td>
+                        <td><InputTextArea class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputTextArea><br/></td>
+                        <td><ValidationMessage For="() => _formGoal.Name"/></td>
+                    </CardHeader>
+                    <CardBody>
+                        <table>
+                            <tr>
+                                <td><label for="DateInput">Due:</label></td>
+                                <td><InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
+                                <td><ValidationMessage For="() => _formGoal.EndDate"/></td>
+                            </tr>
+                            <tr>
+                                <td><label for="NameInput">Description:</label></td>
+                                <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
+                                <td><ValidationMessage For="() => _formGoal.Description"/></td>
+                            </tr>
+                        </table>
+                    </CardBody>
+                    <CardFooter>
+                        <Button Type="ButtonType.Submit" Color="ButtonColor.Success">Add Goal</Button>
+                        <Button @onclick="() => { _formGoal = new Goal { EndDate = DateTimeOffset.Now }; GoalAddCollapse.HideAsync(); }" Color="ButtonColor.Warning">Cancel</Button>
+                    </CardFooter>
+                </Card>
+            </EditForm>
+            </CardHeader>
+        </Collapse>
         <CardBody>
             @* form for creating and editing goals *@
 
             @code{
                 Goal _formGoal = new() { EndDate = DateTimeOffset.Now };
             }
+            
 
-            <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
-                <DataAnnotationsValidator/>
-                <table>
-                    <tr>
-                        <td><label for="NameInput">Name:</label></td>
-                        <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputText><br/></td>
-                        <td><ValidationMessage For="() => _formGoal.Name"/></td>
-                    </tr>
-                    <tr>
-                        <td><label for="DateInput">Due:</label></td>
-                        <td><InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
-                        <td><ValidationMessage For="() => _formGoal.EndDate"/></td>
-                    </tr>
-                    <tr>
-                        <td><label for="NameInput">Description:</label></td>
-                        <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
-                        <td><ValidationMessage For="() => _formGoal.Description"/></td>
-                    </tr>
-                    <tr>
-                        <td><Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button></td>
-                        <td><Button @onclick="() => _formGoal = new Goal { EndDate = DateTimeOffset.Now }" Color="ButtonColor.Warning">Cancel</Button></td>
-                    </tr>
-                </table>
-            </EditForm>
             @* list with goals *@
 
             @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
@@ -314,6 +327,9 @@
                 </Card>
             }
         </CardBody>
+        <CardFooter>
+            <Button Color="ButtonColor.Success" @onclick="() => GoalAddCollapse.ToggleAsync()">Add Goal</Button>
+        </CardFooter>
     </CardsList>
 
     @code
