@@ -14,6 +14,7 @@ builder.Services.AddTransient<GoalService>();
 builder.Services.AddTransient<StrategyService>();
 builder.Services.AddSingleton<ActionMeasureService>();
 builder.Services.AddTransient<GroupService>();
+builder.Services.AddTransient<UserService>();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddDbContextFactory<OgsmDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("WebApiDatabase")));

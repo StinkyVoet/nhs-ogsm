@@ -2,6 +2,10 @@
 @using System.ComponentModel.DataAnnotations
 @using System.ComponentModel
 @using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject NavigationManager NavigationManager
+@inject UserService UserService;
 
 <PageTitle>Login</PageTitle>
 
@@ -14,18 +18,34 @@
     {
         [Required]
         [EmailAddress]
-        public string UserEmail { get; set; }
+        public string Email { get; set; }
         [Required]
         [DataType(DataType.Password)]
-        public string UserPassword { get; set; }
+        public string Password { get; set; }
     }
 
     public InputModel _InputModel = new();
+    bool ShowWarning = false;
 
-    public void HandleLogin()
+    public void HandleLogin(EditContext editContext)
     {
-        
+        User? userlogin = UserService.AuthUser(_InputModel.Email, _InputModel.Password);
+        if(userlogin != null)
+        {
+            NavigationManager.NavigateTo("DashBoard");
+        }
+        else
+        {
+            ShowWarning = true;
+            StateHasChanged();
+        }
     }
+}
+@if(ShowWarning)
+{
+    <Alert Color="AlertColor.Warning">
+        Wrong Email or Password
+    </Alert>
 }
 
 <EditForm Model="@_InputModel" OnValidSubmit="HandleLogin">
@@ -33,15 +53,13 @@
     <table>
         <tr>
             <td><label for="NameInput">Email:</label></td>
-            <td><InputText id="NameInput" @bind-Value="@_InputModel.UserEmail"></InputText><br/></td>
-
-            <td><ValidationMessage For="() => _InputModel.UserEmail"/></td>
+            <td><InputText class="input" id="NameInput" @bind-Value="@_InputModel.Email"></InputText><br/></td>
+            <td><ValidationMessage For="() => _InputModel.Email"/></td>
         </tr>
         <tr>
-            <td><label for="NameInput">Password:</label></td>
-            <td><InputText id="NameInput" @bind-Value="@_InputModel.UserPassword"></InputText><br/></td>
-            <input type="password" />
-            <td><ValidationMessage For="() => _InputModel.UserPassword"/></td>
+            <td><label for="PasswordInput">Password:</label></td>
+            <td><InputText class="input" id="PasswordInput" type="password" @bind-Value="@_InputModel.Password"></InputText><br/></td>
+            <td><ValidationMessage For="() => _InputModel.Password"/></td>
         </tr>
         <tr>
             <td><Button Type="ButtonType.Submit" Color="ButtonColor.Primary">login</Button></td>
