@@ -38,9 +38,52 @@
 
 <link href="css/DashBoard.css" rel="stylesheet"/>
 <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
-
+@code{
+     public void HandleOgsmDelete()
+    {
+        OgsmItemService.DeleteOgsm(currentOgsm.ID);
+        NavigationManager.NavigateTo("DashBoard");
+    }
+    
+    public void HandleOgsmEdit(EditContext editContext)
+    {
+        var newOgsm = (Ogsm)editContext.Model;
+        Ogsm realOgsm = OgsmItemService.GetSingleOgsm(newOgsm.ID);
+        realOgsm.Title = newOgsm.Title;
+        OgsmItemService.UpdateOgsm(realOgsm);
+    }
+    
+    
+    public void SwitchOgsmedit()
+    {
+        if (_editingOgsm)
+        {
+            _editingOgsm = false;
+            return;
+        }
+        _editingOgsm = true;
+    }
+    bool _editingOgsm;
+    Ogsm _editOgsm = new();
+}
 <div class="ogsm-objective">
-    <h1>Objective: @currentOgsm.Title</h1>
+    @if (!_editingOgsm)
+    {
+        <h1>Objective: @currentOgsm.Title</h1>
+        <Button @onclick="SwitchOgsmedit" Color="ButtonColor.Info"><span class="material-symbols-outlined">Settings</span></Button>
+    }
+    else
+    {
+        <div class="editform"></div>
+        <EditForm Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
+            <DataAnnotationsValidator/>
+                <label for="NameInput">Title:</label>
+                <InputText id="NameInput" @bind-Value="@_editOgsm.Title"></InputText><br/>
+
+            <Button @onclick="SwitchOgsmedit" Color="ButtonColor.Info"><span class="material-symbols-outlined">Cancel</span></Button>
+        </EditForm>
+    }
+    
 </div>
 
 
@@ -121,7 +164,7 @@
         }
     }
     <CardsList Title="Goals">
-        <CardBody>
+        <CardHeader>
             <table>
                 <tr>
                     <td>Hide done:</td>
@@ -132,11 +175,14 @@
                     <td><Button @onclick="@FilterGoals">filter</Button></td>
                 </tr>
             </table>
-            <hr/>
+        </CardHeader>
+        <CardBody>
             @* form for creating and editing goals *@
+
             @code{
-                Goal _formGoal = new(){EndDate = DateTimeOffset.Now};
+                Goal _formGoal = new() { EndDate = DateTimeOffset.Now };
             }
+
             <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
                 <DataAnnotationsValidator/>
                 <table>
@@ -157,7 +203,7 @@
                     </tr>
                     <tr>
                         <td><Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button></td>
-                        <td><Button @onclick="() => _formGoal = new Goal{EndDate = DateTimeOffset.Now}" Color="ButtonColor.Warning">Cancel</Button></td>
+                        <td><Button @onclick="() => _formGoal = new Goal { EndDate = DateTimeOffset.Now }" Color="ButtonColor.Warning">Cancel</Button></td>
                     </tr>
                 </table>
             </EditForm>
@@ -215,6 +261,7 @@
                     </EditForm>
                     continue;
                 }
+
                 // NON EDIT CARD FOR GOALS
                 <Card>
                     <CardHeader>
