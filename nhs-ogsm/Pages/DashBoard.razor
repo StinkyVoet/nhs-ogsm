@@ -78,7 +78,7 @@
         <EditForm Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
             <DataAnnotationsValidator/>
                 <label for="NameInput">Title:</label>
-                <InputText id="NameInput" @bind-Value="@_editOgsm.Title"></InputText><br/>
+                <InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText><br/>
 
             <Button @onclick="SwitchOgsmedit" Color="ButtonColor.Info"><span class="material-symbols-outlined">Cancel</span></Button>
         </EditForm>
@@ -188,17 +188,17 @@
                 <table>
                     <tr>
                         <td><label for="NameInput">Name:</label></td>
-                        <td><InputText id="NameInput" @bind-Value="@_formGoal.Name"></InputText><br/></td>
+                        <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputText><br/></td>
                         <td><ValidationMessage For="() => _formGoal.Name"/></td>
                     </tr>
                     <tr>
                         <td><label for="DateInput">Due:</label></td>
-                        <td><InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
+                        <td><InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
                         <td><ValidationMessage For="() => _formGoal.EndDate"/></td>
                     </tr>
                     <tr>
                         <td><label for="NameInput">Description:</label></td>
-                        <td><InputText id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
+                        <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
                         <td><ValidationMessage For="() => _formGoal.Description"/></td>
                     </tr>
                     <tr>
@@ -219,13 +219,13 @@
                             <DataAnnotationsValidator/>
                             <CardHeader>
                                 <td><label for="NameInput">Name:</label></td>
-                                <td><InputTextArea id="NameInput" @bind-Value="@editGoal.Name"></InputTextArea><br/></td>
+                                <td><InputTextArea class="input" id="NameInput" @bind-Value="@editGoal.Name"></InputTextArea><br/></td>
                             </CardHeader>
                             <CardBody>
                                 <table>
                                     <tr>
                                         <td><label for="DateInput">Due:</label></td>
-                                        <td> <InputDate Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
+                                        <td> <InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
                                         <td><ValidationMessage For="() => editGoal.EndDate"/></td>
                                     </tr>
                                     <tr>
@@ -381,7 +381,7 @@
                         <Card class="active-item">
                             <CardHeader>
                                 <td><label for="NameInput">Name:</label></td>
-                                <td><InputTextArea id="NameInput" @bind-Value="@EditStrategy.Name"></InputTextArea><br/></td>
+                                <td><InputTextArea class="input" id="NameInput" @bind-Value="@EditStrategy.Name"></InputTextArea><br/></td>
                             </CardHeader>
                             <CardBody>
                                 <table>
@@ -467,7 +467,7 @@
                 <table>
                     <tr>
                         <td>
-                            <InputText id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
+                            <InputText class="input" id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
                         </td>
                         <td>
                             <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
@@ -589,7 +589,7 @@
                         <table>
                             <tr>
                                 <td>
-                                    <InputText id="NameInput" @bind-Value="@CurrentActionMeasure.Name"></InputText><br/>
+                                    <InputText class="input" id="NameInput" @bind-Value="@CurrentActionMeasure.Name"></InputText><br/>
                                 </td>
                             </tr>
                             <tr>
