@@ -51,41 +51,46 @@
         Ogsm realOgsm = OgsmItemService.GetSingleOgsm(newOgsm.ID);
         realOgsm.Title = newOgsm.Title;
         OgsmItemService.UpdateOgsm(realOgsm);
+        
+        currentOgsm.Title = newOgsm.Title;
+        _editOgsm.Title = newOgsm.Title;
     }
     
     
-    public void SwitchOgsmedit()
-    {
-        if (_editingOgsm)
-        {
-            _editingOgsm = false;
-            return;
-        }
-        _editingOgsm = true;
-    }
-    bool _editingOgsm;
     Ogsm _editOgsm = new();
+    Modal OgsmEditModal;
+    string OgsmFormId = "OgsmEditForm";
+    string modalTitle = "Edit";
+    
+    private async Task OnShowModalClick()
+    {
+        modalTitle = "Edit " + currentOgsm.Title;
+        _editOgsm = new Ogsm {ID = currentOgsm.ID, Title = currentOgsm.Title};
+        await OgsmEditModal.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await OgsmEditModal.HideAsync();
+    }
+    
 }
 <div class="ogsm-objective">
-    @if (!_editingOgsm)
-    {
-        <h1>Objective: @currentOgsm.Title</h1>
-        <Button @onclick="SwitchOgsmedit" Color="ButtonColor.Info"><span class="material-symbols-outlined">Settings</span></Button>
-    }
-    else
-    {
-        <div class="editform"></div>
-        <EditForm Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
-            <DataAnnotationsValidator/>
-                <label for="NameInput">Title:</label>
-                <InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText><br/>
-
-            <Button @onclick="SwitchOgsmedit" Color="ButtonColor.Info"><span class="material-symbols-outlined">Cancel</span></Button>
-        </EditForm>
-    }
-    
+    <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined">Settings</span></h1>
 </div>
-
+<Modal @ref="OgsmEditModal" Title=@modalTitle>
+    <BodyTemplate>
+         <EditForm id="@OgsmFormId" Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
+             <DataAnnotationsValidator/>
+         
+             <label for="NameInput">Title:</label>
+             <InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText><br/>
+         </EditForm>   
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button form="@OgsmFormId" Color="ButtonColor.Primary" Type="ButtonType.Submit">Save</Button>
+    </FooterTemplate>
+</Modal>
 
 <div class="ogsm-dash">
     @code
