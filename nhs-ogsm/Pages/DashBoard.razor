@@ -341,7 +341,7 @@
 
     @code
     {
-        Strategy EditStrategy = new();
+        Strategy _editStrategy = new();
         
         public void HandleStrategySubmit(EditContext editContext)
         {
@@ -372,7 +372,7 @@
         public void ActivateStrategyEdit(Strategy strategy)
         {
             CurrentStrategy = strategy;
-            EditStrategy = new Strategy {ID = strategy.ID, Name = strategy.Name};
+            _editStrategy = new Strategy {ID = strategy.ID, Name = strategy.Name};
             currentGoal = new Goal();
             StateHasChanged();
         }
@@ -404,12 +404,12 @@
             {
                 if (CurrentStrategy.ID == strategy.ID)
                 {
-                    <EditForm Model="@EditStrategy" OnValidSubmit="HandleStrategyEdit">
+                    <EditForm Model="@_editStrategy" OnValidSubmit="HandleStrategyEdit">
                         <DataAnnotationsValidator/>
                         <Card class="active-item">
                             <CardHeader>
                                 <td><label for="NameInput">Name:</label></td>
-                                <td><InputTextArea class="input" id="NameInput" @bind-Value="@EditStrategy.Name"></InputTextArea><br/></td>
+                                <td><InputTextArea class="input" id="NameInput" @bind-Value="@_editStrategy.Name"></InputTextArea><br/></td>
                             </CardHeader>
                             <CardBody>
                                 <table>
@@ -510,9 +510,28 @@
 
     @code
     {
-        public ActionMeasure CurrentActionMeasure = new();
-        public List<ActionMeasure> ActionMeasuresList = new();
-
+        private ActionMeasure CurrentActionMeasure = new();
+        private List<ActionMeasure> ActionMeasuresList = new();
+        private ActionMeasure _editActionMeasure = new();
+        private ActionMeasure _formActionMeasure = new();
+        
+        public void ActivateActionEdit(ActionMeasure action)
+        {
+            CurrentActionMeasure = action;
+            _editActionMeasure = new ActionMeasure {ID = action.ID, Name = action.Name};
+            StateHasChanged();
+        }
+        
+        public void HandleActionEdit(EditContext editContext)
+        {
+            var newAction = (ActionMeasure)editContext.Model;
+            ActionMeasure realAction = ActionMeasureService.GetSingleAction(newAction.ID);
+            realAction.Name = newAction.Name;
+            CurrentActionMeasure.Name = newAction.Name;
+            ActionMeasureService.UpdateAction(realAction);
+            StateHasChanged();
+        }
+        
         public void HandleActionSubmit(EditContext editContext)
         {
             if (CurrentStrategy.ID == 0) return;
@@ -521,10 +540,9 @@
 
             ActionMeasureService.AddAction(newAction);
             newAction.Strategy = CurrentStrategy;
-
             CurrentStrategy.Actions.Add(newAction);
 
-            CurrentActionMeasure = new ActionMeasure();
+            _formActionMeasure = new ActionMeasure();
             StateHasChanged();
         }
         
@@ -586,7 +604,35 @@
             
             @foreach (ActionMeasure action in ActionMeasuresList)
             {
-                <Card class="@(CurrentActionMeasure.ID == action.ID ? "active-item" : "")">
+                if (CurrentActionMeasure.ID == action.ID)
+                {
+                    <EditForm Model="@_editActionMeasure" OnValidSubmit="HandleActionEdit">
+                        <DataAnnotationsValidator/>
+                        <Card class="active-item">
+                            <CardBody>
+ 
+                                <table>
+                                    <tr>
+                                        <td>Title:</td>
+                                        <InputTextArea @bind-Value="_editActionMeasure.Name"></InputTextArea>
+                                    </tr>
+                                    <tr>
+                                        <td>Done:</td>
+                                        <td><input type="checkbox" checked="@action.IsDone" class="form-check-input"/></td>
+                                    </tr>
+                                </table>
+                            </CardBody>
+                            <CardFooter>
+                                <Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
+                                <Button @onclick="() => CurrentActionMeasure = new ActionMeasure()" Color="ButtonColor.Warning">Cancel</Button>
+                                <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
+
+                            </CardFooter>
+                        </Card>
+                    </EditForm>
+                    continue;
+                }
+                <Card>
                     <CardBody>
                         @action.Name
                         <table>
@@ -597,39 +643,40 @@
                         </table>
                     </CardBody>
                     <CardFooter>
-                        <Button @onclick="@(() => { CurrentActionMeasure = action; })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                        @if (CurrentActionMeasure.ID == action.ID)
-                        {
-                            <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
-                        }
+                        <Button @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardFooter>
                 </Card>
             }
 
             
         </CardBody>
+        <CardFooter>
         @if (CurrentStrategy.ID != 0)
         {
-            <CardFooter>
-                <div>
-                    <EditForm Model="@CurrentActionMeasure" OnValidSubmit="HandleActionSubmit">
-                        <DataAnnotationsValidator/>
-                        <table>
-                            <tr>
-                                <td>
-                                    <InputText class="input" id="NameInput" @bind-Value="@CurrentActionMeasure.Name"></InputText><br/>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
-                                    <Button @onclick="@(() => { CurrentActionMeasure = new ActionMeasure(); })" class="material-symbols-outlined btn-primary">Cancel</Button>
-                                </td>
-                            </tr>
-                        </table>
-                    </EditForm>
-                </div>
-            </CardFooter>
+            <EditForm Model="@_formActionMeasure" OnValidSubmit="HandleActionSubmit">
+                <DataAnnotationsValidator/>
+                <table>
+                    <tr>
+                        <td>Title:</td>
+                        <td>
+                            <InputText class="input" id="NameInput" @bind-Value="@_formActionMeasure.Name"></InputText><br/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button> 
+                            <Button @onclick="@(() => { _formActionMeasure = new ActionMeasure(); })" class="material-symbols-outlined btn-primary">Cancel</Button>
+                        </td>
+                    </tr>
+                </table>
+            </EditForm>
         }
+        else
+        {
+            <Alert  Color="AlertColor.Info">
+                Please select a strategy to add an action measure    
+            </Alert>
+        }
+        </CardFooter>
     </CardsList>
 </div>
