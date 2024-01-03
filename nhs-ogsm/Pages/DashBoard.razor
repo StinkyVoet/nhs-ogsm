@@ -343,16 +343,6 @@
     {
         Strategy _editStrategy = new();
         
-        public void HandleStrategySubmit(EditContext editContext)
-        {
-            var newStrategy = (Strategy)editContext.Model;
-            newStrategy.ParentOgsmID = currentOgsm.ID;
-            StrategyService.AddStrategy(newStrategy);
-            currentOgsm.Strategies.Add(newStrategy);
-            CurrentStrategy = new Strategy();
-            StateHasChanged();
-        }
-        
         public void HandleStrategyDelete(Strategy strategy)
         {
             StrategyService.DeleteStrategy(strategy.ID);
@@ -451,7 +441,6 @@
                     <CardHeader>
                         @strategy.Name
                     </CardHeader>
-
                     <CardBody>
                         <table>
                             <tr>
@@ -488,18 +477,30 @@
                 </Card>
             }
         </CardBody>
-
+        @code{
+            Strategy _formStrategy = new();
+            
+            public void HandleStrategySubmit(EditContext editContext)
+            {
+                var newStrategy = (Strategy)editContext.Model;
+                newStrategy.ParentOgsmID = currentOgsm.ID;
+                StrategyService.AddStrategy(newStrategy);
+                currentOgsm.Strategies.Add(newStrategy);
+                _formStrategy = new Strategy();
+                StateHasChanged();
+            }
+        }
         <CardFooter>
-            <EditForm Model="@CurrentStrategy" OnValidSubmit="HandleStrategySubmit">
+            <EditForm Model="@_formStrategy" OnValidSubmit="HandleStrategySubmit">
                 <DataAnnotationsValidator/>
                 <table>
                     <tr>
                         <td>
-                            <InputText class="input" id="NameInput" @bind-Value="@CurrentStrategy.Name"></InputText><br/>
+                            <InputText class="input" id="NameInput" @bind-Value="@_formStrategy.Name"></InputText><br/>
                         </td>
                         <td>
                             <Button Type="ButtonType.Submit" class="material-symbols-outlined btn-primary">Add</Button>
-                            <Button @onclick="@(() => { CurrentStrategy = new Strategy(); })" class="material-symbols-outlined btn-primary">Cancel</Button>
+                            <Button @onclick="@(() => { _formStrategy = new Strategy(); })" class="material-symbols-outlined btn-primary">Cancel</Button>
                         </td>
                     </tr>
                 </table>
