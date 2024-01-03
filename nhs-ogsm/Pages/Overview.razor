@@ -1,5 +1,7 @@
 ﻿@page "/Overview"
 @using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject OgsmItemService OgsmItemService;
 
 <PageTitle>Overview</PageTitle>
 <h1>Overview</h1>
@@ -15,5 +17,73 @@
         <a href="#">Link 3</a>
     </div>*@
 </div>
+<BarChart @ref="barChart" Class="mb-4" />
 
+@code {
+    private BarChart barChart;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RenderManhattanAsync();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task RenderManhattanAsync()
+    {
+        List<string> SetLabels = new List<string>();
+        List<double> GoalCount = new List<double>();
+        List<double> StratCount = new List<double>();
+        foreach (Ogsm ogsm in OgsmItemService.GetAllOgsm())
+        {
+            SetLabels.Add(ogsm.Title);
+            GoalCount.Add(ogsm.Goals.Count);
+            StratCount.Add(ogsm.Strategies.Count);
+        }
+        
+        var data = new ChartData()
+        {
+            Labels = SetLabels,
+            Datasets = new List<IChartDataset>()
+            {
+                new BarChartDataset()
+                {
+                    Label = "Goals",
+                    Data = GoalCount,
+                    CategoryPercentage = 0.8,
+                    BarPercentage = 1,
+                },
+                new BarChartDataset()
+                {
+                    Label = "Strats",
+                    Data = StratCount,
+                    CategoryPercentage = 0.8,
+                    BarPercentage = 1,
+                }
+            }
+        };
+        
+        var options = new BarChartOptions();
+
+        options.Interaction.Mode = InteractionMode.Index;
+
+        options.Plugins.Title.Text = "Items per Ogsm";
+        options.Plugins.Title.Display = true;
+        options.Plugins.Title.Font.Size = 20;
+
+        options.Responsive = true;
+
+        options.Scales.X.Title.Text = "Ogsm";
+        options.Scales.X.Title.Display = true;
+
+        options.Scales.Y.Title.Text = "Items";
+        options.Scales.Y.Title.Display = true;
+
+        await barChart.InitializeAsync(data, options);
+    }
+    
+    
+}
