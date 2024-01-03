@@ -514,8 +514,7 @@
         private ActionMeasure CurrentActionMeasure = new();
         private List<ActionMeasure> ActionMeasuresList = new();
         private ActionMeasure _editActionMeasure = new();
-        private ActionMeasure _formActionMeasure = new();
-        
+
         public void ActivateActionEdit(ActionMeasure action)
         {
             CurrentActionMeasure = action;
@@ -530,20 +529,6 @@
             realAction.Name = newAction.Name;
             CurrentActionMeasure.Name = newAction.Name;
             ActionMeasureService.UpdateAction(realAction);
-            StateHasChanged();
-        }
-        
-        public void HandleActionSubmit(EditContext editContext)
-        {
-            if (CurrentStrategy.ID == 0) return;
-            var newAction = (ActionMeasure)editContext.Model;
-            newAction.ParentStrategyID = CurrentStrategy.ID;
-
-            ActionMeasureService.AddAction(newAction);
-            newAction.Strategy = CurrentStrategy;
-            CurrentStrategy.Actions.Add(newAction);
-
-            _formActionMeasure = new ActionMeasure();
             StateHasChanged();
         }
         
@@ -648,9 +633,25 @@
                     </CardFooter>
                 </Card>
             }
-
-            
         </CardBody>
+        @code
+        {
+            private ActionMeasure _formActionMeasure = new();
+            
+            public void HandleActionSubmit(EditContext editContext)
+            {
+                if (CurrentStrategy.ID == 0) return;
+                var newAction = (ActionMeasure)editContext.Model;
+                newAction.ParentStrategyID = CurrentStrategy.ID;
+
+                ActionMeasureService.AddAction(newAction);
+                newAction.Strategy = CurrentStrategy;
+                CurrentStrategy.Actions.Add(newAction);
+
+                _formActionMeasure = new ActionMeasure();
+                StateHasChanged();
+            }
+        }
         <CardFooter>
         @if (CurrentStrategy.ID != 0)
         {
