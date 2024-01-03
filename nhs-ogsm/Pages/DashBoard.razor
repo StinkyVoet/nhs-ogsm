@@ -53,6 +53,7 @@
         var newOgsm = (Ogsm)editContext.Model;
         Ogsm realOgsm = OgsmItemService.GetSingleOgsm(newOgsm.ID);
         realOgsm.Title = newOgsm.Title;
+        realOgsm.IsActive = newOgsm.IsActive;
         OgsmItemService.UpdateOgsm(realOgsm);
         
         currentOgsm.Title = newOgsm.Title;
@@ -68,7 +69,7 @@
     private async Task OnShowModalClick()
     {
         modalTitle = "Edit " + currentOgsm.Title;
-        _editOgsm = new Ogsm {ID = currentOgsm.ID, Title = currentOgsm.Title};
+        _editOgsm = new Ogsm {ID = currentOgsm.ID, Title = currentOgsm.Title, IsActive = currentOgsm.IsActive};
         await OgsmEditModal.ShowAsync();
     }
 }
@@ -79,9 +80,15 @@
     <BodyTemplate>
          <EditForm id="@OgsmFormId" Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
              <DataAnnotationsValidator/>
-         
-             <label for="NameInput">Title:</label>
-             <InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText><br/>
+             <table>
+                 <tr>
+                     <td>Title:</td>
+                     <td><InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText></td>
+                 </tr>
+                 <tr>
+                     <td><Switch Label="Active" @bind-Value="_editOgsm.IsActive"/></td>
+                 </tr>
+             </table>
          </EditForm>   
     </BodyTemplate>
     <FooterTemplate>
