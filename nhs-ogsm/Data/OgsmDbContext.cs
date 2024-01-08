@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using nhs_ogsm.Pages;
 
 namespace nhs_ogsm.Data;
 
-public class OgsmDbContext : DbContext
+public class OgsmDbContext : IdentityDbContext
 {
 
     public OgsmDbContext(DbContextOptions<OgsmDbContext> options) : base(options)

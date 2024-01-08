@@ -1,4 +1,20 @@
 ﻿<nav>
+    <AuthorizeView>
+        <NotAuthorized>
+            <div>
+                <a href="Identity/Account/Login">
+                    auth
+                </a>
+            </div>
+        </NotAuthorized>
+        <Authorized>
+             <div>
+                 <a href="Identity/Account/Logout">
+                     Logout
+                 </a>
+             </div>   
+        </Authorized>
+    </AuthorizeView> 
     <div>
         <NavLink href="login">
             Login
