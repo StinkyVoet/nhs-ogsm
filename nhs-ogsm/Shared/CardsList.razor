@@ -1,0 +1,20 @@
+<div class="cards-list">
+    @if (Title != null)
+    {
+        <div class="cards-list-header">
+            <h4>@Title</h4>
+        </div>
+    }
+
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    public string? Title { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+}
