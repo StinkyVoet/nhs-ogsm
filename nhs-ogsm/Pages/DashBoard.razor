@@ -253,12 +253,12 @@
                                         <td> <InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
                                         <td><ValidationMessage For="() => editGoal.EndDate"/></td>
                                     </tr>
-                                    <tr>
-                                        <td>Strategies:</td>
-                                        <td>
-                                            @if (goal.Strategies.Any())
-                                            {
-                                                Strategy lastStrat = goal.Strategies.Last();
+                                    @if (goal.Strategies.Any())
+                                    {
+                                        Strategy lastStrat = goal.Strategies.Last();
+                                        <tr>
+                                            <td>Strategies:</td>
+                                            <td>
                                                 @foreach (Strategy strategy in goal.Strategies)
                                                 {
                                                     <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
@@ -267,9 +267,9 @@
                                                         <span> - </span>
                                                     }
                                                 }
-                                            }
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    }
                                     <tr>
                                         <td>Done:</td>
                                         <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
@@ -298,13 +298,13 @@
                                 <td>Due:</td>
                                 <td>@goal.EndDate.DateTime</td>
                             </tr>
-                            <tr>
-                                <td>Strategies:</td>
-                                <td>
-                                    @if (goal.Strategies.Any())
-                                    {
-                                        Strategy lastStrat = goal.Strategies.Last();
-                                        foreach (Strategy strategy in goal.Strategies)
+                            @if (goal.Strategies.Any())
+                            {
+                                Strategy lastStrat = goal.Strategies.Last();
+                                <tr>
+                                    <td>Strategies:</td>
+                                    <td>
+                                        @foreach (Strategy strategy in goal.Strategies)
                                         {
                                             <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
                                             if (strategy != lastStrat)
@@ -312,9 +312,9 @@
                                                 <span> - </span>
                                             }
                                         }
-                                    }
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            }
                             <tr>
                                 <td>Done:</td>
                                 <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
@@ -403,23 +403,20 @@
                             </CardHeader>
                             <CardBody>
                                 <table>
-                                    <tr>
-                                        <td>Goals:</td>
-                                        <td>
-                                            @if (strategy.Goals.Any())
-                                            {
-                                                Goal lastGoal = strategy.Goals.Last();
-                                                foreach (Goal goal in strategy.Goals)
+                                    @if (strategy.Goals.Any())
+                                    {
+                                        Goal lastGoal = strategy.Goals.Last();
+                                        <tr>
+                                            <td>Goals:</td>
+                                            <td>
+                                                @foreach (Goal goal in strategy.Goals)
                                                 {
                                                     <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
-                                                    if (!Equals(goal, lastGoal))
-                                                    {
-                                                        <span> - </span>
-                                                    }
+                                                    if (!Equals(goal, lastGoal)) { <span> - </span> }
                                                 }
-                                            }
-                                        </td>
-                                    </tr>
+                                            </td>
+                                        </tr>
+                                    }
                                     <tr>
                                         <td>Done:</td>
                                         <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
@@ -443,24 +440,20 @@
                     </CardHeader>
                     <CardBody>
                         <table>
-                            <tr>
-                                <td>Goals:</td>
-                                <td>
-                                    @if (strategy.Goals.Any())
-                                    {
-                                        Goal lastGoal = strategy.Goals.Last();
-                                        foreach (Goal goal in strategy.Goals)
+                            @if (strategy.Goals.Any())
+                            {
+                                Goal lastGoal = strategy.Goals.Last();
+                                <tr>
+                                    <td>Goals:</td>
+                                    <td>
+                                        @foreach (Goal goal in strategy.Goals)
                                         {
-                                            // TODO: betere opmaak zodat ze weten dat ze er op kunnen drukken
                                             <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
-                                            if (goal != lastGoal)
-                                            {
-                                                <span> - </span>
-                                            }
+                                            if (!Equals(goal, lastGoal)) { <span> - </span> }
                                         }
-                                    }
-                                </td>
-                            </tr>
+                                    </td>
+                                </tr>
+                            }
                             <tr>
                                 <td>Done:</td>
                                 <td><input type="checkbox" checked="@strategy.IsDone" onchange="@(() => HandleStrategyIsDone(strategy))" class="form-check-input"/></td>
