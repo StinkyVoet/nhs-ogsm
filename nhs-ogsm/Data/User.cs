@@ -21,4 +21,17 @@ public class User
     public ICollection<Group>? Groups { get; set; }
     // child Actions
     public ICollection<ActionMeasure>? Actions { get; set; }
+    
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        User other = (User)obj;
+        return
+            ID == other.ID &&
+            Email == other.Email &&
+            FirstName == other.FirstName &&
+            LastName == other.LastName &&
+            IsAdmin == other.IsAdmin;
+    }
 }
