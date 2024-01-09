@@ -1,0 +1,99 @@
+﻿@page "/Users"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject UserService UserService;
+@inject NavigationManager NavigationManager;
+@inject StrategyService StrategyService;
+
+<h3>User overview</h3>
+
+@code
+{
+    public List<User> _users;
+
+    //get Users on load
+    protected override async Task OnInitializedAsync()
+    {
+        _users = UserService.GetAllUsers();
+    }
+}
+
+<html>
+<head>
+    <link href="css\main.css" rel="stylesheet"/>
+    <title>Users</title>
+</head>
+
+<div class="row">
+    <div class="col-md-5 col-sm-12">
+        <AutoComplete @bind-Value="userName"
+                      TItem="User"
+                      DataProvider="UserDataProvider"
+                      PropertyName="UserName"
+                      Placeholder="Search a user..."
+                      OnChanged="(User user) => OnAutoCompleteChanged(user)" />
+    </div>
+</div>
+
+@code {
+    private string userName;
+
+    public IEnumerable<User> usersEnum;
+    public List<User> foundUsers = new List<User>();
+
+    private async Task<AutoCompleteDataProviderResult<User>> UserDataProvider(AutoCompleteDataProviderRequest<User> request)
+    {
+        if (usersEnum is null) // pull customers only one time for client-side autocomplete
+            usersEnum = UserService.GetAllUsers();
+
+        return await Task.FromResult(request.ApplyTo(usersEnum.OrderBy(user => user.FirstName).ThenBy(user => user.LastName)));
+    }
+    
+    private void OnAutoCompleteChanged(User user)
+    {
+        foreach (User u in _users)
+        {
+            if (user.FirstName.Contains(userName) || user.LastName.Contains(userName))
+            {
+                foundUsers.Add(user);
+            }
+        }
+        _users = foundUsers;
+
+        Console.WriteLine($"'{user?.FirstName}' selected.");
+    }
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>E-mail</th>
+        <th>Role</th>
+    </tr>
+    </thead>
+    <tbody>
+     
+    @if (_users != null)
+    {
+        @foreach (var user in _users)
+        {
+            <tr>
+                <td>@user.FirstName @user.LastName</td>
+                <td>@user.Email</td>
+                <td>
+                    @if (user.IsAdmin)
+                    {
+                        <p>Admin</p>
+                    }
+                    else
+                    {
+                        <p>User</p>
+                    }
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>
+</html>
