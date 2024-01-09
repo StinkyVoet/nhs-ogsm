@@ -9,6 +9,7 @@ public class Ogsm
     public int ID { get; set; }
     [Required]
     public string Title { get; set; }
+    public bool IsActive { get; set; } = true;
     public Ogsm? Parent { get; set; }
     public int? ParentID { get; set; }
     public ICollection<Goal> Goals { get; set; } = new List<Goal>();

@@ -40,4 +40,13 @@ public class ActionMeasureService
         }
         return true;
     }
+
+    public ActionMeasure GetSingleAction(int actionId)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            ActionMeasure actionMeasure = context.Actions.First(action => action.ID == actionId);
+            return actionMeasure;
+        }
+    }
 }
