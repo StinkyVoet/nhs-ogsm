@@ -73,6 +73,7 @@
         await OgsmEditModal.ShowAsync();
     }
 }
+
 <div class="ogsm-objective">
     <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined">Settings</span></h1>
 </div>
@@ -180,14 +181,13 @@
             <Collapse @ref="goalFiltersCollapse">
                 <table>
                     <tr>
-                        <td>Hide done:</td>
-                        <td><input type="checkbox" @bind-value="_goalFilterIsDone" class="form-check-input"/>@_goalFilterIsDone</td>
+                        <td><Switch Label="Hide done" ValueExpression="() => _goalFilterIsDone" @bind-Value="_goalFilterIsDone"/></td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td><Button @onclick="@FilterGoals">filter</Button></td>
+                        <td><Button Color="ButtonColor.Info" Size="Size.Small" @onclick="@FilterGoals">filter</Button></td>
                     </tr>
                 </table>
+                <hr>
             </Collapse>
             <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()"> Toggle Settings </Button>
             
@@ -280,7 +280,7 @@
                                 <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
                                 @* this button should reset it to the old values *@
                                 <Button @onclick="@(() => CancelGoalEdit())" Color="ButtonColor.Warning">Cancel edit</Button>
-                                <Button @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                                <Button Size="Size.Small" @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                             </CardFooter>
                         </Card>
                     </EditForm>
@@ -324,11 +324,11 @@
                     <CardFooter>
                         @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
                         {
-                            <Button @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
+                            <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
                         }
                         @if (currentGoal.ID == 0)
                         {
-                            <Button @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                            <Button Size="Size.Small" @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                         }
                     </CardFooter>
                 </Card>
@@ -427,7 +427,7 @@
                                 <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
                                 @* this button should reset it to the old values *@
                                 <Button @onclick="@(CancelStrategyEdit)" Color="ButtonColor.Warning">Cancel edit</Button>
-                                <Button @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                                <Button Size="Size.Small" @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                             </CardFooter>
                         </Card>
                     </EditForm>
@@ -463,9 +463,9 @@
                     <CardFooter>
                         @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
                         {
-                            <Button @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">add to goal</Button>
+                            <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">add to goal</Button>
                         }
-                        <Button @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        <Button Size="Size.Small" @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardFooter>
                 </Card>
             }
@@ -604,8 +604,7 @@
                             <CardFooter>
                                 <Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
                                 <Button @onclick="() => CurrentActionMeasure = new ActionMeasure()" Color="ButtonColor.Warning">Cancel</Button>
-                                <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
-
+                                <Button Size="Size.Small" @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
                             </CardFooter>
                         </Card>
                     </EditForm>
@@ -622,7 +621,7 @@
                         </table>
                     </CardBody>
                     <CardFooter>
-                        <Button @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        <Button Size="Size.Small" @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardFooter>
                 </Card>
             }
