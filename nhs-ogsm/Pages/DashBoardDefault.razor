@@ -59,7 +59,7 @@
                 <tr>
                     <td>@ogsm.ID</td>
                     <td>@ogsm.Title</td>
-                    <td><Button type="button" OnClick="@(() => Redirect("DashBoard/" + ogsm.ID))" Color="Button.BtnColor.Primary">Select</Button></td>
+                    <td><Button @onclick="@(() => Redirect("DashBoard/" + ogsm.ID))" Color="ButtonColor.Primary">Select</Button></td>
                 </tr>
             }
             </tbody>

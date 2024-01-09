@@ -1,0 +1,38 @@
+.active-item {
+  border-left: 8px #0093ff solid;
+}
+
+.removable-item {
+  color: #0a53be;
+}
+.removable-item:hover {
+  color: red;
+  text-decoration: line-through;
+}
+
+.DashboardItem {
+  margin: 2%;
+  border-radius: 5px;
+  background-color: #ffffff;
+  height: fit-content;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
+  grid-template-areas: "Header" "info" "footer";
+}
+.DashboardItem .Header {
+  grid-area: Header;
+  padding: 5px;
+  background-color: rgba(12, 65, 40, 0.38);
+}
+.DashboardItem .info {
+  grid-area: info;
+  padding: 5px;
+}
+.DashboardItem .footer {
+  grid-area: footer;
+  padding: 5px;
+  background-color: rgba(128, 128, 128, 0.38);
+}
+
+/*# sourceMappingURL=DashBoard.css.map */

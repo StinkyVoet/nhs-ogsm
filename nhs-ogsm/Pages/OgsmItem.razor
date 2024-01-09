@@ -4,55 +4,6 @@
 @using Microsoft.AspNetCore.Http.Extensions
 @inject OgsmItemService OgsmItemService;
 
-<h3>@pageTitle</h3>
-
-<EditForm Model="@_ogsm" OnValidSubmit="HandleSubmit">
-    <label for="TitleInput">Title</label>
-    <InputText id="TitleInput" @bind-Value="@_ogsm.Title" required></InputText>
-    
-    <label for="parent">Parent OGSM</label>
-    <InputSelect id="parent" @bind-Value="@_ogsm.ParentID">
-        <option></option>
-        @foreach (var ogsm in _ogsmItemsArray)
-        {
-            <option value="@ogsm.ID">@ogsm.Title</option>
-        }
-    </InputSelect>
-    
-    <Button type="submit" Color="Button.BtnColor.Primary">Save</Button>
-</EditForm>
-
-@code
-{
-    public string pageTitle = "New ogsm item";
-}
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Title</th>
-        <th>Parent</th>
-        <th>Delete</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var ogsmItems in _ogsmItemsArray)
-    {
-        <tr>
-            <td>@ogsmItems.ID</td>
-            <td>@ogsmItems.Title</td>
-            <td>@ogsmItems.Parent?.Title</td>
-            <td><Button type="button" OnClick="@(() => HandleDelete(ogsmItems))" Color="Button.BtnColor.DangerInverted">Delete</Button></td>
-            <td><Button type="button" OnClick="@(() => EditForm(ogsmItems))" Color="Button.BtnColor.SecondaryInverted">Edit</Button></td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-
-
 @code
 {
     public List<Ogsm> _ogsmItemsArray;
@@ -99,3 +50,54 @@
     }
     
 }
+
+<h3>@pageTitle</h3>
+
+<EditForm Model="@_ogsm" OnValidSubmit="HandleSubmit">
+    <label for="TitleInput">Title</label>
+    <InputText id="TitleInput" @bind-Value="@_ogsm.Title" required></InputText>
+    
+    <label for="parent">Parent OGSM</label>
+    <InputSelect id="parent" @bind-Value="@_ogsm.ParentID">
+        <option></option>
+        @foreach (var ogsm in _ogsmItemsArray)
+        {
+            <option value="@ogsm.ID">@ogsm.Title</option>
+        }
+    </InputSelect>
+    
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
+    <Button Color="ButtonColor.Secondary" @onclick="() => _ogsm = new Ogsm()">Cancel</Button>
+</EditForm>
+
+@code
+{
+    public string pageTitle = "New ogsm item";
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Parent</th>
+        <th>Delete</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var ogsmItems in _ogsmItemsArray)
+    {
+        <tr>
+            <td>@ogsmItems.ID</td>
+            <td>@ogsmItems.Title</td>
+            <td>@ogsmItems.Parent?.Title</td>
+            <td><Button @onclick="@(() => HandleDelete(ogsmItems))" Color="ButtonColor.Danger" Outline="true">Delete</Button></td>
+            <td><Button @onclick="@(() => EditForm(ogsmItems))" Color="ButtonColor.Secondary" Outline="true">Edit</Button></td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+
+
