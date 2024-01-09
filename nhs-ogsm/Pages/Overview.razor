@@ -1,15 +1,14 @@
 ﻿@page "/Overview"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
-
+@using System.Drawing
 @using ChartJs.Blazor.BarChart;
 @using ChartJs.Blazor.Common
 @using ChartJs.Blazor.Util
-@using System.Drawing
 @using ChartJs.Blazor.BarChart.Axes
 @using ChartJs.Blazor.Common.Axes
 @using ChartJs.Blazor.Common.Axes.Ticks
-@using Axis = PSC.Blazor.Components.Chartjs.Models.Common.Axis
+@using InteractionMode = ChartJs.Blazor.Common.Enums.InteractionMode
 
 
 
@@ -30,10 +29,16 @@
         
         _config = new BarConfig()
         {
-
             Options = new BarOptions()
             {
-                
+                Legend = new Legend
+                {
+
+                },
+                Tooltips = new Tooltips
+                {
+                    Mode = InteractionMode.X,
+                },
                 Responsive = true,
                 Title = new OptionsTitle
                 {
@@ -130,7 +135,6 @@
             doneActionsDataSet.Add(doneActions);
             notDoneActionsDataSet.Add(notDoneActions);
         }
-        
     }
 }
 <Chart Config="_config"></Chart>
