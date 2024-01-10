@@ -44,7 +44,7 @@ public class GroupService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            List<Group> groups = context.Groups.ToList();
+            List<Group> groups = context.Groups.Include(g => g.Ogsms).ToList();
             return groups;
         }
     }

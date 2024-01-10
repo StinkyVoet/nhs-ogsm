@@ -56,7 +56,12 @@
             {
                 <tr>
                     <td>@group.Name</td>
-                    <td>@group.Ogsms</td>
+                    <td>
+                        @foreach (var ogsm in group.Ogsms)
+                        {
+                            <p>@ogsm.Title</p>
+                        }
+                    </td>
                     <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + group.ID))" class="btn btn-default"/></td>
                 </tr>
             }
