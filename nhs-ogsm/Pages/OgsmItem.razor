@@ -60,7 +60,9 @@
     <label for="parent">Parent OGSM</label>
     <InputSelect id="parent" @bind-Value="@_ogsm.ParentID">
         <option></option>
-        @foreach (var ogsm in _ogsmItemsArray)
+        @foreach (var ogsm in _ogsmItemsArray.Where(x => x.ID != _ogsm.ID && 
+                                                         !OgsmItemService.FindElders(
+                                                             x.ID, new List<int>()).Contains(_ogsm.ID)))
         {
             <option value="@ogsm.ID">@ogsm.Title</option>
         }
