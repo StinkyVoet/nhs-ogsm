@@ -77,4 +77,15 @@ public class OgsmItemService
             .Query()
             .ToList();
     }
+
+    public List<int> FindElders(int ID, List<int> Elders)
+    {
+        Ogsm ogsm = GetSingleOgsm(ID);
+        if (ogsm.ParentID == null)
+        {
+            return Elders;
+        }
+        Elders.Add(ogsm.ParentID.GetValueOrDefault());
+        return FindElders(ogsm.ParentID.GetValueOrDefault(), Elders);
+    }
 }
