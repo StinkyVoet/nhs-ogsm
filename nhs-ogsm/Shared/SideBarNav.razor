@@ -2,6 +2,8 @@
 @using nhs_ogsm.Services
 @inject OgsmItemService OgsmItemService;
 @inject NavigationManager NavigationManager;
+@inject StateContainerService StateService;
+@implements IDisposable;
 
 <div class="sidebar-top">
     <Button Size="Size.Small">
@@ -40,10 +42,22 @@
     protected override async Task OnInitializedAsync()
     {
         _ogsms = OgsmItemService.GetOgsmsHierarchy();
+        StateService.OnSidebarStateChange += OnChangeHandler;
     }
-    
-    protected override async Task OnParametersSetAsync()
+
+    public void Dispose()
     {
-        await OnInitializedAsync();
+        StateService.OnSidebarStateChange -= OnChangeHandler;
     }
+
+    private async void OnChangeHandler()
+    {
+        await InvokeAsync(() =>
+        {
+            Console.WriteLine("Change Handle Async");
+            _ogsms = OgsmItemService.GetOgsmsHierarchy();
+            StateHasChanged();
+        });
+    }
+
 }
