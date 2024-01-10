@@ -1,5 +1,7 @@
 ﻿@page "/Overview"
 @using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject OgsmItemService OgsmItemService;
 
 <PageTitle>Overview</PageTitle>
 <h1>Overview</h1>
@@ -8,80 +10,80 @@
 
 <div class="dropdown">
     <Button>←</Button>Month<Button>→</Button>
-    <Button Color="Button.BtnColor.Info">OGSM</Button>
+    <Button Color="ButtonColor.Info">OGSM</Button>
     @*<div class="dropdown-content">
         <a href="#">Link 1</a>
         <a href="#">Link 2</a>
         <a href="#">Link 3</a>
     </div>*@
 </div>
-
-<Chart Config="_config1" @ref="_chart1"></Chart>
-<br/>
-<table>
-    <tr>
-        <th>Goals</th>
-        <th>Completed Goals</th>
-        <th>Weight</th>
-    </tr>
-    <tr>
-        <td>20</td>
-        <td>18</td>
-        <td>80%</td>
-    </tr>
-</table>
+<BarChart @ref="barChart" Class="mb-4" />
 
 @code {
-    private BarChartConfig? _config1;
-    private Chart? _chart1;
+    private BarChart barChart;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        _config1 = new BarChartConfig()
+        if (firstRender)
         {
-            Options = new Options()
+            await RenderManhattanAsync();
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task RenderManhattanAsync()
+    {
+        List<string> SetLabels = new List<string>();
+        List<double> GoalCount = new List<double>();
+        List<double> StratCount = new List<double>();
+        foreach (Ogsm ogsm in OgsmItemService.GetAllOgsm())
+        {
+            SetLabels.Add(ogsm.Title);
+            GoalCount.Add(ogsm.Goals.Count);
+            StratCount.Add(ogsm.Strategies.Count);
+        }
+        
+        var data = new ChartData()
+        {
+            Labels = SetLabels,
+            Datasets = new List<IChartDataset>()
             {
-                IndexAxis = "x",
-                Responsive = true,
-                MaintainAspectRatio = false,
-                Plugins = new Plugins()
+                new BarChartDataset()
                 {
-                    Legend = new Legend()
-                    {
-                        Align = Align.Center,
-                        Display = false,
-                        Position = LegendPosition.Right
-                    }
+                    Label = "Goals",
+                    Data = GoalCount,
+                    CategoryPercentage = 0.8,
+                    BarPercentage = 1,
                 },
-                Scales = new Dictionary<string, Axis>()
+                new BarChartDataset()
                 {
-                    {
-                        Scales.XAxisId, new Axis()
-                        {
-                            Stacked = true,
-                            Ticks = new Ticks()
-                            {
-                                MaxRotation = 0,
-                                MinRotation = 0
-                            }
-                        }
-                    },
-                    {
-                        Scales.YAxisId, new Axis()
-                        {
-                            Stacked = true
-                        }
-                    }
+                    Label = "Strats",
+                    Data = StratCount,
+                    CategoryPercentage = 0.8,
+                    BarPercentage = 1,
                 }
             }
         };
+        
+        var options = new BarChartOptions();
 
-        _config1.Data.Labels = ChartTestData.Text;
-        _config1.Data.Datasets.Add(new BarDataset()
-        {
-            Label = "Value",
-            Data = ChartTestData.SimpleBar.Select(l => l.Value).ToList(),
-            BorderWidth = 1
-        });
+        options.Interaction.Mode = InteractionMode.Index;
+
+        options.Plugins.Title.Text = "Items per Ogsm";
+        options.Plugins.Title.Display = true;
+        options.Plugins.Title.Font.Size = 20;
+
+        options.Responsive = true;
+
+        options.Scales.X.Title.Text = "Ogsm";
+        options.Scales.X.Title.Display = true;
+
+        options.Scales.Y.Title.Text = "Items";
+        options.Scales.Y.Title.Display = true;
+
+        await barChart.InitializeAsync(data, options);
     }
+    
+    
 }
