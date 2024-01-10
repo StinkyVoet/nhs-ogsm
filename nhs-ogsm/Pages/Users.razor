@@ -66,12 +66,13 @@
 @*     } *@
 @* } *@
 
-<table class="table">
+<table class="table"  style="table-layout: fixed">
     <thead>
     <tr>
         <th>Name</th>
         <th>E-mail</th>
         <th>Role</th>
+        <th>Groups</th>
     </tr>
     </thead>
     <tbody>
@@ -91,6 +92,15 @@
                     else
                     {
                         <p>User</p>
+                    }
+                </td>
+                <td>
+                    @if (user.Groups != null)
+                    {
+                        @foreach (var group in user.Groups)
+                        {
+                            <p>@group.Name</p>
+                        }
                     }
                 </td>
             </tr>

@@ -59,7 +59,7 @@ public class UserService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            List<User> users = context.Users.ToList();
+            List<User> users = context.Users.Include(u => u.Groups).ToList();
             return users;
         }
     }
