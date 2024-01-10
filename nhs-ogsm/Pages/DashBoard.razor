@@ -42,12 +42,6 @@
 <link href="css/DashBoard.css" rel="stylesheet"/>
 <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
 @code{
-     public void HandleOgsmDelete()
-    {
-        OgsmItemService.DeleteOgsm(currentOgsm.ID);
-        NavigationManager.NavigateTo("DashBoard");
-    }
-    
     public void HandleOgsmEdit(EditContext editContext)
     {
         var newOgsm = (Ogsm)editContext.Model;
@@ -77,6 +71,7 @@
 <div class="ogsm-objective">
     <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined">Settings</span></h1>
 </div>
+@* modal for editing ogsm *@
 <Modal @ref="OgsmEditModal" Title=@modalTitle>
     <BodyTemplate>
          <EditForm id="@OgsmFormId" Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
@@ -178,10 +173,11 @@
     }
     <CardsList Title="Goals">
         <CardHeader>
+            @* filter settings collapse *@
             <Collapse @ref="goalFiltersCollapse">
                 <table>
                     <tr>
-                        <td><Switch Label="Hide done" ValueExpression="() => _goalFilterIsDone" @bind-Value="_goalFilterIsDone"/></td>
+                        <td><Switch Label="Hide done" @bind-Value="_goalFilterIsDone"/></td>
                     </tr>
                     <tr>
                         <td><Button Color="ButtonColor.Info" Size="Size.Small" @onclick="@FilterGoals">filter</Button></td>
@@ -190,8 +186,9 @@
                 <hr>
             </Collapse>
             <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()"> Toggle Settings </Button>
-            
+
         </CardHeader>
+        @* Add goal form behind collapse *@
         <Collapse @ref="GoalAddCollapse">
             <CardHeader>
             <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
@@ -386,14 +383,15 @@
             goal.Strategies.Add(strategy);
         }
     }
-
-
+    
+    @* card list for strategies *@
     <CardsList Title="Strategies">
         <CardBody>
             @foreach (Strategy strategy in currentOgsm.Strategies)
             {
                 if (CurrentStrategy.ID == strategy.ID)
                 {
+                    // edit card for strategies
                     <EditForm Model="@_editStrategy" OnValidSubmit="HandleStrategyEdit">
                         <DataAnnotationsValidator/>
                         <Card class="active-item">
@@ -433,7 +431,7 @@
                     </EditForm>
                     continue;
                 }
-                
+                // non edit card for strategies
                 <Card>
                     <CardHeader>
                         @strategy.Name
@@ -483,6 +481,7 @@
                 StateHasChanged();
             }
         }
+        @* form for adding strategies *@
         <CardFooter>
             <EditForm Model="@_formStrategy" OnValidSubmit="HandleStrategySubmit">
                 <DataAnnotationsValidator/>
@@ -544,7 +543,7 @@
         }
     }
 
-
+    @* card list for action measures *@
     <CardsList Title="@GetMeasuresListTitle()">
         <CardBody>
             @if (CurrentStrategy.Actions.Any())
@@ -585,6 +584,7 @@
             {
                 if (CurrentActionMeasure.ID == action.ID)
                 {
+                    // edit card for action measures
                     <EditForm Model="@_editActionMeasure" OnValidSubmit="HandleActionEdit">
                         <DataAnnotationsValidator/>
                         <Card class="active-item">
@@ -610,6 +610,7 @@
                     </EditForm>
                     continue;
                 }
+                // non edit card for action measures
                 <Card>
                     <CardBody>
                         @action.Name
@@ -647,6 +648,7 @@
         <CardFooter>
         @if (CurrentStrategy.ID != 0)
         {
+            // form for adding action measures
             <EditForm Model="@_formActionMeasure" OnValidSubmit="HandleActionSubmit">
                 <DataAnnotationsValidator/>
                 <table>
