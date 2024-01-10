@@ -1,6 +1,7 @@
 ﻿@page "/Users"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@using BlazorBootstrap
 @inject UserService UserService;
 @inject NavigationManager NavigationManager;
 @inject StrategyService StrategyService;
@@ -10,6 +11,7 @@
 @code
 {
     public List<User> _users;
+    public List<User>? foundUsers;
 
     //get Users on load
     protected override async Task OnInitializedAsync()
@@ -24,45 +26,45 @@
     <title>Users</title>
 </head>
 
-<div class="row">
-    <div class="col-md-5 col-sm-12">
-        <AutoComplete @bind-Value="userName"
-                      TItem="User"
-                      DataProvider="UserDataProvider"
-                      PropertyName="UserName"
-                      Placeholder="Search a user..."
-                      OnChanged="(User user) => OnAutoCompleteChanged(user)" />
-    </div>
-</div>
-
-@code {
-    private string userName;
-
-    public IEnumerable<User> usersEnum;
-    public List<User> foundUsers = new List<User>();
-
-    private async Task<AutoCompleteDataProviderResult<User>> UserDataProvider(AutoCompleteDataProviderRequest<User> request)
-    {
-        if (usersEnum is null) // pull customers only one time for client-side autocomplete
-            usersEnum = UserService.GetAllUsers();
-
-        return await Task.FromResult(request.ApplyTo(usersEnum.OrderBy(user => user.FirstName).ThenBy(user => user.LastName)));
-    }
-    
-    private void OnAutoCompleteChanged(User user)
-    {
-        foreach (User u in _users)
-        {
-            if (user.FirstName.Contains(userName) || user.LastName.Contains(userName))
-            {
-                foundUsers.Add(user);
-            }
-        }
-        _users = foundUsers;
-
-        Console.WriteLine($"'{user?.FirstName}' selected.");
-    }
-}
+@* <div class="row"> *@
+@*     <div class="col-md-5 col-sm-12"> *@
+@*         <AutoComplete @bind-Value="userName" *@
+@*                       TItem="User" *@
+@*                       DataProvider="UserDataProvider" *@
+@*                       PropertyName="UserName" *@
+@*                       Placeholder="Search a user..." *@
+@*                       OnChanged="(User user) => OnAutoCompleteChanged(user)" /> *@
+@*     </div> *@
+@* </div> *@
+@* *@
+@* @code { *@
+@*     private string userName; *@
+@* *@
+@*     public IEnumerable<User> usersEnum; *@
+@* *@
+@*     private async Task<AutoCompleteDataProviderResult<User>> UserDataProvider(AutoCompleteDataProviderRequest<User> request) *@
+@*     { *@
+@*         if (usersEnum is null) // pull customers only one time for client-side autocomplete *@
+@*             usersEnum = UserService.GetAllUsers(); *@
+@* *@
+@*         return await Task.FromResult(request.ApplyTo(usersEnum.OrderBy(user => user.FirstName))); *@
+@*     } *@
+@*      *@
+@*     private void OnAutoCompleteChanged(User user) *@
+@*     { *@
+@*          *@
+@*         foreach (User u in _users) *@
+@*         { *@
+@*             if (u.FirstName.Contains(userName) || u.LastName.Contains(userName)) *@
+@*             { *@
+@*                 foundUsers.Add(u); *@
+@*             } *@
+@*         } *@
+@*         _users = foundUsers; *@
+@* *@
+@*         Console.WriteLine($"'{user?.FirstName}' selected."); *@
+@*     } *@
+@* } *@
 
 <table class="table">
     <thead>
