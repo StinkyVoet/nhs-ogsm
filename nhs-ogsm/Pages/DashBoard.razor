@@ -14,7 +14,7 @@
     public int OgsmId { get; set; }
     
     public Ogsm currentOgsm { get; set; }
-    public IQueryable<Goal> _filterGoalList { get; set; }
+    public List<Goal> _filterGoalList { get; set; }
 
     public Strategy CurrentStrategy { get; set; } = new();
     protected override async Task OnInitializedAsync()
@@ -39,7 +39,6 @@
 
 }
 
-<link href="css/DashBoard.css" rel="stylesheet"/>
 <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
 @code{
     public void HandleOgsmEdit(EditContext editContext)
@@ -53,7 +52,6 @@
         currentOgsm.Title = newOgsm.Title;
         _editOgsm.Title = newOgsm.Title;
     }
-    
     
     Ogsm _editOgsm = new();
     Modal OgsmEditModal;
@@ -160,18 +158,21 @@
         bool _goalFilterIsDone;
         public void FilterGoals()
         {
-            _filterGoalList = currentOgsm.Goals.AsQueryable();
+            IQueryable<Goal> GoalList = currentOgsm.Goals.AsQueryable();
             if (_goalFilterIsDone)
             {
-                _filterGoalList = _filterGoalList.Where(goal => !goal.IsDone);
+                GoalList = GoalList.Where(goal => !goal.IsDone);
             }
+
+            GoalList = GoalList.OrderBy(goal => goal.IsDone).ThenBy(goal => goal.EndDate);
+            _filterGoalList = GoalList.ToList();
             StateHasChanged();
         }
 
         Collapse goalFiltersCollapse = default!;
         Collapse GoalAddCollapse = default!;
     }
-    <CardsList Title="Goals">
+    <CardsList Title="Goals" >
         <CardHeader>
             @* filter settings collapse *@
             <Collapse @ref="goalFiltersCollapse">
@@ -186,9 +187,13 @@
                 <hr>
             </Collapse>
             <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()"> Toggle Settings </Button>
+            <Button Color="ButtonColor.Primary" @onclick="FilterGoals">refresh</Button>
 
         </CardHeader>
         @* Add goal form behind collapse *@
+        @code{
+            Goal _formGoal = new() { EndDate = DateTimeOffset.Now };
+        }
         <Collapse @ref="GoalAddCollapse">
             <CardHeader>
             <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
@@ -222,17 +227,11 @@
             </CardHeader>
         </Collapse>
         <CardBody>
-            @* form for creating and editing goals *@
-
-            @code{
-                Goal _formGoal = new() { EndDate = DateTimeOffset.Now };
-            }
-            
-
             @* list with goals *@
-
-            @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
+            @foreach (var goal in _filterGoalList)
             {
+                Collapse goalCardCollaps = default!;
+
                 // EDIT CARD FOR GOALS
                 if (currentGoal.ID == goal.ID)
                 {
@@ -285,49 +284,59 @@
                 }
 
                 // NON EDIT CARD FOR GOALS
-                <Card>
+                string cssClass = "";
+                if (goal.EndDate < DateTimeOffset.Now) cssClass = "overdue";
+                if (goal.IsDone) cssClass = "done";
+                <Card Class=@cssClass>
                     <CardHeader>
                         @goal.Name
+                        <Button Color="ButtonColor.Info" onclick="@(() => goalCardCollaps.ToggleAsync())">info</Button>
+                        <Button Outline="@(!goal.IsDone)" style="float: right"  Color="ButtonColor.Success" @onclick="@(() => HandleGoalIsDone(goal))"><br/></Button>
                     </CardHeader>
-                    <CardBody>
-                        <table>
-                            <tr>
-                                <td>Due:</td>
-                                <td>@goal.EndDate.DateTime</td>
-                            </tr>
-                            @if (goal.Strategies.Any())
-                            {
-                                Strategy lastStrat = goal.Strategies.Last();
+
+                    <Collapse @ref="@goalCardCollaps">
+
+                        
+                        <CardBody>
+
+                            <table>
                                 <tr>
-                                    <td>Strategies:</td>
-                                    <td>
-                                        @foreach (Strategy strategy in goal.Strategies)
-                                        {
-                                            <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
-                                            if (strategy != lastStrat)
-                                            {
-                                                <span> - </span>
-                                            }
-                                        }
-                                    </td>
+                                    <td>Due:</td>
+                                    <td>@goal.EndDate.DateTime.ToString("dd/MM/yyyy HH:MM")</td>
                                 </tr>
+                                @if (goal.Strategies.Any())
+                                {
+                                    Strategy lastStrat = goal.Strategies.Last();
+                                    <tr>
+                                        <td>Strategies:</td>
+                                        <td>
+                                            @foreach (Strategy strategy in goal.Strategies)
+                                            {
+                                                <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
+                                                if (strategy != lastStrat)
+                                                {
+                                                    <span> - </span>
+                                                }
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+
+                        </CardBody>
+                        
+                        <CardFooter>
+                            @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
+                            {
+                                <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
                             }
-                            <tr>
-                                <td>Done:</td>
-                                <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
-                            </tr>
-                        </table>
-                    </CardBody>
-                    <CardFooter>
-                        @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
-                        {
-                            <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
-                        }
-                        @if (currentGoal.ID == 0)
-                        {
-                            <Button Size="Size.Small" @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                        }
-                    </CardFooter>
+                            @if (currentGoal.ID == 0)
+                            {
+                                <Button Size="Size.Small" @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                            }
+
+                        </CardFooter>
+                    </Collapse>
                 </Card>
             }
         </CardBody>
@@ -373,7 +382,6 @@
         {
             strategy.IsDone = !strategy.IsDone;
             StrategyService.UpdateStrategy(strategy);
-            StateHasChanged();
         }
 
         public void AddStratToGoal(Strategy strategy, Goal goal)
@@ -387,7 +395,7 @@
     @* card list for strategies *@
     <CardsList Title="Strategies">
         <CardBody>
-            @foreach (Strategy strategy in currentOgsm.Strategies)
+            @foreach (Strategy strategy in currentOgsm.Strategies.OrderBy(strategy => strategy.IsDone))
             {
                 if (CurrentStrategy.ID == strategy.ID)
                 {
@@ -432,7 +440,9 @@
                     continue;
                 }
                 // non edit card for strategies
-                <Card>
+                string cssClass = "";
+                if (strategy.IsDone) cssClass = "done";
+                <Card Class=@cssClass>
                     <CardHeader>
                         @strategy.Name
                     </CardHeader>

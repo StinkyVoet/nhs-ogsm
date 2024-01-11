@@ -23,18 +23,14 @@
 @code
 {
     
-    private BarConfig _config;
+    private BarConfig ogsmOverView;
     protected override void OnInitialized()
     {
         
-        _config = new BarConfig()
+        ogsmOverView = new BarConfig()
         {
             Options = new BarOptions()
             {
-                Legend = new Legend
-                {
-
-                },
                 Tooltips = new Tooltips
                 {
                     Mode = InteractionMode.X,
@@ -82,8 +78,8 @@
             BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(50,255, 37, 73)),
             Stack = "Goals",
         };
-        _config.Data.Datasets.Add(doneGoalDataSet);
-        _config.Data.Datasets.Add(notDoneGoalDataSet);
+        ogsmOverView.Data.Datasets.Add(doneGoalDataSet);
+        ogsmOverView.Data.Datasets.Add(notDoneGoalDataSet);
         
         IDataset<int> doneStratDataSet = new BarDataset<int>()
         {
@@ -97,8 +93,8 @@
             BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(50,229, 135, 0)),
             Stack = "Strats",
         };
-        _config.Data.Datasets.Add(doneStratDataSet);
-        _config.Data.Datasets.Add(notDoneStratDataSet);
+        ogsmOverView.Data.Datasets.Add(doneStratDataSet);
+        ogsmOverView.Data.Datasets.Add(notDoneStratDataSet);
         
         IDataset<int> doneActionsDataSet = new BarDataset<int>()
         {
@@ -112,12 +108,12 @@
             BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(50,0, 135, 229)),
             Stack = "Actions",
         };
-        _config.Data.Datasets.Add(doneActionsDataSet);
-        _config.Data.Datasets.Add(notDoneActionsDataSet);
+        ogsmOverView.Data.Datasets.Add(doneActionsDataSet);
+        ogsmOverView.Data.Datasets.Add(notDoneActionsDataSet);
         
         foreach (Ogsm ogsm in OgsmItemService.GetAllOgsm())
         {
-            _config.Data.Labels.Add(ogsm.Title);
+            ogsmOverView.Data.Labels.Add(ogsm.Title);
             
             doneGoalDataSet.Add(ogsm.Goals.Count(g => g.IsDone));
             notDoneGoalDataSet.Add(ogsm.Goals.Count(g => !g.IsDone));
@@ -136,5 +132,6 @@
             notDoneActionsDataSet.Add(notDoneActions);
         }
     }
+    
 }
-<Chart Config="_config"></Chart>
+<Chart Config="ogsmOverView"></Chart>
