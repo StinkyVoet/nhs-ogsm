@@ -227,11 +227,16 @@
             </CardHeader>
         </Collapse>
         <CardBody>
+
             @* list with goals *@
+            @code{
+                Dictionary<int, bool> _isGoalCollapsed = new();
+            }
             @foreach (var goal in _filterGoalList)
             {
-                Collapse goalCardCollaps = default!;
-
+                
+                _isGoalCollapsed.TryAdd(goal.ID, true);
+                
                 // EDIT CARD FOR GOALS
                 if (currentGoal.ID == goal.ID)
                 {
@@ -290,53 +295,46 @@
                 <Card Class=@cssClass>
                     <CardHeader>
                         @goal.Name
-                        <Button Color="ButtonColor.Info" onclick="@(() => goalCardCollaps.ToggleAsync())">info</Button>
-                        <Button Outline="@(!goal.IsDone)" style="float: right"  Color="ButtonColor.Success" @onclick="@(() => HandleGoalIsDone(goal))"><br/></Button>
+                        <Button Size="Size.Small" Outline="@(!_isGoalCollapsed[goal.ID])" Color="ButtonColor.Info" @onclick="() => _isGoalCollapsed[goal.ID] = !_isGoalCollapsed[goal.ID]">
+                            <span class="material-symbols-outlined">@(_isGoalCollapsed[goal.ID]?"expand_more":"expand_less")</span>
+                        </Button>
+                        <Button Outline="@(!goal.IsDone)" style="float: right" Color="ButtonColor.Success" @onclick="@(() => HandleGoalIsDone(goal))"><br/></Button>
                     </CardHeader>
-
-                    <Collapse @ref="@goalCardCollaps">
-
-                        
-                        <CardBody>
-
-                            <table>
+                    <CardBody Class="@(_isGoalCollapsed[goal.ID] ? "hide" : "show")">
+                        <table>
+                            <tr>
+                                <td>Due:</td>
+                                <td>@goal.EndDate.DateTime.ToString("dd/MM/yyyy HH:MM")</td>
+                            </tr>
+                            @if (goal.Strategies.Any())
+                            {
+                                Strategy lastStrat = goal.Strategies.Last();
                                 <tr>
-                                    <td>Due:</td>
-                                    <td>@goal.EndDate.DateTime.ToString("dd/MM/yyyy HH:MM")</td>
-                                </tr>
-                                @if (goal.Strategies.Any())
-                                {
-                                    Strategy lastStrat = goal.Strategies.Last();
-                                    <tr>
-                                        <td>Strategies:</td>
-                                        <td>
-                                            @foreach (Strategy strategy in goal.Strategies)
+                                    <td>Strategies:</td>
+                                    <td>
+                                        @foreach (Strategy strategy in goal.Strategies)
+                                        {
+                                            <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
+                                            if (strategy != lastStrat)
                                             {
-                                                <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@strategy.Name</a>
-                                                if (strategy != lastStrat)
-                                                {
-                                                    <span> - </span>
-                                                }
+                                                <span> - </span>
                                             }
-                                        </td>
-                                    </tr>
-                                }
-                            </table>
-
-                        </CardBody>
-                        
-                        <CardFooter>
-                            @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
-                            {
-                                <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
+                                        }
+                                    </td>
+                                </tr>
                             }
-                            @if (currentGoal.ID == 0)
-                            {
-                                <Button Size="Size.Small" @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                            }
-
-                        </CardFooter>
-                    </Collapse>
+                        </table>
+                    </CardBody>
+                    <CardFooter Class="@(_isGoalCollapsed[goal.ID] ? "hide" : "show")">
+                        @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
+                        {
+                            <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
+                        }
+                        @if (currentGoal.ID == 0)
+                        {
+                            <Button Size="Size.Small" @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        }
+                    </CardFooter>
                 </Card>
             }
         </CardBody>
