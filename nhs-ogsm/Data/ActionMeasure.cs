@@ -16,4 +16,15 @@ public class ActionMeasure
     public Strategy Strategy;
     // parent Users
     public ICollection<User> Users { get; set; }
+    
+    public override bool Equals(object? obj)
+    {
+        if (obj == null || GetType() != obj.GetType()) return false;
+     
+        ActionMeasure other = (ActionMeasure)obj;
+        return
+            ID == other.ID &&
+            Name == other.Name &&
+            IsDone == other.IsDone;
+    }
 }

@@ -7,6 +7,7 @@
 @inject GoalService GoalService;
 @inject StrategyService StrategyService;
 @inject ActionMeasureService ActionMeasureService;
+@inject StateContainerService StateService;
 
 
 @code{
@@ -53,6 +54,8 @@
         
         currentOgsm.Title = newOgsm.Title;
         _editOgsm.Title = newOgsm.Title;
+        
+        StateService.NotifyStateChanged();
     }
     
     Ogsm _editOgsm = new();
