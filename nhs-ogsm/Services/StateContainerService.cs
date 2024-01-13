@@ -6,8 +6,5 @@ public class StateContainerService
 {
     public event Action? OnSidebarStateChange;
     
-    public void NotifyStateChanged() {
-        Console.WriteLine("State Service Notified");
-        OnSidebarStateChange?.Invoke();
-    }
+    public void NotifyStateChanged() => OnSidebarStateChange?.Invoke();
 }
