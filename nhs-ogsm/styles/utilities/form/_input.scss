@@ -9,6 +9,12 @@
   border-radius: 0.2em 0.2em 0 0;
 
   transition: all .2s ease-out;
+  
+  text-align: left;
+  
+  &::placeholder {
+    color: lighten($centric-black, 70%);
+  }
 
   &:focus {
     border-bottom-color: $centric-green-1;
