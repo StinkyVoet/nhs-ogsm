@@ -43,6 +43,7 @@
         isEdit = true;
         pageTitle = "Editing: "+item.ID;
         _ogsm = item;
+        StateService.NotifyStateChanged();
         StateHasChanged();
     }
     
