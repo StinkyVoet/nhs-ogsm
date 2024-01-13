@@ -160,8 +160,12 @@
                 </table>
                 <hr>
             </Collapse>
-            <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()"> Toggle Settings </Button>
-            <Button Color="ButtonColor.Primary" @onclick="FilterGoals">refresh</Button>
+            <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()">
+                <span class="material-symbols-outlined">tune</span>
+            </Button>
+            <Button Color="ButtonColor.Primary" @onclick="FilterGoals" TooltipTitle="Refresh">
+                <span class="material-symbols-outlined">refresh</span>
+            </Button>
 
         </CardHeader>
         @* Add goal form behind collapse *@
