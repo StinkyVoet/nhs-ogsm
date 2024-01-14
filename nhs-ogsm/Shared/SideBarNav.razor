@@ -2,23 +2,32 @@
 @using nhs_ogsm.Services
 @inject OgsmItemService OgsmItemService;
 @inject NavigationManager NavigationManager;
+@inject StateContainerService StateService;
+@implements IDisposable;
+@inject OgsmDbContext DbContext;
 
 <div class="sidebar-top">
-    <Button Size="Size.Small">
+    <Button Size="Size.Small" @onclick="ToggleFiltersAsync">
         <i class="material-symbols-outlined">
             filter_list
         </i>
     </Button>
     <p class="sidebar-title">OGSMs</p>
-    <Button Size="Size.Small">
+    <Button Size="Size.Small" @onclick="ToggleSearchbarAsync">
         <i class="material-symbols-outlined">
             search
-        </i>        
+        </i>
     </Button>
+    <Collapse @ref="_filtersCollapse" class="w-100 mt-2">
+        <Switch Label="Active" Value="_filterActive" ValueChanged="value => { _filterActive = value; _searchHandle(); }" ValueExpression="() => _filterActive" />
+    </Collapse>
+    <Collapse @ref="_searchBarCollapse" class="w-100 mt-2">
+        <input class="input" @bind:event="oninput" @bind:get="_searchQuery" @bind:set="value => { _searchQuery = value; _searchHandle(); }" style="width: 100%;" placeholder="Ogsm title" />
+    </Collapse>
 </div>
 <div class="sidebar-body">
     <ul>
-        @foreach (var ogsm in _ogsms)
+        @foreach (var ogsm in _ogsmsFilter!)
         {
             <OgsmListItem Data="ogsm"/>
         }
@@ -35,15 +44,47 @@
 
 @code {
     private List<Ogsm> _ogsms = new();
-    
+    private List<Ogsm>? _ogsmsFilter;
+
+    string _searchQuery = "";
+    bool _filterActive = true;
+    Collapse _filtersCollapse = default!;
+    Collapse _searchBarCollapse = default!;
+
     //get Ogsm items on load
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         _ogsms = OgsmItemService.GetOgsmsHierarchy();
+        _searchHandle();
+        StateService.OnSidebarStateChange += OnChangeHandler;
     }
-    
-    protected override async Task OnParametersSetAsync()
+
+    public void Dispose()
     {
-        await OnInitializedAsync();
+        StateService.OnSidebarStateChange -= OnChangeHandler;
     }
+
+    private async void OnChangeHandler()
+    {
+        await InvokeAsync(() =>
+        {
+            _ogsms = OgsmItemService.GetOgsmsHierarchy();
+            _searchHandle();
+            StateHasChanged();
+        });
+    }
+
+    private void _searchHandle()
+    {
+        Console.WriteLine("Active: " + _filterActive + "\nSearchQuery: " + _searchQuery);
+        var test = _ogsms.Where(o => o.Parent == null)
+            .Where(o => o.Title.Contains(_searchQuery))
+            .Where(o => o.IsActive.Equals(_filterActive))
+            .ToList();
+        _ogsmsFilter = test;
+    }
+
+    private async Task ToggleSearchbarAsync() => await _searchBarCollapse.ToggleAsync();
+    private async Task ToggleFiltersAsync() => await _filtersCollapse.ToggleAsync();
+
 }
