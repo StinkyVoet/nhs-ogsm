@@ -18,6 +18,11 @@
     {
         _users = UserService.GetAllUsers();
     }
+    
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
 }
 
 <html>
@@ -73,6 +78,7 @@
         <th>E-mail</th>
         <th>Role</th>
         <th>Groups</th>
+        <th>Action</th>
     </tr>
     </thead>
     <tbody>
@@ -102,6 +108,10 @@
                             <p>@group.Name</p>
                         }
                     }
+                </td>
+                <td>
+                    <Button @onclick="@(() => Redirect("DashBoard/"))" Color="ButtonColor.Primary">Edit</Button>
+                    <Button @onclick="@(() => UserService.DeleteUser(user.ID))" Color="ButtonColor.Danger">Delete</Button>
                 </td>
             </tr>
         }
