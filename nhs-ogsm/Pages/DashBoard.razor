@@ -9,6 +9,8 @@
 @inject ActionMeasureService ActionMeasureService;
 @inject StateContainerService StateService;
 
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage LocalStorage
 
 @code{
     [Parameter]
@@ -32,8 +34,9 @@
         {
             NavigationManager.NavigateTo("DashBoard");
         }
+        
         FilterGoals();
-
+        FilterStrategies();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -151,25 +154,64 @@
     }
     <CardsList Title="Goals" >
         <CardHeader>
+            @code{
+                
+                GoalFilters goalFilter = new();
+                class GoalFilterSettings
+                {
+                    public bool isDone;
+                    public bool isOverdue = false;
+                    public int StrategyID = 0;
+                }
+                class GoalFilters
+                {
+                    public GoalFilterSettings Settings = new();
+                    public Collapse Collapse = default!;
+                    
+                    public List<Goal> Filter(Ogsm currentOgsm)
+                    {
+                        IQueryable<Goal> filterGoalList = currentOgsm.Goals.AsQueryable();
+                    
+                        if (Settings.isDone)
+                            filterGoalList = filterGoalList.Where(goal => !goal.IsDone);
+                        
+                        if (Settings.isOverdue)
+                            filterGoalList = filterGoalList.Where(goal => goal.EndDate < DateTimeOffset.Now);
+
+                        if (Settings.StrategyID != 0)
+                            filterGoalList = filterGoalList.Where(goal => goal.Strategies.Any(strat => strat.ID == Settings.StrategyID));
+                    
+                        filterGoalList = filterGoalList.OrderBy(goal => goal.IsDone).ThenBy(goal => goal.EndDate);
+                        return filterGoalList.ToList();
+                    }
+                    
+                    public void ToggleFilterByStrategy(int strategyID) => Settings.StrategyID = Settings.StrategyID == strategyID ? 0 : strategyID;
+                }
+                public void FilterGoals() => goalList = goalFilter.Filter(currentOgsm);
+            }
             @* filter settings collapse *@
             <Collapse @ref="goalFiltersCollapse">
                 <table>
                     <tr>
-                        <td><Switch Label="Hide done" @bind-Value="_goalFilterIsDone"/></td>
+                        <td><Switch Label="Hide done" @bind-Value="goalFilter.Settings.isDone"/></td>
+                    </tr>
+                    <tr>
+                        <td><Switch Label="Show overdue" @bind-Value="goalFilter.Settings.isOverdue"/></td>
                     </tr>
                     <tr>
                         <td><Button Color="ButtonColor.Info" Size="Size.Small" @onclick="@FilterGoals">filter</Button></td>
                     </tr>
+
                 </table>
                 <hr>
             </Collapse>
+
             <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()">
                 <span class="material-symbols-outlined">tune</span>
             </Button>
             <Button Color="ButtonColor.Primary" @onclick="FilterGoals" TooltipTitle="Refresh">
                 <span class="material-symbols-outlined">refresh</span>
             </Button>
-
         </CardHeader>
         @* Add goal form behind collapse *@
         @code{
@@ -220,21 +262,6 @@
         <CardBody>
             @* list with goals *@
             @code{
-                // Goal Filter
-                bool _goalFilterIsDone;
-                public void FilterGoals()
-                {
-                    IQueryable<Goal> FilterGoalList = currentOgsm.Goals.AsQueryable();
-                    if (_goalFilterIsDone)
-                    {
-                        FilterGoalList = FilterGoalList.Where(goal => !goal.IsDone);
-                    }
-
-                    FilterGoalList = FilterGoalList.OrderBy(goal => goal.IsDone).ThenBy(goal => goal.EndDate);
-                    goalList = FilterGoalList.ToList();
-                    StateHasChanged();
-                }
-                
                 Dictionary<int, bool> goalCollapsed = new();
             }
             @foreach (var goal in goalList)
@@ -302,6 +329,10 @@
                 <Card Class=@cssClass>
                     <CardHeader>
                         @goal.Name
+                        <Button Size="Size.Small" Color="ButtonColor.Info" Style="float: right" Outline="_strategyFilter.Settings.GoalID != goal.ID"
+                                TooltipTitle="Search linked to goal" @onclick="() => {_strategyFilter.ToggleFilterByGoal(goal.ID); FilterStrategies();}">
+                            <span class="material-symbols-outlined">search</span>
+                        </Button>
                         <Button Size="Size.Small" Outline="@(!goalCollapsed[goal.ID])" style="float: right" Color="ButtonColor.Info" @onclick="() => goalCollapsed[goal.ID] = !goalCollapsed[goal.ID]">
                             <span class="material-symbols-outlined">@(goalCollapsed[goal.ID]?"expand_more":"expand_less")</span>
                         </Button> 
@@ -311,7 +342,7 @@
                         @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
                         {
                             <Button Size="Size.Small" style="float: right" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">
-                            <span class="material-symbols-outlined">link</span>
+                                <span class="material-symbols-outlined">link</span>
                             </Button>
                         }
                     </CardHeader>
@@ -407,26 +438,63 @@
     
     @* card list for strategies *@
     <CardsList Title="Strategies">
-        <CardBody>
+        <CardHeader>
             @code{
-                Dictionary<int,bool> StrategyCollapsed = new();
-                bool _StrategyFilterIsDone;
-                public void FilterStrategies()
+  
+                Dictionary<int, bool> _strategyCollapsed = new();
+                StrategyFilter _strategyFilter = new();
+                class StrategyFilterSettings
                 {
-                    IQueryable<Strategy> FilterStrategyList = currentOgsm.Strategies.AsQueryable();
-                    if (_goalFilterIsDone)
+                    public bool IsDone;
+                    public int GoalID = 0;
+                }
+                class StrategyFilter
+                {
+                    public Collapse Collapse = default!;
+                    public StrategyFilterSettings Settings = new();
+                    
+                    public List<Strategy> Filter(Ogsm currentOgsm)
                     {
-                        FilterStrategyList = FilterStrategyList.Where(strat => !strat.IsDone);
+                        IQueryable<Strategy> filterStrategyList = currentOgsm.Strategies.AsQueryable();
+                    
+                        if (Settings.IsDone)
+                            filterStrategyList = filterStrategyList.Where(strat => !strat.IsDone);
+                        
+                        if(Settings.GoalID != 0)
+                            filterStrategyList = filterStrategyList.Where(strat => strat.Goals.Any(goal => goal.ID == Settings.GoalID));
+                    
+                        filterStrategyList = filterStrategyList.OrderBy(strat => strat.IsDone);
+                        return filterStrategyList.ToList();
                     }
 
-                    FilterStrategyList = FilterStrategyList.OrderBy(goal => goal.IsDone);
-                    strategyList = FilterStrategyList.ToList();
-                    StateHasChanged();
+                    public void ToggleFilterByGoal(int goalID) => Settings.GoalID = Settings.GoalID == goalID ? 0 : goalID;
                 }
+                public void FilterStrategies() => strategyList = _strategyFilter.Filter(currentOgsm);
             }
-            @foreach (Strategy strategy in currentOgsm.Strategies.OrderBy(strategy => strategy.IsDone))
+            <Collapse @ref="_strategyFilter.Collapse">
+                <table>
+                    <tr>
+                        <td><Switch Label="Hide done" @bind-Value="_strategyFilter.Settings.IsDone"/></td>
+                    </tr>
+                    <tr>
+                        <td><Button Color="ButtonColor.Info" Size="Size.Small" @onclick="@FilterStrategies">filter</Button></td>
+                    </tr>
+                </table>
+                <hr>
+            </Collapse>
+            <Button Color="ButtonColor.Primary" @onclick="() => _strategyFilter.Collapse.ToggleAsync()">
+                <span class="material-symbols-outlined">tune</span>
+            </Button>
+            <Button Color="ButtonColor.Primary" @onclick="FilterStrategies" TooltipTitle="Refresh">
+                <span class="material-symbols-outlined">refresh</span>
+            </Button>
+        </CardHeader>
+        @* filter settings collapse *@
+        <CardBody>
+            @foreach (Strategy strategy in strategyList)
             {
-                StrategyCollapsed.TryAdd(strategy.ID, true);
+                _strategyCollapsed.TryAdd(strategy.ID, true);
+                // EDIT CARD FOR STRATEGIES
                 if (CurrentStrategy.ID == strategy.ID)
                 {
                     // edit card for strategies
@@ -472,16 +540,19 @@
                     </EditForm>
                     continue;
                 }
-
-                // non edit card for strategies
+                // NON EDIT CARD FOR STRATEGIES
                 string cssClass = "";
                 if (strategy.IsDone) cssClass = "done";
                 <Card Class=@cssClass>
                     <CardHeader>
                         @strategy.Name
-                        <Button Size="Size.Small" Outline="@(!StrategyCollapsed[strategy.ID])" style="float: right" Color="ButtonColor.Info" @onclick="() => StrategyCollapsed[strategy.ID] = !StrategyCollapsed[strategy.ID]">
-                            <span class="material-symbols-outlined">@(StrategyCollapsed[strategy.ID]?"expand_more":"expand_less")</span>
-                        </Button> 
+                        <Button Size="Size.Small" Color="ButtonColor.Info" Style="float: right" Outline="goalFilter.Settings.StrategyID != strategy.ID"
+                                TooltipTitle="Search linked to goal" @onclick="() => {goalFilter.ToggleFilterByStrategy(strategy.ID); FilterGoals();}">
+                            <span class="material-symbols-outlined">search</span>
+                        </Button>
+                        <Button Size="Size.Small" Outline="@(!_strategyCollapsed[strategy.ID])" style="float: right" Color="ButtonColor.Info" @onclick="() => _strategyCollapsed[strategy.ID] = !_strategyCollapsed[strategy.ID]">
+                            <span class="material-symbols-outlined">@(_strategyCollapsed[strategy.ID] ? "expand_more" : "expand_less")</span>
+                        </Button>
                         <Button Outline="@(!strategy.IsDone)" style="float: right" Color="ButtonColor.Success" @onclick="@(() => HandleStrategyIsDone(strategy))" TooltipTitle="Done / Total">
                             @strategy.Actions.Count(s => s.IsDone) / @strategy.Actions.Count()
                         </Button>
@@ -492,7 +563,7 @@
                             </Button>
                         }
                     </CardHeader>
-                    <CardBody Class="@(StrategyCollapsed[strategy.ID] ? "hide" : "show")">
+                    <CardBody Class="@(_strategyCollapsed[strategy.ID] ? "hide" : "show")">
                         <table>
                             @if (strategy.Goals.Any())
                             {
@@ -517,26 +588,30 @@
                             </tr>
                         </table>
                     </CardBody>
-                    <CardFooter Class="@(StrategyCollapsed[strategy.ID] ? "hide" : "show")">
+                    <CardFooter Class="@(_strategyCollapsed[strategy.ID] ? "hide" : "show")">
 
                         <Button Size="Size.Small" @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardFooter>
                 </Card>
             }
         </CardBody>
+
         @code{
             Strategy _formStrategy = new();
-            
+
             public void HandleStrategySubmit(EditContext editContext)
             {
                 var newStrategy = (Strategy)editContext.Model;
                 newStrategy.ParentOgsmID = currentOgsm.ID;
                 StrategyService.AddStrategy(newStrategy);
                 currentOgsm.Strategies.Add(newStrategy);
+                strategyList.Add(newStrategy);
                 _formStrategy = new Strategy();
                 StateHasChanged();
             }
+
         }
+
         @* form for adding strategies *@
         <CardFooter>
             <EditForm Model="@_formStrategy" OnValidSubmit="HandleStrategySubmit">
