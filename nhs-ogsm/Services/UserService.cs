@@ -24,13 +24,13 @@ public class UserService
         return true;
     }
 
-    public void DeleteUser(int id)
+    public async Task DeleteUser(int id)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
             User entity = context.Users.First(t => t.ID == id);
             context.Users.Remove(entity);
-            context.SaveChanges();
+            await context.SaveChangesAsync();
         }
     }
 
