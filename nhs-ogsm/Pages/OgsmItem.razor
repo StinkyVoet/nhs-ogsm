@@ -3,6 +3,7 @@
 @using nhs_ogsm.Services
 @using Microsoft.AspNetCore.Http.Extensions
 @inject OgsmItemService OgsmItemService;
+@inject StateContainerService StateService;
 
 @code
 {
@@ -24,6 +25,7 @@
         }
         _ogsm = new Ogsm();
         _ogsmItemsArray = OgsmItemService.GetAllOgsm();
+        StateService.NotifyStateChanged();
         StateHasChanged();
     }
     
@@ -32,6 +34,7 @@
     {
         OgsmItemService.DeleteOgsm(item.ID);
         _ogsmItemsArray.Remove(item);
+        StateService.NotifyStateChanged();
         StateHasChanged();
     }
 
@@ -40,6 +43,7 @@
         isEdit = true;
         pageTitle = "Editing: "+item.ID;
         _ogsm = item;
+        StateService.NotifyStateChanged();
         StateHasChanged();
     }
     
@@ -55,12 +59,14 @@
 
 <EditForm Model="@_ogsm" OnValidSubmit="HandleSubmit">
     <label for="TitleInput">Title</label>
-    <InputText id="TitleInput" @bind-Value="@_ogsm.Title" required></InputText>
+    <InputText id="TitleInput" class="input" @bind-Value="@_ogsm.Title" required></InputText>
     
     <label for="parent">Parent OGSM</label>
-    <InputSelect id="parent" @bind-Value="@_ogsm.ParentID">
+    <InputSelect id="parent" class="input" @bind-Value="@_ogsm.ParentID">
         <option></option>
-        @foreach (var ogsm in _ogsmItemsArray)
+        @foreach (var ogsm in _ogsmItemsArray.Where(x => x.ID != _ogsm.ID && 
+                                                         !OgsmItemService.FindElders(
+                                                             x.ID, new List<int>()).Contains(_ogsm.ID)))
         {
             <option value="@ogsm.ID">@ogsm.Title</option>
         }
