@@ -188,20 +188,20 @@
                 <Card>
                     <DataAnnotationsValidator/>
                     <CardHeader>
-                        <td><label for="NameInput">Name:</label></td>
-                        <td><InputTextArea class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputTextArea><br/></td>
-                        <td><ValidationMessage For="() => _formGoal.Name"/></td>
+                        <label for="NameInput">Name:</label>
+                        <InputTextArea class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputTextArea><br/>
+                        <ValidationMessage For="() => _formGoal.Name"/>
                     </CardHeader>
                     <CardBody>
                         <table>
                             <tr>
                                 <td><label for="DateInput">Due:</label></td>
-                                <td><InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
+                                <td><InputDate class="input" id="DateInput" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
                                 <td><ValidationMessage For="() => _formGoal.EndDate"/></td>
                             </tr>
                             <tr>
-                                <td><label for="NameInput">Description:</label></td>
-                                <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
+                                <td><label for="DescriptionInput">Description:</label></td>
+                                <td><InputText class="input" id="DescriptionInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
                                 <td><ValidationMessage For="() => _formGoal.Description"/></td>
                             </tr>
                         </table>
@@ -298,17 +298,20 @@
                 if (goal.IsDone) cssClass = "done";
                 <Card Class=@cssClass>
                     <CardHeader>
-                        @goal.Name
-                        <Button Size="Size.Small" Outline="@(!goalCollapsed[goal.ID])" style="float: right" Color="ButtonColor.Info" @onclick="() => goalCollapsed[goal.ID] = !goalCollapsed[goal.ID]">
-                            <span class="material-symbols-outlined">@(goalCollapsed[goal.ID]?"expand_more":"expand_less")</span>
-                        </Button> 
-                        <Button Outline="@(!goal.IsDone)" style="float: right" Color="ButtonColor.Success" @onclick="@(() => HandleGoalIsDone(goal))" TooltipTitle="Done / Total">
+                        <div class="d-inline-block">
+                            <h5 class="m-0">@goal.Name</h5>
+                            <small class="small">Due: @goal.EndDate.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <Button Size="Size.Small" Outline="@(!goalCollapsed[goal.ID])" class="float-end ms-1" Color="ButtonColor.Info" @onclick="() => goalCollapsed[goal.ID] = !goalCollapsed[goal.ID]">
+                            <span class="material-symbols-outlined">@(goalCollapsed[goal.ID] ? "expand_more" : "expand_less")</span>
+                        </Button>
+                        <Button Outline="@(!goal.IsDone)" class="float-end ms-1" Color="ButtonColor.Success" @onclick="@(() => HandleGoalIsDone(goal))" TooltipTitle="Done / Total">
                             @goal.Strategies.Count(s => s.IsDone) / @goal.Strategies.Count()
                         </Button>
                         @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
                         {
-                            <Button Size="Size.Small" style="float: right" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">
-                            <span class="material-symbols-outlined">link</span>
+                            <Button Size="Size.Small" class="float-end" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">
+                                <span class="material-symbols-outlined">link</span>
                             </Button>
                         }
                     </CardHeader>
@@ -431,8 +434,8 @@
                         <DataAnnotationsValidator/>
                         <Card class="active-item">
                             <CardHeader>
-                                <td><label for="NameInput">Name:</label></td>
-                                <td><InputTextArea class="input" id="NameInput" @bind-Value="@_editStrategy.Name"></InputTextArea><br/></td>
+                                <label for="NameInput">Name:</label>
+                                <InputTextArea class="input" id="NameInput" @bind-Value="@_editStrategy.Name"></InputTextArea>
                             </CardHeader>
                             <CardBody>
                                 <table>
@@ -476,10 +479,10 @@
                 <Card Class=@cssClass>
                     <CardHeader>
                         @strategy.Name
-                        <Button Size="Size.Small" Outline="@(!StrategyCollapsed[strategy.ID])" style="float: right" Color="ButtonColor.Info" @onclick="() => StrategyCollapsed[strategy.ID] = !StrategyCollapsed[strategy.ID]">
+                        <Button Size="Size.Small" Outline="@(!StrategyCollapsed[strategy.ID])" class="float-end ms-1" Color="ButtonColor.Info" @onclick="() => StrategyCollapsed[strategy.ID] = !StrategyCollapsed[strategy.ID]">
                             <span class="material-symbols-outlined">@(StrategyCollapsed[strategy.ID]?"expand_more":"expand_less")</span>
                         </Button> 
-                        <Button Outline="@(!strategy.IsDone)" style="float: right" Color="ButtonColor.Success" @onclick="@(() => HandleStrategyIsDone(strategy))" TooltipTitle="Done / Total">
+                        <Button Outline="@(!strategy.IsDone)" class="float-end ms-1" Color="ButtonColor.Success" @onclick="@(() => HandleStrategyIsDone(strategy))" TooltipTitle="Done / Total">
                             @strategy.Actions.Count(s => s.IsDone) / @strategy.Actions.Count()
                         </Button>
                         @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
@@ -672,10 +675,10 @@
                 <Card>
                     <CardHeader>
                         @action.Name
-                        <Button Outline="@(!action.IsDone)" style="float: right" Color="ButtonColor.Success" @onclick="@(() => HandleActionisDone(action))">
+                        <Button Outline="@(!action.IsDone)" class="float-end ms-1" Color="ButtonColor.Success" @onclick="@(() => HandleActionisDone(action))">
                             <br/>
                         </Button>
-                        <Button Size="Size.Small" style="float: right" @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                        <Button Size="Size.Small" class="float-end ms-1" @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardHeader>
                 </Card>
             }
