@@ -332,6 +332,10 @@
                             <h5 class="m-0">@goal.Name</h5>
                             <small class="small">Due: @goal.EndDate.ToString("dd/MM/yyyy HH:mm")</small>
                         </div>
+                        <Button Size="Size.Small" Color="ButtonColor.Info" class="float-end ms-1" Outline="_strategyFilter.Settings.GoalID != goal.ID"
+                                TooltipTitle="Search linked to goal" @onclick="() => {_strategyFilter.ToggleFilterByGoal(goal.ID); FilterStrategies();}">
+                            <span class="material-symbols-outlined">search</span>
+                        </Button>
                         <Button Size="Size.Small" Outline="@(!goalCollapsed[goal.ID])" class="float-end ms-1" Color="ButtonColor.Info" @onclick="() => goalCollapsed[goal.ID] = !goalCollapsed[goal.ID]">
                             <span class="material-symbols-outlined">@(goalCollapsed[goal.ID] ? "expand_more" : "expand_less")</span>
                         </Button>
@@ -545,7 +549,7 @@
                 <Card Class=@cssClass>
                     <CardHeader>
                         @strategy.Name
-                        <Button Size="Size.Small" Color="ButtonColor.Info" Style="float: right" Outline="goalFilter.Settings.StrategyID != strategy.ID"
+                        <Button Size="Size.Small" Color="ButtonColor.Info" class="float-end ms-1" Outline="goalFilter.Settings.StrategyID != strategy.ID"
                                 TooltipTitle="Search linked to goal" @onclick="() => {goalFilter.ToggleFilterByStrategy(strategy.ID); FilterGoals();}">
                             <span class="material-symbols-outlined">search</span>
                         </Button>
