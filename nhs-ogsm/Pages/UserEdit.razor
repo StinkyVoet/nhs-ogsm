@@ -3,6 +3,7 @@
 @using nhs_ogsm.Services
 @using BlazorBootstrap
 @inject UserService UserService;
+@inject GroupService GroupService;
 @inject NavigationManager NavigationManager;
 
 @code
@@ -73,13 +74,32 @@
             <option value="false">No</option>
         </InputSelect>
     </div>
+    <div class="form-group">
+        <label for="group">Group:</label>
+        <InputSelect id="group" class="form-control" @bind-Value="_selectedGroupID">
+            <option value="">None</option>
+            @foreach (var group in GroupService.GetAllGroups())
+            {
+                <option value="@group.ID">@group.Name</option>
+            }
+        </InputSelect>
+    </div>
     <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" style="margin-top: 10px">Edit</Button>
 </EditForm>
 
 @code
 {
+    int? _selectedGroupID;
+    Group? _selectedGroup;
+    
     public void EditUser(EditContext editContext)
     {
+        if (_selectedGroupID != null)
+        {
+            _selectedGroup = GroupService.GetSingleGroup((int)_selectedGroupID);
+            GroupService.AddUserToGroup(_user, _selectedGroup);
+        }
+        
         UserService.UpdateUser(_user);
         Redirect("/Users");
     }
