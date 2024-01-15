@@ -10,13 +10,6 @@
   box-shadow: -3px 0 0px 0 green;
 }
 
-.show {
-  display: block;
-}
-.hide {
-  display: none;
-}
-
 .removable-item {
   color: #0a53be;
 
@@ -60,4 +53,11 @@
     padding: 5px;
     background-color: rgba(128, 128, 128, 0.38);
   }
+}
+
+.show {
+  display: block;
+}
+.hide {
+  display: none;
 }
