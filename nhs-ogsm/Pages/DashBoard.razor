@@ -262,21 +262,6 @@
         <CardBody>
             @* list with goals *@
             @code{
-                // Goal Filter
-                bool _goalFilterIsDone;
-                public void FilterGoals()
-                {
-                    IQueryable<Goal> FilterGoalList = currentOgsm.Goals.AsQueryable();
-                    if (_goalFilterIsDone)
-                    {
-                        FilterGoalList = FilterGoalList.Where(goal => !goal.IsDone);
-                    }
-
-                    FilterGoalList = FilterGoalList.OrderBy(goal => goal.IsDone).ThenBy(goal => goal.EndDate);
-                    goalList = FilterGoalList.ToList();
-                    StateHasChanged();
-                }
-                
                 Dictionary<int, bool> goalCollapsed = new();
             }
             @foreach (var goal in goalList)
@@ -455,7 +440,7 @@
         <CardHeader>
             @code{
   
-                Dictionary<int, bool> _strategyCollapsed = new();
+                Dictionary<int, bool> StrategyCollapsed = new();
                 StrategyFilter _strategyFilter = new();
                 class StrategyFilterSettings
                 {
@@ -507,7 +492,7 @@
         <CardBody>
             @foreach (Strategy strategy in strategyList)
             {
-                _strategyCollapsed.TryAdd(strategy.ID, true);
+                StrategyCollapsed.TryAdd(strategy.ID, true);
                 // EDIT CARD FOR STRATEGIES
                 if (CurrentStrategy.ID == strategy.ID)
                 {
@@ -577,7 +562,7 @@
                             </Button>
                         }
                     </CardHeader>
-                    <CardBody Class="@(_strategyCollapsed[strategy.ID] ? "hide" : "show")">
+                    <CardBody Class="@(StrategyCollapsed[strategy.ID] ? "hide" : "show")">
                         <table>
                             @if (strategy.Goals.Any())
                             {
@@ -602,7 +587,7 @@
                             </tr>
                         </table>
                     </CardBody>
-                    <CardFooter Class="@(_strategyCollapsed[strategy.ID] ? "hide" : "show")">
+                    <CardFooter Class="@(StrategyCollapsed[strategy.ID] ? "hide" : "show")">
 
                         <Button Size="Size.Small" @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardFooter>
@@ -697,10 +682,9 @@
     @* card list for action measures *@
     <CardsList Title="@GetMeasuresListTitle()">
         <CardBody>
-            @if (CurrentStrategy.Actions.Any())
+            @if (goalFilter.Settings.StrategyID != 0)
             {
-                ActionMeasuresList = new();
-                ActionMeasuresList = CurrentStrategy.Actions.ToList();
+                ActionMeasuresList = currentOgsm.Strategies.First(strat => strat.ID == goalFilter.Settings.StrategyID).Actions.ToList();
             }
             else if (currentGoal.Strategies.Any())
             {
