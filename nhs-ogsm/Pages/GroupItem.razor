@@ -85,7 +85,7 @@
     <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>People</th>
+        <th>Leader</th>
         <th>Delete</th>
         <th>Edit</th>
     </tr>
@@ -96,7 +96,7 @@
         <tr>
             <td>@groupItems.ID</td>
             <td>@groupItems.Name</td>
-            <td>@foreach (var user in groupItems.Users) @user.FirstName</td>
+            <td>@groupItems.Leader.FirstName</td>
             <td><Button @onclick="@(() => HandleDelete(groupItems))" Color="ButtonColor.Danger" Outline="true">Delete</Button></td>
             <td><Button @onclick="@(() => EditForm(groupItems))" Color="ButtonColor.Secondary" Outline="true">Edit</Button></td>
         </tr>
