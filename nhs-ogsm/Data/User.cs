@@ -20,7 +20,7 @@ public class User
     public string LastName { get; set; }
     public bool IsAdmin { get; set; } = false;
     // parent groups
-    public ICollection<Group>? Groups { get; set; } = new List<Group>();
+    public ICollection<Group> Groups { get; set; } = new List<Group>();
     // child Actions
     public ICollection<ActionMeasure>? Actions { get; set; }
     

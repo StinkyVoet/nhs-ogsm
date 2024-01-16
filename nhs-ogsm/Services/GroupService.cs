@@ -15,7 +15,8 @@ public class GroupService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            group.Users.Add(account);
+            group.Users.Add(account); 
+            context.SaveChanges();
             UpdateGroup(group);
         }
         return true;
@@ -69,11 +70,14 @@ public class GroupService
             return groups;
         }
     }
-    public Group GetSingleGroup(int groupId)
+    
+    public Group GetSingleGroup(int groupID)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            Group group = context.Groups.Where(group => group.ID == groupId).First();
+            Group group = context.Groups.Where(group => group.ID == groupID)
+                .First();
+
             return group;
         }
     }

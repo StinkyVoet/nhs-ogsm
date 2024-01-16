@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using nhs_ogsm.Data;
+using nhs_ogsm.Pages;
+using Group = System.Text.RegularExpressions.Group;
+
 namespace nhs_ogsm.Services;
 
 public class UserService
@@ -38,6 +41,7 @@ public class UserService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
+
             context.Entry(user).State = EntityState.Modified;
             context.SaveChanges();
         }
@@ -84,20 +88,27 @@ public class UserService
         }
     }
 
-    public async Task<IEnumerable<User>> GetUsersAsync(string searchText)
+    public void AddGroupToUser(User user, Data.Group selectedgroup)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            // Simulate an asynchronous operation if needed
-            await Task.Delay(100); // Simulating a delay
-
-            // Perform the actual data filtering based on the search text
-            var filteredUsers = await context.Users
-                .Where(user => user.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                               || user.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToListAsync();
-
-            return filteredUsers;
+            Data.Group Group = context.Groups.Include(g => g.Users).First(g => g.ID == selectedgroup.ID);
+            Data.User User = context.Users.Include(g => g.Groups).First(u => u.ID == user.ID);
+            Group.Users.Add(User);
+            user.Groups.Add(Group);
+            context.SaveChanges();
+        }
+    }
+    
+    public void removeGroupFromUser(User user, Data.Group selectedgroup)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Data.Group Group = context.Groups.Include(g => g.Users).First(g => g.ID == selectedgroup.ID);
+            Data.User User = context.Users.Include(g => g.Groups).First(u => u.ID == user.ID);
+            Group.Users.Remove(User);
+            user.Groups.Remove(Group);
+            context.SaveChanges();
         }
     }
 }

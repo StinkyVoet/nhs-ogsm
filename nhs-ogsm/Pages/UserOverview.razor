@@ -3,6 +3,7 @@
 @using nhs_ogsm.Services
 @using BlazorBootstrap
 @inject UserService UserService;
+@inject GroupService GroupService;
 @inject NavigationManager NavigationManager;
 
 <h3>User Overview</h3>
@@ -10,12 +11,12 @@
 @code
 {
     public List<User> _users;
-    public List<User>? foundUsers;
 
     //get Users on load
     protected override async Task OnInitializedAsync()
     {
         _users = UserService.GetAllUsers();
+        _allGroups = GroupService.GetAllGroups();
     }
     
     public void Redirect(string uri)
@@ -29,45 +30,6 @@
     <link href="css\main.css" rel="stylesheet"/>
     <title>Users</title>
 </head>
-
-@*<div class="row">
-    <div class="col-md-5 col-sm-12">
-        <AutoComplete @bind-Value="userName"
-                      TItem="User"
-                      DataProvider="UserDataProvider"
-                      PropertyName="UserName"
-                      Placeholder="Search a user..."
-                      OnChanged="(User user) => OnAutoCompleteChanged(user)" />
-    </div>
-</div>
-
-@code {
-    private string userName;
-
-    public IEnumerable<User> usersEnum;
-
-    private async Task<AutoCompleteDataProviderResult<User>> UserDataProvider(AutoCompleteDataProviderRequest<User> request)
-    {
-        if (usersEnum is null) // pull customers only one time for client-side autocomplete
-            usersEnum = UserService.GetAllUsers();
-
-        return await Task.FromResult(request.ApplyTo(usersEnum.OrderBy(user => user.FirstName)));
-    }
-
-    private void OnAutoCompleteChanged(User user)
-    {
-        foreach (User u in _users)
-        {
-            if (u.FirstName.Contains(userName) || u.LastName.Contains(userName))
-            {
-                foundUsers.Add(u);
-            }
-        }
-        _users = foundUsers;
-
-        Console.WriteLine($"'{user?.FirstName}' selected.");
-    }
-}*@
 
 <style>
     .dashboardButton {
@@ -88,7 +50,105 @@
           color: white;
     }
 </style>
+@code{
 
+    private Modal _editModal = default!;
+    private User _editingUser = new();
+    private int _SelectedGroup;
+    List<Group> _allGroups = new();
+    
+    public void AddGroupToUser()
+    {
+        if (_SelectedGroup == 0) return;
+        Group selectedgroup = new Group(){ID = _SelectedGroup};
+        UserService.AddGroupToUser(_editingUser, selectedgroup);
+        _editingUser.Groups.Add(selectedgroup);
+        StateHasChanged();
+    }
+    
+    public void RemoveGroupFromUser(Group group)
+    {
+        UserService.removeGroupFromUser(_editingUser, group);
+        _editingUser.Groups.Remove(group);
+        StateHasChanged();
+    }
+    
+    public void HandleUserEdit(EditContext editContext)
+    {
+        var newUser = (User)editContext.Model;
+        _editingUser = newUser;
+        
+        UserService.UpdateUser(_editingUser);
+        HideModal(_editModal);
+    }
+    
+    public void ShowModal(Modal modal)
+    {
+        modal.ShowAsync();
+    }
+    private void HideModal(Modal modal)
+    {
+        modal.HideAsync();
+    }
+
+
+                            
+}
+<Modal @ref="_editModal" Title="Editing User">
+    <BodyTemplate>
+
+        <EditForm Model="@_editingUser" OnValidSubmit="HandleUserEdit">
+            <DataAnnotationsValidator/>
+            <table>
+                <tr>
+                    <td><label>Email:</label></td>
+                    <td><InputText class="input" @bind-Value="@_editingUser.Email"></InputText></td>
+                    <td><ValidationMessage For="() => _editingUser.Email"/></td>
+                </tr>
+                <tr>
+                    <td><label>FirstName:</label></td>
+                    <td><InputText class="input" @bind-Value="@_editingUser.FirstName"></InputText></td>
+                    <td><ValidationMessage For="() => _editingUser.FirstName"/></td>
+                </tr>
+                <tr>
+                    <td><label>LastName:</label></td>
+                    <td><InputText class="input" @bind-Value="@_editingUser.LastName"></InputText></td>
+                    <td><ValidationMessage For="() => _editingUser.LastName"/></td>
+                </tr>
+                <tr>
+                    <td><label>Password:</label></td>
+                    <td><InputText type="password" class="input" @bind-Value="@_editingUser.Password"></InputText></td>
+                    <td><ValidationMessage For="() => _editingUser.Password"/></td>
+                </tr>
+                <tr>
+                    <td><label>Group:</label></td>
+                    <td>
+
+                        <InputSelect class="input" @bind-Value="@_SelectedGroup">
+                            <option value="0">None</option>
+                            @foreach (var group in _allGroups)
+                            {
+                                if (_editingUser.Groups.Any(group1 => group1.ID == group.ID)) continue;
+                                <option value="@group.ID">@group.Name</option>
+                            }
+                        </InputSelect>
+                    </td>
+                    <td><Button Color="ButtonColor.Info" @onclick="() => { AddGroupToUser(); }">+</Button></td>
+                </tr>
+                <tr>
+                    <td>
+                        @foreach (var group in _editingUser.Groups)
+                        {
+                            <span @onclick="() => RemoveGroupFromUser(group)">@group.Name</span><span>, </span>
+                        }
+                    </td>
+                </tr>
+            </table>
+            <Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
+            <Button @onclick="() => { _editingUser = new User(); HideModal(_editModal); }" Color="ButtonColor.Warning">Cancel</Button>
+        </EditForm>
+    </BodyTemplate>
+</Modal>
 <table class="table"  style="table-layout: fixed">
     <thead>
     <tr>
@@ -128,7 +188,7 @@
                     }
                 </td>
                 <td>
-                    <Button @onclick="@(() => Redirect($"User/{user.ID}"))" Color="ButtonColor.Primary">Edit</Button>
+                    <Button @onclick="@(() => { _editingUser = user; ShowModal(_editModal); })" Color="ButtonColor.Primary">Edit</Button>
                     <Button @onclick="@(() => DeleteUser(user.ID))" Color="ButtonColor.Danger">Delete</Button>
                 </td>
             </tr>
