@@ -1,0 +1,76 @@
+﻿@page "/Groups"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject GroupService GroupService;
+@inject NavigationManager NavigationManager
+
+
+@code
+{
+    public List<Group> _groups;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _groups = GroupService.GetAllGroups();
+    }
+    
+}
+
+
+<PageTitle>Overview</PageTitle>
+
+<style>
+    .dashboardButton {
+        border: 2px solid #04AA6D;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 24px;
+        border-radius: 8px;   
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 16px 0 rgba(0,0,0,0.19);
+        float: right;
+        transition-duration: 0.4s;
+        position: sticky;
+        bottom: 10px;
+    }
+    
+    .dashboardButton:hover {
+        background-color: #04AA6D;
+          color: white;
+    }
+</style>
+
+<h3>All Groups</h3>
+<div style="height: 20px"></div>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Select</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @foreach (var group in _groups)
+        {
+            <tr>
+                <td>@group.ID</td>
+                <td>@group.Name</td>
+                <td><Button @onclick="@(() => Redirect("Groups/" + group.ID))" Color="ButtonColor.Primary">Select</Button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+        
+    <button class="dashboardButton" onclick="@(() => Redirect("GroupItem/"))">+</button>
+</div>
+    
+
+@code
+{
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
+}

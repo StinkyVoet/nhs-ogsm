@@ -1,72 +1,108 @@
-﻿@page "/Groups"
+﻿@page "/Groups/{GroupId:int}"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@using ActionMeasure = nhs_ogsm.Data.ActionMeasure
+@inject NavigationManager NavigationManager
 @inject GroupService GroupService;
-@inject NavigationManager NavigationManager;
-@inject StrategyService StrategyService;
+@inject UserService UserService;
+@inject StateContainerService StateService;
 
 
-<h3>Groups overview</h3>
-
-@code
-{
-    public List<Group> _groups;
-
-    //get Groups on load
+@code{
+    [Parameter]
+    public int GroupId { get; set; }
+    
+    public Group currentGroup { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        _groups = GroupService.GetAllGroups();
+        try
+        {
+            currentGroup = GroupService.GetSingleGroup(GroupId);
+        }
+        catch (Exception e)
+        {
+            NavigationManager.NavigateTo("Groups");
+        }
+        
     }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
+    
+
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <link href="css\main.css" rel="stylesheet"/>
-    <title>Groups</title>
-</head>
-<body>
+<link href="css/DashBoard.css" rel="stylesheet"/>
+<PageTitle>Group: @currentGroup.Name</PageTitle>
 <div>
     <table class="table">
         <thead>
         <tr>
-            <th>Assigned People</th>
-            <th>Assigned OGSM's</th>
-            <th>Statistics</th>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Select</th>
         </tr>
         </thead>
         <tbody>
-         
-        @if (_groups != null)
+
+        @foreach (var user in currentGroup.Users)
         {
-            @foreach (var group in _groups)
-            {
-                <tr>
-                    <td>@group.Users</td>
-                    <td>@group.Ogsms</td>
-                    <td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/" + group.ID))" class="btn btn-default"/></td>
-                </tr>
-            }
+            <tr>
+                <td>@user.FirstName</td>
+                <td>@user.LastName</td>
+            </tr>
         }
-        <tr>
-            <td><Button Color="ButtonColor.Primary" OnClick="@(() => Redirect("AddPersonToGroup"))">+</Button></td>
-            <td><Button Color="ButtonColor.Primary" OnClick="@(() => Redirect("AddOGSMToGroup"))">+</Button></td>
-        </tr>
         </tbody>
     </table>
 </div>
-@code
-{
-    public void HandleAddPersonToGroup(User user, Group group)
+@code{
+     public void HandleGroupDelete()
     {
-        group.Users.Add(user);
-        StateHasChanged();
+        GroupService.DeleteGroup(currentGroup.ID);
+        NavigationManager.NavigateTo("Groups");
     }
     
-    public void Redirect(string uri)
+    public void HandleGroupEdit(EditContext editContext)
     {
-        NavigationManager.NavigateTo(uri);
+        var newGroup = (Group)editContext.Model;
+        Group realGroup = GroupService.GetSingleGroup(newGroup.ID);
+        realGroup.Name = newGroup.Name;
+        GroupService.UpdateGroup(realGroup);
+        
+        currentGroup.Name = newGroup.Name;
+        _editGroup.Name = newGroup.Name;
+        
+        StateService.NotifyStateChanged();
+    }
+    
+    
+    Group _editGroup = new();
+    Modal GroupEditModal;
+    string GroupFormId = "GroupEditForm";
+    string modalTitle = "Edit";
+    
+    private async Task OnShowModalClick()
+    {
+        modalTitle = "Edit " + currentGroup.Name;
+        _editGroup = new Group {ID = currentGroup.ID, Name = currentGroup.Name};
+        await GroupEditModal.ShowAsync();
     }
 }
-</body>
-</html>
+<Modal @ref="GroupEditModal" Title=@modalTitle>
+    <BodyTemplate>
+         <EditForm id="@GroupFormId" Model="@_editGroup" OnValidSubmit="HandleGroupEdit">
+             <DataAnnotationsValidator/>
+             <table>
+                 <tr>
+                     <td>Name:</td>
+                     <td><InputText class="input" id="NameInput" @bind-Value="@_editGroup.Name"></InputText></td>
+                 </tr>
+             </table>
+         </EditForm>   
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button form="@GroupFormId" Color="ButtonColor.Primary" Type="ButtonType.Submit">Save</Button>
+    </FooterTemplate>
+</Modal>

@@ -40,6 +40,27 @@ public class GroupService
             context.SaveChanges();
         }
     }
+    
+    public bool AddGroup(Group group)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            context.Groups.Add(group);
+            context.SaveChanges();
+        }
+        
+        return true;
+    }
+    
+    public void DeleteGroup(int id)  
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Group entity = context.Groups.First(t => t.ID == id);
+            context.Groups.Remove(entity);
+            context.SaveChanges();
+        }
+    }
 
     public List<Group> GetAllGroups()
     {
