@@ -3,11 +3,13 @@
 @using nhs_ogsm.Services
 @using Microsoft.AspNetCore.Http.Extensions
 @inject GroupService GroupService;
+@inject UserService UserService;
 @inject StateContainerService StateService;
 
 @code
 {
     public List<Group> _groups;
+    public List<User> _users;
     private bool isEdit = false;
     
     //Save new OGSM item
@@ -40,7 +42,7 @@
     public void EditForm(Group item)
     {
         isEdit = true;
-        pageTitle = "Editing: "+item.ID;
+        pageTitle = "Editing: "+ item.Name;
         _group = item;
         StateService.NotifyStateChanged();
         StateHasChanged();
@@ -49,6 +51,7 @@
     protected override async Task OnInitializedAsync()
     {
         _groups = GroupService.GetAllGroups();
+        _users = UserService.GetAllUsers();
     }
     
 }
@@ -59,12 +62,12 @@
     <label for="GroupInput">Name</label>
     <InputText id="GroupInput" class="input" @bind-Value="@_group.Name" required></InputText>
     
-    <label for="people">People</label>
-    <InputSelect id="people" class="input" @bind-Value="@_group.Users">
+    <label for="Leader">Group Leader</label>
+    <InputSelect id="leader" class="input" @bind-Value="@_group.LeaderID">
         <option></option>
-        @foreach (var person in _group.Users)
+        @foreach (var user in _users)
         {
-            <option value="@person.ID">@person.FirstName</option>
+            <option value="@user.ID">@user.FirstName @user.LastName</option>
         }
     </InputSelect>
     
@@ -93,7 +96,7 @@
         <tr>
             <td>@groupItems.ID</td>
             <td>@groupItems.Name</td>
-            <td>@groupItems.Users</td>
+            <td>@foreach (var user in groupItems.Users) @user.FirstName</td>
             <td><Button @onclick="@(() => HandleDelete(groupItems))" Color="ButtonColor.Danger" Outline="true">Delete</Button></td>
             <td><Button @onclick="@(() => EditForm(groupItems))" Color="ButtonColor.Secondary" Outline="true">Edit</Button></td>
         </tr>

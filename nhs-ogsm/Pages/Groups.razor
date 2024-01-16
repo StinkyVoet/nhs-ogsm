@@ -36,6 +36,27 @@
 
 <link href="css/DashBoard.css" rel="stylesheet"/>
 <PageTitle>Group: @currentGroup.Name</PageTitle>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Select</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @foreach (var user in currentGroup.Users)
+        {
+            <tr>
+                <td>@user.FirstName</td>
+                <td>@user.LastName</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
 @code{
      public void HandleGroupDelete()
     {
