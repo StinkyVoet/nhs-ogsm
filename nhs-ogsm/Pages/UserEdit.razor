@@ -2,6 +2,7 @@
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
 @using BlazorBootstrap
+@using System.Net.Sockets
 @inject UserService UserService;
 @inject GroupService GroupService;
 @inject NavigationManager NavigationManager;
@@ -98,6 +99,8 @@
         {
             _selectedGroup = GroupService.GetSingleGroup((int)_selectedGroupID);
             GroupService.AddUserToGroup(_user, _selectedGroup);
+            _user.Groups.Add(_selectedGroup);
+            _selectedGroup.Users.Add(_user);
         }
         
         UserService.UpdateUser(_user);

@@ -83,21 +83,4 @@ public class UserService
 
         }
     }
-
-    public async Task<IEnumerable<User>> GetUsersAsync(string searchText)
-    {
-        using (var context = _dbContextFactory.CreateDbContext())
-        {
-            // Simulate an asynchronous operation if needed
-            await Task.Delay(100); // Simulating a delay
-
-            // Perform the actual data filtering based on the search text
-            var filteredUsers = await context.Users
-                .Where(user => user.FirstName.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-                               || user.LastName.Contains(searchText, StringComparison.OrdinalIgnoreCase))
-                .ToListAsync();
-
-            return filteredUsers;
-        }
-    }
 }
