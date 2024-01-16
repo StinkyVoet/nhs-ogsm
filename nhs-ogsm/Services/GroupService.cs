@@ -45,7 +45,7 @@ public class GroupService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            List<Group> groups = context.Groups.Include(g => g.Ogsms).ToList();
+            List<Group> groups = context.Groups.ToList();
             return groups;
         }
     }
@@ -55,7 +55,6 @@ public class GroupService
         using (var context = _dbContextFactory.CreateDbContext())
         {
             Group group = context.Groups.Where(group => group.ID == groupID)
-                .Include(group => group.Ogsms)
                 .First();
 
             return group;
