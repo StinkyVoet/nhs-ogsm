@@ -52,7 +52,7 @@
 
         @if (_groups != null)
         {
-            @foreach (var group in _groups)
+            @foreach (var group in _groups.OrderBy(g => g.ID))
             {
                 <tr>
                     <td>@group.Name</td>
