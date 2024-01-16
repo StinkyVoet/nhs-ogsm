@@ -32,6 +32,30 @@ public class GroupService
         return true;
     }
     
+    public void AddOgsmToGroup(Group group, Data.Ogsm selectedOgsm)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Data.Ogsm Ogsm = context.Ogsms.Include(o => o.Groups).First(o => o.ID == selectedOgsm.ID);
+            Data.Group Group = context.Groups.Include(g => g.Ogsms).First(g => g.ID == group.ID);
+            Ogsm.Groups.Add(Group);
+            group.Ogsms.Add(Ogsm);
+            context.SaveChanges();
+        }
+    }
+    
+    public void RemoveOgsmFromGroup(Group group, Data.Ogsm selectedOgsm)
+    {
+        using (var context = _dbContextFactory.CreateDbContext())
+        {
+            Data.Ogsm Ogsm = context.Ogsms.Include(o => o.Groups).First(o => o.ID == selectedOgsm.ID);
+            Data.Group Group = context.Groups.Include(g => g.Ogsms).First(g => g.ID == group.ID);
+            Ogsm.Groups.Remove(Group);
+            group.Ogsms.Remove(Ogsm);
+            context.SaveChanges();
+        }
+    }
+    
     public void UpdateGroup(Group group)
     {
         using (var context = _dbContextFactory.CreateDbContext())
@@ -75,7 +99,8 @@ public class GroupService
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {
-            Group group = context.Groups.Where(group => group.ID == groupID)
+            Group group = context.Groups.Include(g => g.Users)
+                .Where(group => group.ID == groupID)
                 .First();
 
             return group;
