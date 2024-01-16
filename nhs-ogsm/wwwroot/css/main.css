@@ -288,6 +288,10 @@ main:has(.ogsm-objective) {
   border-bottom: 1px solid #b3b3b3;
   border-radius: 0.2em 0.2em 0 0;
   transition: all 0.2s ease-out;
+  text-align: left;
+}
+.input::placeholder {
+  color: #b3b3b3;
 }
 .input:focus {
   border-bottom-color: #007734;
@@ -309,6 +313,7 @@ select.input {
   display: grid;
   column-gap: 0.5rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: 0 1fr;
 }
 .ogsm-dash .active-item {
   border: 1px #005ea8 solid;
@@ -331,7 +336,8 @@ body {
   padding: 0.5rem 0.75rem;
   text-align: center;
   display: flex;
-  height: 3em;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #b3b3b3;
 }
 .sidebar-top > .sidebar-title {
   flex-grow: 1;
@@ -426,6 +432,14 @@ body {
   grid-area: footer;
   padding: 5px;
   background-color: rgba(128, 128, 128, 0.38);
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }
 
 /*# sourceMappingURL=main.css.map */
