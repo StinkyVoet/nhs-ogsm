@@ -1,89 +1,137 @@
 ﻿@page "/Overview"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@using System.Drawing
+@using ChartJs.Blazor.BarChart;
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Util
+@using ChartJs.Blazor.BarChart.Axes
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Axes.Ticks
+@using InteractionMode = ChartJs.Blazor.Common.Enums.InteractionMode
+
+
+
 @inject OgsmItemService OgsmItemService;
+
+
 
 <PageTitle>Overview</PageTitle>
 <h1>Overview</h1>
 <br/>
 <br/>
-
-<div class="dropdown">
-    <Button>←</Button>Month<Button>→</Button>
-    <Button Color="ButtonColor.Info">OGSM</Button>
-    @*<div class="dropdown-content">
-        <a href="#">Link 1</a>
-        <a href="#">Link 2</a>
-        <a href="#">Link 3</a>
-    </div>*@
-</div>
-<BarChart @ref="barChart" Class="mb-4" />
-
-@code {
-    private BarChart barChart;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+@code
+{
+    
+    private BarConfig ogsmOverView;
+    protected override void OnInitialized()
     {
-        if (firstRender)
-        {
-            await RenderManhattanAsync();
-        }
-
-        await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private async Task RenderManhattanAsync()
-    {
-        List<string> SetLabels = new List<string>();
-        List<double> GoalCount = new List<double>();
-        List<double> StratCount = new List<double>();
-        foreach (Ogsm ogsm in OgsmItemService.GetAllOgsm())
-        {
-            SetLabels.Add(ogsm.Title);
-            GoalCount.Add(ogsm.Goals.Count);
-            StratCount.Add(ogsm.Strategies.Count);
-        }
         
-        var data = new ChartData()
+        ogsmOverView = new BarConfig()
         {
-            Labels = SetLabels,
-            Datasets = new List<IChartDataset>()
+            Options = new BarOptions()
             {
-                new BarChartDataset()
+                Tooltips = new Tooltips
                 {
-                    Label = "Goals",
-                    Data = GoalCount,
-                    CategoryPercentage = 0.8,
-                    BarPercentage = 1,
+                    Mode = InteractionMode.X,
                 },
-                new BarChartDataset()
+                Responsive = true,
+                Title = new OptionsTitle
                 {
-                    Label = "Strats",
-                    Data = StratCount,
-                    CategoryPercentage = 0.8,
-                    BarPercentage = 1,
+                    Text = "Ogsm Overview",
+                    Display = true
+                },
+                Scales = new BarScales()
+                {
+                    YAxes = new List<CartesianAxis>()
+                    {
+                        new BarLinearCartesianAxis()
+                        {
+                            Stacked = true,
+                            ScaleLabel = new ScaleLabel()
+                            {
+                                LabelString = "Items",
+                                Display = true
+                            },
+                            Ticks = new LinearCartesianTicks()
+                            {
+                                BeginAtZero = true,
+                                StepSize = 1,
+                                SuggestedMax = 5,
+                                
+                            }
+                        },
+                    },
                 }
-            }
+            },
         };
         
-        var options = new BarChartOptions();
-
-        options.Interaction.Mode = InteractionMode.Index;
-
-        options.Plugins.Title.Text = "Items per Ogsm";
-        options.Plugins.Title.Display = true;
-        options.Plugins.Title.Font.Size = 20;
-
-        options.Responsive = true;
-
-        options.Scales.X.Title.Text = "Ogsm";
-        options.Scales.X.Title.Display = true;
-
-        options.Scales.Y.Title.Text = "Items";
-        options.Scales.Y.Title.Display = true;
-
-        await barChart.InitializeAsync(data, options);
+        IDataset<int> doneGoalDataSet = new BarDataset<int>()
+        {
+            Label = "Finished Goals",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(255, 37, 73)),
+            Stack = "Goals",
+        };
+        IDataset<int> notDoneGoalDataSet = new BarDataset<int>()
+        {
+            Label = "Unfinished Goals",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(50,255, 37, 73)),
+            Stack = "Goals",
+        };
+        ogsmOverView.Data.Datasets.Add(doneGoalDataSet);
+        ogsmOverView.Data.Datasets.Add(notDoneGoalDataSet);
+        
+        IDataset<int> doneStratDataSet = new BarDataset<int>()
+        {
+            Label = "Finished Strats",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(229, 135, 0)),
+            Stack = "Strats",
+        };
+        IDataset<int> notDoneStratDataSet = new BarDataset<int>()
+        {
+            Label = "Unfinished Strats",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(50,229, 135, 0)),
+            Stack = "Strats",
+        };
+        ogsmOverView.Data.Datasets.Add(doneStratDataSet);
+        ogsmOverView.Data.Datasets.Add(notDoneStratDataSet);
+        
+        IDataset<int> doneActionsDataSet = new BarDataset<int>()
+        {
+            Label = "Finished Actions",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(0, 135, 229)),
+            Stack = "Actions",
+        };
+        IDataset<int> notDoneActionsDataSet = new BarDataset<int>()
+        {
+            Label = "Unfinished Actions",
+            BackgroundColor = ColorUtil.FromDrawingColor(Color.FromArgb(50,0, 135, 229)),
+            Stack = "Actions",
+        };
+        ogsmOverView.Data.Datasets.Add(doneActionsDataSet);
+        ogsmOverView.Data.Datasets.Add(notDoneActionsDataSet);
+        
+        foreach (Ogsm ogsm in OgsmItemService.GetAllOgsm())
+        {
+            ogsmOverView.Data.Labels.Add(ogsm.Title);
+            
+            doneGoalDataSet.Add(ogsm.Goals.Count(g => g.IsDone));
+            notDoneGoalDataSet.Add(ogsm.Goals.Count(g => !g.IsDone));
+            
+            doneStratDataSet.Add(ogsm.Strategies.Count(s => s.IsDone));
+            notDoneStratDataSet.Add(ogsm.Strategies.Count(s => !s.IsDone));
+            
+            int doneActions = 0;
+            int notDoneActions = 0;
+            foreach (var strategy in ogsm.Strategies)
+            {
+                doneActions += strategy.Actions.Count(a => a.IsDone);
+                notDoneActions += strategy.Actions.Count(a => !a.IsDone);
+            }
+            doneActionsDataSet.Add(doneActions);
+            notDoneActionsDataSet.Add(notDoneActions);
+        }
     }
     
-    
 }
+<Chart Config="ogsmOverView"></Chart>
