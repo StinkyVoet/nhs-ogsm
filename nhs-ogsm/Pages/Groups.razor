@@ -1,64 +1,87 @@
-﻿@page "/Groups"
+﻿@page "/Groups/{GroupId:int}"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@using ActionMeasure = nhs_ogsm.Data.ActionMeasure
+@inject NavigationManager NavigationManager
 @inject GroupService GroupService;
-@inject NavigationManager NavigationManager;
-@inject StrategyService StrategyService;
+@inject UserService UserService;
+@inject StateContainerService StateService;
 
 
-<h3>Groups overview</h3>
-
-@code
-{
-    public List<Group> _groups;
-
-    //get Groups on load
-    /*protected override async Task OnInitializedAsync()
+@code{
+    [Parameter]
+    public int GroupId { get; set; }
+    
+    public Group currentGroup { get; set; }
+    protected override async Task OnInitializedAsync()
     {
-        _groups = GroupService.GetAllGroups();
-    }*/
-}
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Groups</title>
-</head>
-<body>
-<div>
-    <table class="table">
-        <thead>
-        <tr>
-            <th>Assigned People</th>
-            <th>Assigned OGSM's</th>
-            <th>Statistics</th>
-        </tr>
-        </thead>
-        <tbody>
-
-        @*@foreach (var group in _groups)
+        try
         {
-            <tr>
-                <td>@group.Members</td>
-                <td>@group.Name</td>
-                $1$<td><input type="button" value="Select" onclick="@(() => Redirect("DashBoard/"+group.ID))" class="btn btn-default"/></td>#1#
-            </tr>
-        }*@
-        </tbody>
-    </table>
-</div>
-@code
-{
-    public void HandleAddPersonToGroup(User user, Group group)
+            currentGroup = GroupService.GetSingleGroup(GroupId);
+        }
+        catch (Exception e)
+        {
+            NavigationManager.NavigateTo("Groups");
+        }
+        
+    }
+
+    protected override async Task OnParametersSetAsync()
     {
-        group.Users.Add(user);
-        StateHasChanged();
+        await OnInitializedAsync();
     }
     
-    public void Redirect(string uri)
+
+}
+
+<link href="css/DashBoard.css" rel="stylesheet"/>
+<PageTitle>OGSM: @currentGroup.Name</PageTitle>
+@code{
+     public void HandleGroupDelete()
     {
-        NavigationManager.NavigateTo(uri);
+        GroupService.DeleteGroup(currentGroup.ID);
+        NavigationManager.NavigateTo("Groups");
+    }
+    
+    public void HandleGroupEdit(EditContext editContext)
+    {
+        var newGroup = (Group)editContext.Model;
+        Group realGroup = GroupService.GetSingleGroup(newGroup.ID);
+        realGroup.Name = newGroup.Name;
+        GroupService.UpdateGroup(realGroup);
+        
+        currentGroup.Name = newGroup.Name;
+        _editGroup.Name = newGroup.Name;
+        
+        StateService.NotifyStateChanged();
+    }
+    
+    
+    Group _editGroup = new();
+    Modal GroupEditModal;
+    string GroupFormId = "GroupEditForm";
+    string modalTitle = "Edit";
+    
+    private async Task OnShowModalClick()
+    {
+        modalTitle = "Edit " + currentGroup.Name;
+        _editGroup = new Group {ID = currentGroup.ID, Name = currentGroup.Name};
+        await GroupEditModal.ShowAsync();
     }
 }
-</body>
-</html>
+<Modal @ref="GroupEditModal" Title=@modalTitle>
+    <BodyTemplate>
+         <EditForm id="@GroupFormId" Model="@_editGroup" OnValidSubmit="HandleGroupEdit">
+             <DataAnnotationsValidator/>
+             <table>
+                 <tr>
+                     <td>Name:</td>
+                     <td><InputText class="input" id="NameInput" @bind-Value="@_editGroup.Name"></InputText></td>
+                 </tr>
+             </table>
+         </EditForm>   
+    </BodyTemplate>
+    <FooterTemplate>
+        <Button form="@GroupFormId" Color="ButtonColor.Primary" Type="ButtonType.Submit">Save</Button>
+    </FooterTemplate>
+</Modal>

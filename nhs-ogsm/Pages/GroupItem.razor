@@ -1,0 +1,103 @@
+﻿@page "/GroupItem"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@using Microsoft.AspNetCore.Http.Extensions
+@inject GroupService GroupService;
+@inject StateContainerService StateService;
+
+@code
+{
+    public List<Group> _groups;
+    private bool isEdit = false;
+    
+    //Save new OGSM item
+    Group _group = new();
+    public void HandleSubmit(EditContext editContext)
+    {
+        var newGroup = (Group)editContext.Model;
+        if (isEdit)
+        {
+            GroupService.UpdateGroup(_group);
+        }
+        else
+        {
+            GroupService.AddGroup(newGroup);
+        }
+        _group = new Group();
+        _groups = GroupService.GetAllGroups();
+        StateService.NotifyStateChanged();
+        StateHasChanged();
+    }
+    
+    public void HandleDelete(Group item)
+    {
+        GroupService.DeleteGroup(item.ID);
+        _groups.Remove(item);
+        StateService.NotifyStateChanged();
+        StateHasChanged();
+    }
+
+    public void EditForm(Group item)
+    {
+        isEdit = true;
+        pageTitle = "Editing: "+item.ID;
+        _group = item;
+        StateService.NotifyStateChanged();
+        StateHasChanged();
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _groups = GroupService.GetAllGroups();
+    }
+    
+}
+
+<h3>@pageTitle</h3>
+
+<EditForm Model="@_group" OnValidSubmit="HandleSubmit">
+    <label for="GroupInput">Name</label>
+    <InputText id="GroupInput" class="input" @bind-Value="@_group.Name" required></InputText>
+    
+    <label for="people">People</label>
+    <InputSelect id="people" class="input" @bind-Value="@_group.Users">
+        <option></option>
+        @foreach (var person in _group.Users)
+        {
+            <option value="@person.ID">@person.FirstName</option>
+        }
+    </InputSelect>
+    
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
+    <Button Color="ButtonColor.Secondary" @onclick="() => _group = new Group()">Cancel</Button>
+</EditForm>
+
+@code
+{
+    public string pageTitle = "New group item";
+}
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>People</th>
+        <th>Delete</th>
+        <th>Edit</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var groupItems in _groups)
+    {
+        <tr>
+            <td>@groupItems.ID</td>
+            <td>@groupItems.Name</td>
+            <td>@groupItems.Users</td>
+            <td><Button @onclick="@(() => HandleDelete(groupItems))" Color="ButtonColor.Danger" Outline="true">Delete</Button></td>
+            <td><Button @onclick="@(() => EditForm(groupItems))" Color="ButtonColor.Secondary" Outline="true">Edit</Button></td>
+        </tr>
+    }
+    </tbody>
+</table>
+

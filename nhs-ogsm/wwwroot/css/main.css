@@ -288,6 +288,10 @@ main:has(.ogsm-objective) {
   border-bottom: 1px solid #b3b3b3;
   border-radius: 0.2em 0.2em 0 0;
   transition: all 0.2s ease-out;
+  text-align: left;
+}
+.input::placeholder {
+  color: #b3b3b3;
 }
 .input:focus {
   border-bottom-color: #007734;
@@ -331,7 +335,8 @@ body {
   padding: 0.5rem 0.75rem;
   text-align: center;
   display: flex;
-  height: 3em;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #b3b3b3;
 }
 .sidebar-top > .sidebar-title {
   flex-grow: 1;
