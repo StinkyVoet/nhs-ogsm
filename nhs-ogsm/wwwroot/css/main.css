@@ -288,6 +288,10 @@ main:has(.ogsm-objective) {
   border-bottom: 1px solid #b3b3b3;
   border-radius: 0.2em 0.2em 0 0;
   transition: all 0.2s ease-out;
+  text-align: left;
+}
+.input::placeholder {
+  color: #b3b3b3;
 }
 .input:focus {
   border-bottom-color: #007734;
@@ -309,6 +313,7 @@ select.input {
   display: grid;
   column-gap: 0.5rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: 0 1fr;
 }
 .ogsm-dash .active-item {
   border: 1px #005ea8 solid;
@@ -331,7 +336,8 @@ body {
   padding: 0.5rem 0.75rem;
   text-align: center;
   display: flex;
-  height: 3em;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #b3b3b3;
 }
 .sidebar-top > .sidebar-title {
   flex-grow: 1;
@@ -381,6 +387,59 @@ body {
   align-items: center;
   justify-content: center;
   text-decoration: none;
+}
+
+.active-item {
+  border-left: 8px #0093ff solid;
+}
+
+.overdue {
+  box-shadow: -3px 0 0px 0 red;
+}
+
+.done {
+  box-shadow: -3px 0 0px 0 green;
+}
+
+.removable-item {
+  color: #0a53be;
+}
+.removable-item:hover {
+  color: red;
+  text-decoration: line-through;
+}
+
+.DashboardItem {
+  margin: 2%;
+  border-radius: 5px;
+  background-color: #ffffff;
+  height: fit-content;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: fit-content(100%) fit-content(100%) fit-content(100%);
+  grid-template-areas: "Header" "info" "footer";
+}
+.DashboardItem .Header {
+  grid-area: Header;
+  padding: 5px;
+  background-color: rgba(12, 65, 40, 0.38);
+}
+.DashboardItem .info {
+  grid-area: info;
+  padding: 5px;
+}
+.DashboardItem .footer {
+  grid-area: footer;
+  padding: 5px;
+  background-color: rgba(128, 128, 128, 0.38);
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }
 
 /*# sourceMappingURL=main.css.map */

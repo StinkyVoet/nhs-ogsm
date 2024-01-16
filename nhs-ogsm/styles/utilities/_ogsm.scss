@@ -13,6 +13,7 @@
   display: grid;
   column-gap: 0.5rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: 0 1fr;
 
   .active-item {
     border: 1px $centric-blue-1 solid;

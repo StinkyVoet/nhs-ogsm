@@ -5,20 +5,27 @@
 @using ActionMeasure = nhs_ogsm.Data.ActionMeasure
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
+@inject GroupService GroupService;
 @inject GoalService GoalService;
 @inject StrategyService StrategyService;
 @inject ActionMeasureService ActionMeasureService;
 @inject StateContainerService StateService;
 
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedLocalStorage LocalStorage
 
 @code{
     [Parameter]
     public int OgsmId { get; set; }
     
     public Ogsm currentOgsm { get; set; }
-    public IQueryable<Goal> _filterGoalList { get; set; }
-
+    
+    public List<Goal> goalList { get; set; }
+    public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
+    
+    public List<Strategy> strategyList { get; set; }
     public Strategy CurrentStrategy { get; set; } = new();
+    
     protected override async Task OnInitializedAsync()
     {
         try
@@ -29,19 +36,17 @@
         {
             NavigationManager.NavigateTo("DashBoard");
         }
+        
         FilterGoals();
-
+        FilterStrategies();
     }
 
     protected override async Task OnParametersSetAsync()
     {
         await OnInitializedAsync();
     }
-    
-
 }
 
-<link href="css/DashBoard.css" rel="stylesheet"/>
 <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
 @code{
     private ConfirmDialog ogsmDeleteDialog = default!;
@@ -85,9 +90,11 @@
         await OgsmEditModal.ShowAsync();
     }
 }
+
 <div class="ogsm-objective">
     <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined" style="cursor: pointer;">Settings</span></h1>
 </div>
+@* modal for editing ogsm *@
 <Modal @ref="OgsmEditModal" Title=@modalTitle>
     <BodyTemplate>
          <EditForm id="@OgsmFormId" Model="@_editOgsm" OnValidSubmit="HandleOgsmEdit">
@@ -97,6 +104,29 @@
                      <td>Title:</td>
                      <td><InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText></td>
                  </tr>
+                 <tr>
+                     <label for="parent">Parent OGSM</label>
+                      <InputSelect id="parent" class="input" @bind-Value="@_editOgsm.ParentID">
+                          <option></option>
+                          @foreach (var ogsm in OgsmItemService.GetAllOgsm().Where(x => x.ID != _editOgsm.ID && 
+                                                                                        !OgsmItemService.FindElders(
+                                                                                            x.ID, new List<int>()).Contains(_editOgsm.ID)))
+                          {
+                              <option value="@ogsm.ID">@ogsm.Title</option>
+                          }
+                      </InputSelect>
+                 </tr>
+                 <tr>
+                     <label for="group">Group</label>
+                     <InputSelect id="group" class="input" @bind-Value="@_editOgsm.Groups">
+                         <option></option>
+                         @foreach (var group in GroupService.GetAllGroups())
+                         {
+                             <option value="@group.ID">@group.Name</option>
+                         }
+                     </InputSelect>
+                 </tr>
+                  
                  <tr>
                      <td><Switch Label="Active" @bind-Value="_editOgsm.IsActive"/></td>
                  </tr>
@@ -113,27 +143,13 @@
 <div class="ogsm-dash">
     @code
     {
-        
-        public Goal currentGoal { get; set; } = new() { EndDate = DateTimeOffset.Now };
         Goal editGoal = new();
-
-        public void HandleGoalSubmit(EditContext editContext)
-        {
-            
-            var newGoal = (Goal)editContext.Model;
-
-            newGoal.ParentOgsmID = currentOgsm.ID;
-            GoalService.AddGoal(newGoal);
-            currentOgsm.Goals.Add(newGoal);
-        
-            _formGoal = new Goal() { EndDate = DateTimeOffset.Now };
-            StateHasChanged();
-        }
         
         public void HandleGoalDelete(Goal goal)
         {
             GoalService.DeleteGoal(goal.ID);
             currentOgsm.Goals.Remove(goal);
+            goalList.Remove(goal);
             if (Equals(currentGoal, goal)) CancelGoalEdit();
             StateHasChanged();
         }
@@ -175,57 +191,104 @@
             goal.Strategies.Remove(strategy);
         }
 
-        bool _goalFilterIsDone;
-        public void FilterGoals()
-        {
-            _filterGoalList = currentOgsm.Goals.AsQueryable();
-            if (_goalFilterIsDone)
-            {
-                _filterGoalList = _filterGoalList.Where(goal => !goal.IsDone);
-            }
-            StateHasChanged();
-        }
-
         Collapse goalFiltersCollapse = default!;
         Collapse GoalAddCollapse = default!;
     }
-    <CardsList Title="Goals">
+    <CardsList Title="Goals" >
         <CardHeader>
+            @code{
+                
+                GoalFilters goalFilter = new();
+                class GoalFilterSettings
+                {
+                    public bool isDone;
+                    public bool isOverdue = false;
+                    public int StrategyID = 0;
+                }
+                class GoalFilters
+                {
+                    public GoalFilterSettings Settings = new();
+                    public Collapse Collapse = default!;
+                    
+                    public List<Goal> Filter(Ogsm currentOgsm)
+                    {
+                        IQueryable<Goal> filterGoalList = currentOgsm.Goals.AsQueryable();
+                    
+                        if (Settings.isDone)
+                            filterGoalList = filterGoalList.Where(goal => !goal.IsDone);
+                        
+                        if (Settings.isOverdue)
+                            filterGoalList = filterGoalList.Where(goal => goal.EndDate < DateTimeOffset.Now);
+
+                        if (Settings.StrategyID != 0)
+                            filterGoalList = filterGoalList.Where(goal => goal.Strategies.Any(strat => strat.ID == Settings.StrategyID));
+                    
+                        filterGoalList = filterGoalList.OrderBy(goal => goal.IsDone).ThenBy(goal => goal.EndDate);
+                        return filterGoalList.ToList();
+                    }
+                    
+                    public void ToggleFilterByStrategy(int strategyID) => Settings.StrategyID = Settings.StrategyID == strategyID ? 0 : strategyID;
+                }
+                public void FilterGoals() => goalList = goalFilter.Filter(currentOgsm);
+            }
+            @* filter settings collapse *@
             <Collapse @ref="goalFiltersCollapse">
                 <table>
                     <tr>
-                        <td>Hide done:</td>
-                        <td><input type="checkbox" @bind-value="_goalFilterIsDone" class="form-check-input"/>@_goalFilterIsDone</td>
+                        <td><Switch Label="Hide done" @bind-Value="goalFilter.Settings.isDone"/></td>
                     </tr>
                     <tr>
-                        <td></td>
-                        <td><Button @onclick="@FilterGoals">filter</Button></td>
+                        <td><Switch Label="Show overdue" @bind-Value="goalFilter.Settings.isOverdue"/></td>
                     </tr>
+                    <tr>
+                        <td><Button Color="ButtonColor.Info" Size="Size.Small" @onclick="@FilterGoals">filter</Button></td>
+                    </tr>
+
                 </table>
+                <hr>
             </Collapse>
-            <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()"> Toggle Settings </Button>
-            
+
+            <Button Color="ButtonColor.Primary" @onclick="() => goalFiltersCollapse.ToggleAsync()">
+                <span class="material-symbols-outlined">tune</span>
+            </Button>
+            <Button Color="ButtonColor.Primary" @onclick="FilterGoals" TooltipTitle="Refresh">
+                <span class="material-symbols-outlined">refresh</span>
+            </Button>
         </CardHeader>
+        @* Add goal form behind collapse *@
+        @code{
+            Goal _formGoal = new() { EndDate = DateTimeOffset.Now };
+            public void HandleGoalSubmit(EditContext editContext)
+            {
+                var newGoal = (Goal)editContext.Model;
+                newGoal.ParentOgsmID = currentOgsm.ID;
+                GoalService.AddGoal(newGoal);
+                currentOgsm.Goals.Add(newGoal);
+                goalList.Add(newGoal);
+                _formGoal = new Goal() { EndDate = DateTimeOffset.Now };
+                StateHasChanged();
+            }
+        }
         <Collapse @ref="GoalAddCollapse">
             <CardHeader>
             <EditForm Model="@_formGoal" OnValidSubmit="HandleGoalSubmit">
                 <Card>
                     <DataAnnotationsValidator/>
                     <CardHeader>
-                        <td><label for="NameInput">Name:</label></td>
-                        <td><InputTextArea class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputTextArea><br/></td>
-                        <td><ValidationMessage For="() => _formGoal.Name"/></td>
+                        <label for="NameInput">Name:</label>
+                        <InputTextArea class="input" id="NameInput" @bind-Value="@_formGoal.Name"></InputTextArea><br/>
+                        <ValidationMessage For="() => _formGoal.Name"/>
                     </CardHeader>
                     <CardBody>
                         <table>
                             <tr>
                                 <td><label for="DateInput">Due:</label></td>
-                                <td><InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
+                                <td><InputDate class="input" id="DateInput" Type="InputDateType.DateTimeLocal" @bind-Value="@_formGoal.EndDate"/><br/></td>
                                 <td><ValidationMessage For="() => _formGoal.EndDate"/></td>
                             </tr>
                             <tr>
-                                <td><label for="NameInput">Description:</label></td>
-                                <td><InputText class="input" id="NameInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
+                                <td><label for="DescriptionInput">Description:</label></td>
+                                <td><InputText class="input" id="DescriptionInput" @bind-Value="@_formGoal.Description"></InputText><br/></td>
                                 <td><ValidationMessage For="() => _formGoal.Description"/></td>
                             </tr>
                         </table>
@@ -239,17 +302,13 @@
             </CardHeader>
         </Collapse>
         <CardBody>
-            @* form for creating and editing goals *@
-
-            @code{
-                Goal _formGoal = new() { EndDate = DateTimeOffset.Now };
-            }
-            
-
             @* list with goals *@
-
-            @foreach (var goal in _filterGoalList.OrderBy(goal => goal.EndDate))
+            @code{
+                Dictionary<int, bool> goalCollapsed = new();
+            }
+            @foreach (var goal in goalList)
             {
+                goalCollapsed.TryAdd(goal.ID, true);
                 // EDIT CARD FOR GOALS
                 if (currentGoal.ID == goal.ID)
                 {
@@ -266,6 +325,11 @@
                                         <td><label for="DateInput">Due:</label></td>
                                         <td> <InputDate class="input" Type="InputDateType.DateTimeLocal" @bind-Value="@editGoal.EndDate"/><br/></td>
                                         <td><ValidationMessage For="() => editGoal.EndDate"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><label for="DateInput">Description:</label></td>
+                                        <td> <InputTextArea @bind-Value="@editGoal.Description"/><br/></td>
+                                        <td><ValidationMessage For="() => editGoal.Description"/></td>
                                     </tr>
                                     @if (goal.Strategies.Any())
                                     {
@@ -294,23 +358,48 @@
                                 <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
                                 @* this button should reset it to the old values *@
                                 <Button @onclick="@(() => CancelGoalEdit())" Color="ButtonColor.Warning">Cancel edit</Button>
-                                <Button @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                                <Button Size="Size.Small" @onclick="@(() => HandleGoalDelete(goal))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                             </CardFooter>
                         </Card>
                     </EditForm>
                     continue;
                 }
-
                 // NON EDIT CARD FOR GOALS
-                <Card>
+                string cssClass = "";
+                if (goal.EndDate < DateTimeOffset.Now) cssClass = "overdue";
+                if (goal.IsDone) cssClass = "done";
+                <Card Class=@cssClass>
                     <CardHeader>
-                        @goal.Name
+                        <div class="d-inline-block">
+                            <h5 class="m-0">@goal.Name</h5>
+                            <small class="small">Due: @goal.EndDate.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                        <Button Size="Size.Small" Color="ButtonColor.Info" class="float-end ms-1" Outline="_strategyFilter.Settings.GoalID != goal.ID"
+                                TooltipTitle="Search linked to goal" @onclick="() => {_strategyFilter.ToggleFilterByGoal(goal.ID); FilterStrategies();}">
+                            <span class="material-symbols-outlined">search</span>
+                        </Button>
+                        <Button Size="Size.Small" Outline="@(!goalCollapsed[goal.ID])" class="float-end ms-1" Color="ButtonColor.Info" @onclick="() => goalCollapsed[goal.ID] = !goalCollapsed[goal.ID]">
+                            <span class="material-symbols-outlined">@(goalCollapsed[goal.ID] ? "expand_more" : "expand_less")</span>
+                        </Button>
+                        <Button Outline="@(!goal.IsDone)" class="float-end ms-1" Color="ButtonColor.Success" @onclick="@(() => HandleGoalIsDone(goal))" TooltipTitle="Done / Total">
+                            @goal.Strategies.Count(s => s.IsDone) / @goal.Strategies.Count()
+                        </Button>
+                        @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
+                        {
+                            <Button Size="Size.Small" class="float-end" @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">
+                                <span class="material-symbols-outlined">link</span>
+                            </Button>
+                        }
                     </CardHeader>
-                    <CardBody>
+                    <CardBody Class="@(goalCollapsed[goal.ID] ? "hide" : "show")">
                         <table>
                             <tr>
                                 <td>Due:</td>
-                                <td>@goal.EndDate.DateTime</td>
+                                <td>@goal.EndDate.DateTime.ToString("dd/MM/yyyy HH:MM")</td>
+                            </tr>
+                            <tr>
+                                <td>Description:</td>
+                                <td>@goal.Description</td>
                             </tr>
                             @if (goal.Strategies.Any())
                             {
@@ -329,20 +418,12 @@
                                     </td>
                                 </tr>
                             }
-                            <tr>
-                                <td>Done:</td>
-                                <td><input type="checkbox" checked="@goal.IsDone" onchange="@(() => HandleGoalIsDone(goal))" class="form-check-input"/></td>
-                            </tr>
                         </table>
                     </CardBody>
-                    <CardFooter>
-                        @if (CurrentStrategy.ID != 0 && !CurrentStrategy.Goals.Contains(goal))
-                        {
-                            <Button @onclick="@(() => AddStratToGoal(CurrentStrategy, goal))" Color="ButtonColor.Primary">add to goal</Button>
-                        }
+                    <CardFooter Class="@(goalCollapsed[goal.ID] ? "hide" : "show")">
                         @if (currentGoal.ID == 0)
                         {
-                            <Button @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                            <Button Size="Size.Small" @onclick="@(() => ActivateGoalEdit(goal))" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                         }
                     </CardFooter>
                 </Card>
@@ -390,7 +471,6 @@
         {
             strategy.IsDone = !strategy.IsDone;
             StrategyService.UpdateStrategy(strategy);
-            StateHasChanged();
         }
 
         public void AddStratToGoal(Strategy strategy, Goal goal)
@@ -400,20 +480,75 @@
             goal.Strategies.Add(strategy);
         }
     }
-
-
+    
+    @* card list for strategies *@
     <CardsList Title="Strategies">
+        <CardHeader>
+            @code{
+  
+                Dictionary<int, bool> StrategyCollapsed = new();
+                StrategyFilter _strategyFilter = new();
+                class StrategyFilterSettings
+                {
+                    public bool IsDone;
+                    public int GoalID = 0;
+                }
+                class StrategyFilter
+                {
+                    public Collapse Collapse = default!;
+                    public StrategyFilterSettings Settings = new();
+                    
+                    public List<Strategy> Filter(Ogsm currentOgsm)
+                    {
+                        IQueryable<Strategy> filterStrategyList = currentOgsm.Strategies.AsQueryable();
+                    
+                        if (Settings.IsDone)
+                            filterStrategyList = filterStrategyList.Where(strat => !strat.IsDone);
+                        
+                        if(Settings.GoalID != 0)
+                            filterStrategyList = filterStrategyList.Where(strat => strat.Goals.Any(goal => goal.ID == Settings.GoalID));
+                    
+                        filterStrategyList = filterStrategyList.OrderBy(strat => strat.IsDone);
+                        return filterStrategyList.ToList();
+                    }
+
+                    public void ToggleFilterByGoal(int goalID) => Settings.GoalID = Settings.GoalID == goalID ? 0 : goalID;
+                }
+                public void FilterStrategies() => strategyList = _strategyFilter.Filter(currentOgsm);
+            }
+            <Collapse @ref="_strategyFilter.Collapse">
+                <table>
+                    <tr>
+                        <td><Switch Label="Hide done" @bind-Value="_strategyFilter.Settings.IsDone"/></td>
+                    </tr>
+                    <tr>
+                        <td><Button Color="ButtonColor.Info" Size="Size.Small" @onclick="@FilterStrategies">filter</Button></td>
+                    </tr>
+                </table>
+                <hr>
+            </Collapse>
+            <Button Color="ButtonColor.Primary" @onclick="() => _strategyFilter.Collapse.ToggleAsync()">
+                <span class="material-symbols-outlined">tune</span>
+            </Button>
+            <Button Color="ButtonColor.Primary" @onclick="FilterStrategies" TooltipTitle="Refresh">
+                <span class="material-symbols-outlined">refresh</span>
+            </Button>
+        </CardHeader>
+        @* filter settings collapse *@
         <CardBody>
-            @foreach (Strategy strategy in currentOgsm.Strategies)
+            @foreach (Strategy strategy in strategyList)
             {
+                StrategyCollapsed.TryAdd(strategy.ID, true);
+                // EDIT CARD FOR STRATEGIES
                 if (CurrentStrategy.ID == strategy.ID)
                 {
+                    // edit card for strategies
                     <EditForm Model="@_editStrategy" OnValidSubmit="HandleStrategyEdit">
                         <DataAnnotationsValidator/>
                         <Card class="active-item">
                             <CardHeader>
-                                <td><label for="NameInput">Name:</label></td>
-                                <td><InputTextArea class="input" id="NameInput" @bind-Value="@_editStrategy.Name"></InputTextArea><br/></td>
+                                <label for="NameInput">Name:</label>
+                                <InputTextArea class="input" id="NameInput" @bind-Value="@_editStrategy.Name"></InputTextArea>
                             </CardHeader>
                             <CardBody>
                                 <table>
@@ -426,7 +561,10 @@
                                                 @foreach (Goal goal in strategy.Goals)
                                                 {
                                                     <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
-                                                    if (!Equals(goal, lastGoal)) { <span> - </span> }
+                                                    if (!Equals(goal, lastGoal))
+                                                    {
+                                                        <span> - </span>
+                                                    }
                                                 }
                                             </td>
                                         </tr>
@@ -441,18 +579,36 @@
                                 <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
                                 @* this button should reset it to the old values *@
                                 <Button @onclick="@(CancelStrategyEdit)" Color="ButtonColor.Warning">Cancel edit</Button>
-                                <Button @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
+                                <Button Size="Size.Small" @onclick="@(() => HandleStrategyDelete(strategy))" Color="ButtonColor.Danger"><span class="material-symbols-outlined">Delete</span></Button>
                             </CardFooter>
                         </Card>
                     </EditForm>
                     continue;
                 }
-                
-                <Card>
+                // NON EDIT CARD FOR STRATEGIES
+                string cssClass = "";
+                if (strategy.IsDone) cssClass = "done";
+                <Card Class=@cssClass>
                     <CardHeader>
                         @strategy.Name
+                        <Button Size="Size.Small" Color="ButtonColor.Info" class="float-end ms-1" Outline="goalFilter.Settings.StrategyID != strategy.ID"
+                                TooltipTitle="Search linked to goal" @onclick="() => {goalFilter.ToggleFilterByStrategy(strategy.ID); FilterGoals();}">
+                            <span class="material-symbols-outlined">search</span>
+                        </Button>
+                        <Button Size="Size.Small" Outline="@(!StrategyCollapsed[strategy.ID])" class="float-end ms-1" Color="ButtonColor.Info" @onclick="() => StrategyCollapsed[strategy.ID] = !StrategyCollapsed[strategy.ID]">
+                            <span class="material-symbols-outlined">@(StrategyCollapsed[strategy.ID]?"expand_more":"expand_less")</span>
+                        </Button> 
+                        <Button Outline="@(!strategy.IsDone)" class="float-end ms-1" Color="ButtonColor.Success" @onclick="@(() => HandleStrategyIsDone(strategy))" TooltipTitle="Done / Total">
+                            @strategy.Actions.Count(s => s.IsDone) / @strategy.Actions.Count()
+                        </Button>
+                        @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
+                        {
+                            <Button Size="Size.Small" @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">
+                                <span class="material-symbols-outlined">link</span>
+                            </Button>
+                        }
                     </CardHeader>
-                    <CardBody>
+                    <CardBody Class="@(StrategyCollapsed[strategy.ID] ? "hide" : "show")">
                         <table>
                             @if (strategy.Goals.Any())
                             {
@@ -463,7 +619,10 @@
                                         @foreach (Goal goal in strategy.Goals)
                                         {
                                             <a class="removable-item" @onclick="() => RemoveStratFromGoal(strategy, goal)">@goal.Name</a>
-                                            if (!Equals(goal, lastGoal)) { <span> - </span> }
+                                            if (!Equals(goal, lastGoal))
+                                            {
+                                                <span> - </span>
+                                            }
                                         }
                                     </td>
                                 </tr>
@@ -474,29 +633,31 @@
                             </tr>
                         </table>
                     </CardBody>
-                    <CardFooter>
-                        @if (currentGoal.ID != 0 && !currentGoal.Strategies.Contains(strategy))
-                        {
-                            <Button @onclick="@(() => AddStratToGoal(strategy, currentGoal))" Color="ButtonColor.Primary">add to goal</Button>
-                        }
-                        <Button @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                    <CardFooter Class="@(StrategyCollapsed[strategy.ID] ? "hide" : "show")">
+
+                        <Button Size="Size.Small" @onclick="@(() => { ActivateStrategyEdit(strategy); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
                     </CardFooter>
                 </Card>
             }
         </CardBody>
+
         @code{
             Strategy _formStrategy = new();
-            
+
             public void HandleStrategySubmit(EditContext editContext)
             {
                 var newStrategy = (Strategy)editContext.Model;
                 newStrategy.ParentOgsmID = currentOgsm.ID;
                 StrategyService.AddStrategy(newStrategy);
                 currentOgsm.Strategies.Add(newStrategy);
+                strategyList.Add(newStrategy);
                 _formStrategy = new Strategy();
                 StateHasChanged();
             }
+
         }
+
+        @* form for adding strategies *@
         <CardFooter>
             <EditForm Model="@_formStrategy" OnValidSubmit="HandleStrategySubmit">
                 <DataAnnotationsValidator/>
@@ -556,15 +717,20 @@
 
             return "Measures (All)";
         }
+        
+        private void HandleActionisDone(ActionMeasure action)
+        {
+            action.IsDone = !action.IsDone;
+            ActionMeasureService.UpdateAction(action);
+        }
     }
 
-
+    @* card list for action measures *@
     <CardsList Title="@GetMeasuresListTitle()">
         <CardBody>
-            @if (CurrentStrategy.Actions.Any())
+            @if (goalFilter.Settings.StrategyID != 0)
             {
-                ActionMeasuresList = new();
-                ActionMeasuresList = CurrentStrategy.Actions.ToList();
+                ActionMeasuresList = currentOgsm.Strategies.First(strat => strat.ID == goalFilter.Settings.StrategyID).Actions.ToList();
             }
             else if (currentGoal.Strategies.Any())
             {
@@ -599,15 +765,15 @@
             {
                 if (CurrentActionMeasure.ID == action.ID)
                 {
+                    // edit card for action measures
                     <EditForm Model="@_editActionMeasure" OnValidSubmit="HandleActionEdit">
                         <DataAnnotationsValidator/>
                         <Card class="active-item">
                             <CardBody>
- 
                                 <table>
                                     <tr>
                                         <td>Title:</td>
-                                        <InputTextArea @bind-Value="_editActionMeasure.Name"></InputTextArea>
+                                        <InputTextArea class="input" @bind-Value="_editActionMeasure.Name"></InputTextArea>
                                     </tr>
                                     <tr>
                                         <td>Done:</td>
@@ -618,26 +784,21 @@
                             <CardFooter>
                                 <Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
                                 <Button @onclick="() => CurrentActionMeasure = new ActionMeasure()" Color="ButtonColor.Warning">Cancel</Button>
-                                <Button @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
-
+                                <Button Size="Size.Small" @onclick="@(() => HandleActionDelete(action))" Color="ButtonColor.Danger" Outline="true"><span class="material-symbols-outlined">Delete</span></Button>
                             </CardFooter>
                         </Card>
                     </EditForm>
                     continue;
                 }
+                // non edit card for action measures
                 <Card>
-                    <CardBody>
+                    <CardHeader>
                         @action.Name
-                        <table>
-                            <tr>
-                                <td>Done:</td>
-                                <td><input type="checkbox" checked="@action.IsDone" class="form-check-input"/></td>
-                            </tr>
-                        </table>
-                    </CardBody>
-                    <CardFooter>
-                        <Button @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
-                    </CardFooter>
+                        <Button Outline="@(!action.IsDone)" class="float-end ms-1" Color="ButtonColor.Success" @onclick="@(() => HandleActionisDone(action))">
+                            <br/>
+                        </Button>
+                        <Button Size="Size.Small" class="float-end ms-1" @onclick="@(() => { ActivateActionEdit(action); })" Color="ButtonColor.Warning"><span class="material-symbols-outlined">Edit</span></Button>
+                    </CardHeader>
                 </Card>
             }
         </CardBody>
@@ -662,6 +823,7 @@
         <CardFooter>
         @if (CurrentStrategy.ID != 0)
         {
+            // form for adding action measures
             <EditForm Model="@_formActionMeasure" OnValidSubmit="HandleActionSubmit">
                 <DataAnnotationsValidator/>
                 <table>

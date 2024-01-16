@@ -2,6 +2,14 @@
   border-left: 8px #0093ff solid;
 }
 
+.overdue {
+  box-shadow: -3px 0 0px 0 red;
+}
+
+.done {
+  box-shadow: -3px 0 0px 0 green;
+}
+
 .removable-item {
   color: #0a53be;
 
@@ -47,3 +55,9 @@
   }
 }
 
+.show {
+  display: block;
+}
+.hide {
+  display: none;
+}
