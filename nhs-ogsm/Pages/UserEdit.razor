@@ -1,0 +1,106 @@
+﻿@page "/User/{UserId:int}"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@using BlazorBootstrap
+@inject UserService UserService;
+@inject GroupService GroupService;
+@inject NavigationManager NavigationManager;
+
+@code
+{
+    [Parameter]
+    public int UserId { get; set; }
+
+    User _user { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = UserService.GetSingleUser(UserId);
+    }
+    
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
+}
+
+<h3>Editing User</h3>
+
+<style>
+    label {
+        width:95px;
+        clear:left;
+        text-align:left;
+        padding-right:10px;
+    }
+    
+    input, label {
+        float:left;
+    }
+    
+    ::placeholder {
+        color: gray;
+        opacity: 0.7;
+    }
+    
+</style>
+
+<EditForm Model="@_user" OnValidSubmit="EditUser">
+    <DataAnnotationsValidator/>
+    <div class="form-group">
+        <label for="email">E-mail:</label>
+        <InputText id="email" class="form-control" @bind-Value="_user.Email"/>
+        <ValidationMessage For="() => _user.Email"/>
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <InputText id="password" class="form-control" @bind-Value="_user.Password"/>
+        <ValidationMessage For="() => _user.Password"/>
+    </div>
+    <div class="form-group">
+        <label for="fname">First name:</label>
+        <InputText id="fname" class="form-control" @bind-Value="_user.FirstName"/>
+        <ValidationMessage For="() => _user.FirstName"/>
+    </div>
+    <div class="form-group">
+        <label for="lname">Last name:</label>
+        <InputText id="lname" class="form-control" @bind-Value="_user.LastName"/>
+        <ValidationMessage For="() => _user.LastName"/>
+    </div>
+    <div class="form-group">
+        <label for="admin">Admin:</label>
+        <InputSelect id="admin" class="form-control" @bind-Value="_user.IsAdmin">
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+        </InputSelect>
+    </div>
+    <div class="form-group">
+        <label for="group">Group:</label>
+        <InputSelect id="group" class="form-control" @bind-Value="_selectedGroupID">
+            <option value="">None</option>
+            @foreach (var group in GroupService.GetAllGroups())
+            {
+                <option value="@group.ID">@group.Name</option>
+            }
+        </InputSelect>
+    </div>
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" style="margin-top: 10px">Edit</Button>
+</EditForm>
+
+@code
+{
+    int? _selectedGroupID;
+    Group? _selectedGroup;
+    
+    public void EditUser(EditContext editContext)
+    {
+        if (_selectedGroupID != null)
+        {
+            _selectedGroup = GroupService.GetSingleGroup((int)_selectedGroupID);
+            GroupService.AddUserToGroup(_user, _selectedGroup);
+        }
+        
+        UserService.UpdateUser(_user);
+        Redirect("/Users");
+    }
+}
