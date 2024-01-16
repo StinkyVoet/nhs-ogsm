@@ -100,7 +100,7 @@ public class UserService
         }
     }
     
-    public void removeGroupFromUser(User user, Data.Group selectedgroup)
+    public void RemoveGroupFromUser(User user, Data.Group selectedgroup)
     {
         using (var context = _dbContextFactory.CreateDbContext())
         {

@@ -60,15 +60,17 @@
     public void AddGroupToUser()
     {
         if (_SelectedGroup == 0) return;
-        Group selectedgroup = new Group(){ID = _SelectedGroup};
-        UserService.AddGroupToUser(_editingUser, selectedgroup);
-        _editingUser.Groups.Add(selectedgroup);
+        if (_editingUser.Groups.Any(group => group.ID == _SelectedGroup)) return;
+        
+        Group selectedGroup = new Group(){ID = _SelectedGroup};
+        UserService.AddGroupToUser(_editingUser, selectedGroup);
+        _editingUser.Groups.Add(selectedGroup);
         StateHasChanged();
     }
     
     public void RemoveGroupFromUser(Group group)
     {
-        UserService.removeGroupFromUser(_editingUser, group);
+        UserService.RemoveGroupFromUser(_editingUser, group);
         _editingUser.Groups.Remove(group);
         StateHasChanged();
     }
@@ -86,13 +88,12 @@
     {
         modal.ShowAsync();
     }
+    
     private void HideModal(Modal modal)
     {
         modal.HideAsync();
     }
 
-
-                            
 }
 <Modal @ref="_editModal" Title="Editing User">
     <BodyTemplate>
@@ -106,12 +107,12 @@
                     <td><ValidationMessage For="() => _editingUser.Email"/></td>
                 </tr>
                 <tr>
-                    <td><label>FirstName:</label></td>
+                    <td><label>First Name:</label></td>
                     <td><InputText class="input" @bind-Value="@_editingUser.FirstName"></InputText></td>
                     <td><ValidationMessage For="() => _editingUser.FirstName"/></td>
                 </tr>
                 <tr>
-                    <td><label>LastName:</label></td>
+                    <td><label>Last Name:</label></td>
                     <td><InputText class="input" @bind-Value="@_editingUser.LastName"></InputText></td>
                     <td><ValidationMessage For="() => _editingUser.LastName"/></td>
                 </tr>
@@ -126,7 +127,7 @@
 
                         <InputSelect class="input" @bind-Value="@_SelectedGroup">
                             <option value="0">None</option>
-                            @foreach (var group in _allGroups)
+                            @foreach (var group in _allGroups.OrderBy(g => g.Name))
                             {
                                 if (_editingUser.Groups.Any(group1 => group1.ID == group.ID)) continue;
                                 <option value="@group.ID">@group.Name</option>
@@ -139,7 +140,7 @@
                     <td>
                         @foreach (var group in _editingUser.Groups)
                         {
-                            <span @onclick="() => RemoveGroupFromUser(group)">@group.Name</span><span>, </span>
+                            <div class="removable-item" @onclick="() => RemoveGroupFromUser(group)">@group.Name</div>
                         }
                     </td>
                 </tr>
