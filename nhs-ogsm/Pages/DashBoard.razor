@@ -4,6 +4,7 @@
 @using ActionMeasure = nhs_ogsm.Data.ActionMeasure
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
+@inject GroupService GroupService;
 @inject GoalService GoalService;
 @inject StrategyService StrategyService;
 @inject ActionMeasureService ActionMeasureService;
@@ -87,6 +88,29 @@
                      <td>Title:</td>
                      <td><InputText class="input" id="NameInput" @bind-Value="@_editOgsm.Title"></InputText></td>
                  </tr>
+                 <tr>
+                     <label for="parent">Parent OGSM</label>
+                      <InputSelect id="parent" class="input" @bind-Value="@_editOgsm.ParentID">
+                          <option></option>
+                          @foreach (var ogsm in OgsmItemService.GetAllOgsm().Where(x => x.ID != _editOgsm.ID && 
+                                                                                        !OgsmItemService.FindElders(
+                                                                                            x.ID, new List<int>()).Contains(_editOgsm.ID)))
+                          {
+                              <option value="@ogsm.ID">@ogsm.Title</option>
+                          }
+                      </InputSelect>
+                 </tr>
+                 <tr>
+                     <label for="group">Group</label>
+                     <InputSelect id="group" class="input" @bind-Value="@_editOgsm.Groups">
+                         <option></option>
+                         @foreach (var group in GroupService.GetAllGroups())
+                         {
+                             <option value="@group.ID">@group.Name</option>
+                         }
+                     </InputSelect>
+                 </tr>
+                  
                  <tr>
                      <td><Switch Label="Active" @bind-Value="_editOgsm.IsActive"/></td>
                  </tr>

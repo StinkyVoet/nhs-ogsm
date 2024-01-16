@@ -1,0 +1,174 @@
+﻿@page "/Groups"
+@using nhs_ogsm.Data
+@using nhs_ogsm.Services
+@inject GroupService GroupService;
+@inject OgsmItemService OgsmItemService;
+@inject NavigationManager NavigationManager
+
+
+@code
+{
+    public List<Group> _groups;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _groups = GroupService.GetAllGroups();
+        _allOgsms = OgsmItemService.GetAllOgsm();
+    }
+    
+}
+
+
+<PageTitle>Overview</PageTitle>
+
+<style>
+    .dashboardButton {
+        border: 2px solid #04AA6D;
+        padding: 24px 32px;
+        text-align: center;
+        font-size: 24px;
+        border-radius: 8px;   
+        box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 16px 0 rgba(0,0,0,0.19);
+        float: right;
+        transition-duration: 0.4s;
+        position: sticky;
+        bottom: 10px;
+    }
+    
+    .dashboardButton:hover {
+        background-color: #04AA6D;
+          color: white;
+    }
+</style>
+
+@code{
+
+    private Modal _editModal = default!;
+    private Group _editGroup = new();
+    private int _SelectedOgsm;
+    List<Ogsm> _allOgsms = new();
+    
+    public void AddOgsmToGroup()
+    {
+        if (_SelectedOgsm == 0) return;
+        if (_editGroup.Ogsms.Any(o => o.ID == _SelectedOgsm)) return;
+        
+        Ogsm selectedOgsm = new Ogsm(){ID = _SelectedOgsm};
+        GroupService.AddOgsmToGroup(_editGroup, selectedOgsm);
+        _editGroup.Ogsms.Add(selectedOgsm);
+        StateHasChanged();
+    }
+    
+    public void RemoveOgsmFromGroup(Ogsm ogsm)
+    {
+        GroupService.RemoveOgsmFromGroup(_editGroup, ogsm);
+        _editGroup.Ogsms.Remove(ogsm);
+        StateHasChanged();
+    }
+    
+    public void HandleGroupEdit(EditContext editContext)
+    {
+        var newGroup = (Group)editContext.Model;
+        _editGroup = newGroup;
+        
+        GroupService.UpdateGroup(_editGroup);
+        HideModal(_editModal);
+    }
+    
+    public void ShowModal(Modal modal)
+    {
+        modal.ShowAsync();
+    }
+    
+    private void HideModal(Modal modal)
+    {
+        modal.HideAsync();
+    }
+
+}
+<Modal @ref="_editModal" Title="Editing Group">
+    <BodyTemplate>
+
+        <EditForm Model="@_editGroup" OnValidSubmit="HandleGroupEdit">
+            <DataAnnotationsValidator/>
+            <table>
+                <tr>
+                    <td><label>Name:</label></td>
+                    <td><InputText class="input" @bind-Value="@_editGroup.Name"></InputText></td>
+                    <td><ValidationMessage For="() => _editGroup.Name"/></td>
+                </tr>
+                <tr>
+                    <td><label>Ogsms:</label></td>
+                    <td>
+
+                        <InputSelect class="input" @bind-Value="@_SelectedOgsm">
+                            <option value="0">None</option>
+                            @foreach (var ogsm in _allOgsms.OrderBy(o => o.Title))
+                            {
+                                if (_editGroup.Ogsms.Any(ogsm1 => ogsm1.ID == ogsm.ID)) continue;
+                                <option value="@ogsm.ID">@ogsm.Title</option>
+                            }
+                        </InputSelect>
+                    </td>
+                    <td><Button Color="ButtonColor.Info" @onclick="() => { AddOgsmToGroup(); }">+</Button></td>
+                </tr>
+                <tr>
+                    <td>
+                        @foreach (var ogsm in _editGroup.Ogsms)
+                        {
+                            <div class="removable-item" @onclick="() => RemoveOgsmFromGroup(ogsm)">@ogsm.Title</div>
+                        }
+                    </td>
+                </tr>
+            </table>
+            <Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
+            <Button @onclick="() => { _editGroup = new Group(); HideModal(_editModal); }" Color="ButtonColor.Warning">Cancel</Button>
+        </EditForm>
+    </BodyTemplate>
+</Modal>
+<h3>All Groups</h3>
+<div style="height: 20px"></div>
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Assigned People</th>
+            <th>Assigned Ogsms</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        @foreach (var group in _groups.OrderBy(g => g.ID))
+        {
+            <tr>
+                <td>@group.ID</td>
+                <td>@group.Name</td>
+                <td>@foreach (var user in group.Users)
+                    {
+                        <p>@user.FirstName @user.LastName</p>
+                    }</td>
+                <td>@foreach (var ogsm in group.Ogsms)
+                    {
+                        <p>@ogsm.Title</p>
+                    }</td>
+                <td><Button @onclick="@(() => { _editGroup = group; ShowModal(_editModal); })" Color="ButtonColor.Primary">Edit</Button>
+                    <Button @onclick="@(() => { GroupService.DeleteGroup(group.ID); _groups.Remove(group);})" Color="ButtonColor.Danger">Delete</Button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+        
+    <button class="dashboardButton" onclick="@(() => Redirect("GroupItem/"))">+</button>
+</div>
+    
+
+@code
+{
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
+}
