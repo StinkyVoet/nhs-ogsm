@@ -148,14 +148,14 @@
                 <td>@group.Name</td>
                 <td>@foreach (var user in group.Users)
                     {
-                        @user.FirstName @user.LastName
+                        <p>@user.FirstName @user.LastName</p>
                     }</td>
                 <td>@foreach (var ogsm in group.Ogsms)
                     {
-                        @ogsm.Title
+                        <p>@ogsm.Title</p>
                     }</td>
                 <td><Button @onclick="@(() => { _editGroup = group; ShowModal(_editModal); })" Color="ButtonColor.Primary">Edit</Button>
-                    <Button @onclick="@(() => GroupService.DeleteGroup(group.ID))" Color="ButtonColor.Danger">Delete</Button></td>
+                    <Button @onclick="@(() => { GroupService.DeleteGroup(group.ID); _groups.Remove(group);})" Color="ButtonColor.Danger">Delete</Button></td>
             </tr>
         }
         </tbody>

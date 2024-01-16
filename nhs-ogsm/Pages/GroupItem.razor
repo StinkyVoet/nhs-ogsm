@@ -5,6 +5,7 @@
 @inject GroupService GroupService;
 @inject UserService UserService;
 @inject StateContainerService StateService;
+@inject NavigationManager NavigationManager;
 
 @code
 {
@@ -61,34 +62,18 @@
 <EditForm Model="@_group" OnValidSubmit="HandleSubmit">
     <label for="GroupInput">Name</label>
     <InputText id="GroupInput" class="input" @bind-Value="@_group.Name" required></InputText>
-    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
-    <Button Color="ButtonColor.Secondary" @onclick="() => _group = new Group()">Cancel</Button>
+    <Button Type="ButtonType.Submit" Color="ButtonColor.Primary" onclick="@(() => Redirect("Groups/"))">Save</Button>
+    <Button Color="ButtonColor.Secondary" onclick="@(() => Redirect("Groups/"))">Cancel</Button>
 </EditForm>
 
 @code
 {
     public string pageTitle = "New group item";
+    
+    public void Redirect(string uri)
+    {
+        NavigationManager.NavigateTo(uri);
+    }
 }
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Delete</th>
-        <th>Edit</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var groupItems in _groups)
-    {
-        <tr>
-            <td>@groupItems.ID</td>
-            <td>@groupItems.Name</td>
-            <td><Button @onclick="@(() => HandleDelete(groupItems))" Color="ButtonColor.Danger" Outline="true">Delete</Button></td>
-            <td><Button @onclick="@(() => EditForm(groupItems))" Color="ButtonColor.Secondary" Outline="true">Edit</Button></td>
-        </tr>
-    }
-    </tbody>
-</table>
 
