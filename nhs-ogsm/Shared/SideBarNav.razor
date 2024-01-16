@@ -34,17 +34,41 @@
     </ul>
 </div>
 <div class="sidebar-footer">
-    <a class="button button-primary-inverted button-md" href="ogsmitem">
-        <i class="material-symbols-outlined">
-            add_circle
-        </i>
-        Add Ogsm
-    </a>
+    <Dropdown @ref="_addOgsmDropdown">
+        <DropdownMenu>
+            <EditForm Model="@_ogsm" OnValidSubmit="AddOgsm" class="m-3">
+                <label for="TitleInput">Title</label>
+                <InputText id="TitleInput" class="input" @bind-Value="_ogsm.Title" required></InputText>
+
+                <label for="parent">Parent OGSM</label>
+                <InputSelect id="parent" class="input w-100" @bind-Value="_ogsm.ParentID">
+                    <option></option>
+                    @foreach (var ogsm in OgsmItemService.GetAllOgsm().Where(x => x.ID != _ogsm.ID &&
+                                                                                  !OgsmItemService.FindElders(
+                                                                                      x.ID, new List<int>()).Contains(_ogsm.ID)))
+                    {
+                        <option value="@ogsm.ID">@ogsm.Title</option>
+                    }
+                </InputSelect>
+
+                <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
+                <Button Color="ButtonColor.Secondary" @onclick="ToggleAddOgsmDropdown">Cancel</Button>
+            </EditForm>
+        </DropdownMenu>
+    </Dropdown>
+        <a type="button" class="button button-primary-inverted button-md w-100" @onclick="ToggleAddOgsmDropdown">
+            <i class="material-symbols-outlined">
+                add_circle
+            </i>
+            Add Ogsm
+        </a>
 </div>
 
 @code {
     private List<Ogsm> _ogsms = new();
     private List<Ogsm>? _ogsmsFilter;
+
+    private Dropdown _addOgsmDropdown = default!;
 
     string _searchQuery = "";
     bool _filterActive = true;
@@ -83,8 +107,22 @@
             .ToList();
         _ogsmsFilter = test;
     }
+    
+    //Save new OGSM item
+    Ogsm _ogsm = new();
+    public void AddOgsm(EditContext editContext)
+    {
+        var newOgsmItem = (Ogsm)editContext.Model;
+
+        OgsmItemService.AddOgsm(newOgsmItem);
+
+        _ogsm = new Ogsm();
+        StateService.NotifyStateChanged();
+        StateHasChanged();
+    }
 
     private async Task ToggleSearchbarAsync() => await _searchBarCollapse.ToggleAsync();
     private async Task ToggleFiltersAsync() => await _filtersCollapse.ToggleAsync();
 
+    private async Task ToggleAddOgsmDropdown() => await _addOgsmDropdown.ToggleAsync();
 }

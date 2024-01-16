@@ -1,6 +1,7 @@
 ﻿@page "/DashBoard/{OgsmId:int}"
 @using nhs_ogsm.Data
 @using nhs_ogsm.Services
+@using PSC.Blazor.Components.Chartjs.Models.Common
 @using ActionMeasure = nhs_ogsm.Data.ActionMeasure
 @inject NavigationManager NavigationManager
 @inject OgsmItemService OgsmItemService;
@@ -48,6 +49,21 @@
 
 <PageTitle>OGSM: @currentOgsm.Title</PageTitle>
 @code{
+    private ConfirmDialog ogsmDeleteDialog = default!;
+    
+    public async void HandleOgsmDelete()
+    {
+        var confirmation = await ogsmDeleteDialog.ShowAsync(
+            title: "Are you sure you want to delete this OGSM?",
+            message1: "Do you want to proceed?");
+
+        if (!confirmation) return;
+        
+        OgsmItemService.DeleteOgsm(currentOgsm.ID);
+        StateService.NotifyStateChanged();
+        NavigationManager.NavigateTo("DashBoard");
+    }
+    
     public void HandleOgsmEdit(EditContext editContext)
     {
         var newOgsm = (Ogsm)editContext.Model;
@@ -76,7 +92,7 @@
 }
 
 <div class="ogsm-objective">
-    <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined">Settings</span></h1>
+    <h1>Objective: @currentOgsm.Title<span @onclick="OnShowModalClick" class="material-symbols-outlined" style="cursor: pointer;">Settings</span></h1>
 </div>
 @* modal for editing ogsm *@
 <Modal @ref="OgsmEditModal" Title=@modalTitle>
@@ -119,8 +135,10 @@
     </BodyTemplate>
     <FooterTemplate>
         <Button form="@OgsmFormId" Color="ButtonColor.Primary" Type="ButtonType.Submit">Save</Button>
+        <Button Color="ButtonColor.Danger" Type="ButtonType.Button" @onclick="HandleOgsmDelete"> Delete OGSM</Button>
     </FooterTemplate>
 </Modal>
+<ConfirmDialog @ref="ogsmDeleteDialog" />
 
 <div class="ogsm-dash">
     @code
