@@ -56,8 +56,6 @@ public class OgsmDbContext : DbContext
         modelBuilder.Entity<User>()
                     .HasMany(e => e.Groups)
                     .WithMany(e => e.Users);
-        modelBuilder.Entity<Group>()
-                    .HasOne(e => e.Leader);
         
         
         // OGSM -> Group

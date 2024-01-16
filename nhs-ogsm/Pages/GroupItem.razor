@@ -61,16 +61,6 @@
 <EditForm Model="@_group" OnValidSubmit="HandleSubmit">
     <label for="GroupInput">Name</label>
     <InputText id="GroupInput" class="input" @bind-Value="@_group.Name" required></InputText>
-    
-    <label for="Leader">Group Leader</label>
-    <InputSelect id="leader" class="input" @bind-Value="@_group.LeaderID">
-        <option></option>
-        @foreach (var user in _users)
-        {
-            <option value="@user.ID">@user.FirstName @user.LastName</option>
-        }
-    </InputSelect>
-    
     <Button Type="ButtonType.Submit" Color="ButtonColor.Primary">Save</Button>
     <Button Color="ButtonColor.Secondary" @onclick="() => _group = new Group()">Cancel</Button>
 </EditForm>
@@ -85,7 +75,6 @@
     <tr>
         <th>ID</th>
         <th>Name</th>
-        <th>Leader</th>
         <th>Delete</th>
         <th>Edit</th>
     </tr>
@@ -96,7 +85,6 @@
         <tr>
             <td>@groupItems.ID</td>
             <td>@groupItems.Name</td>
-            <td>@groupItems.Leader.FirstName</td>
             <td><Button @onclick="@(() => HandleDelete(groupItems))" Color="ButtonColor.Danger" Outline="true">Delete</Button></td>
             <td><Button @onclick="@(() => EditForm(groupItems))" Color="ButtonColor.Secondary" Outline="true">Edit</Button></td>
         </tr>

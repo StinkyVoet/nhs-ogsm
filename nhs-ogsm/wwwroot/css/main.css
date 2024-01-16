@@ -313,6 +313,7 @@ select.input {
   display: grid;
   column-gap: 0.5rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: 0 1fr;
 }
 .ogsm-dash .active-item {
   border: 1px #005ea8 solid;
@@ -431,6 +432,14 @@ body {
   grid-area: footer;
   padding: 5px;
   background-color: rgba(128, 128, 128, 0.38);
+}
+
+.show {
+  display: block;
+}
+
+.hide {
+  display: none;
 }
 
 /*# sourceMappingURL=main.css.map */
