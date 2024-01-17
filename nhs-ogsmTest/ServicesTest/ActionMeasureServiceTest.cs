@@ -76,6 +76,23 @@ public class ActionMeasureServiceTest
         Assert.IsFalse(result.Contains(am1));
         Assert.IsTrue(result.Contains(am2));
     }
+
+    [TestMethod]
+    public void GetSingleActionTest()
+    {
+        // Arrange
+        var service = new ActionMeasureService(_contextFactory);
+        ActionMeasure am1 = new ActionMeasure { Name = "am1", IsDone = false };
+        ActionMeasure am2 = new ActionMeasure { Name = "am2", IsDone = false };
+        service.AddAction(am1);
+        service.AddAction(am2);
+        
+        // Act
+        var result = service.GetSingleAction(am1.ID);
+        
+        // Assert
+        Assert.AreEqual(result, am1);
+    }
     
     private List<ActionMeasure> GetAllActionMeasure()
     {

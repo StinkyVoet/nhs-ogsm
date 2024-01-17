@@ -49,7 +49,7 @@ public class UserServiceTest
 
         // Act
         service.DeleteUser(user1.ID);
-        var result = GetAllUser();
+        var result = service.GetAllUsers();
 
         // Assert
         Assert.IsFalse(result.Contains(user1));
@@ -110,13 +110,65 @@ public class UserServiceTest
         Assert.IsNull(result1);
         Assert.AreEqual(result2, user1);
     }
-    
-    private List<User> GetAllUser()
+
+    [TestMethod]
+    public void GetAllUsersTest()
     {
-        using (var context = _contextFactory.CreateDbContext())
-        {
-            List<User> users = context.Users.ToList();
-            return users;
-        }
+        // Arrange
+        var service = new UserService(_contextFactory);
+        
+        // Act
+        var result = service.GetAllUsers(); 
+        
+        // Assert
+        Assert.IsTrue(result.Count == 0);
+    }
+
+    [TestMethod]
+    public void AddGroupToUserTest()
+    {
+        // Arrange
+        var service = new UserService(_contextFactory);
+        User user1 = new User { Email = "user1@test.test", FirstName = "u1", LastName = "1", Password = "password" };
+        service.AddUser(user1);
+        
+        Group group1 = new Group() { Name = "g1" };
+        Group group2 = new Group() { Name = "g2" };
+        new GroupService(_contextFactory).AddGroup(group1);
+        new GroupService(_contextFactory).AddGroup(group2);
+        
+        // Act
+        service.AddGroupToUser(user1, group1);
+        service.AddGroupToUser(user1, group2);
+        var result = service.GetSingleUser(group1.ID).Groups;
+        
+        // Assert
+        Assert.IsTrue(result.Contains(group1));
+        Assert.IsTrue(result.Contains(group2));
+    }
+
+    [TestMethod]
+    public void RemoveGroupFromUserTest()
+    {
+        // Arrange
+        var service = new UserService(_contextFactory);
+        User user1 = new User { Email = "user1@test.test", FirstName = "u1", LastName = "1", Password = "password" };
+        service.AddUser(user1);
+        
+        Group group1 = new Group() { Name = "g1" };
+        Group group2 = new Group() { Name = "g2" };
+        new GroupService(_contextFactory).AddGroup(group1);
+        new GroupService(_contextFactory).AddGroup(group2);
+        
+        service.AddGroupToUser(user1, group1);
+        service.AddGroupToUser(user1, group2);
+        
+        // Act
+        service.RemoveGroupFromUser(user1, group1);
+        var result = service.GetSingleUser(group1.ID).Groups;
+        
+        // Assert
+        Assert.IsFalse(result.Contains(group1));
+        Assert.IsTrue(result.Contains(group2));
     }
 }

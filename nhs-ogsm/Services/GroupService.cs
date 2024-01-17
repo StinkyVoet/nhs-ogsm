@@ -13,22 +13,13 @@ public class GroupService
     
     public bool AddUserToGroup(User account, Group group)
     {
-        using (var context = _dbContextFactory.CreateDbContext())
-        {
-            group.Users.Add(account); 
-            context.SaveChanges();
-            UpdateGroup(group);
-        }
+        new UserService(_dbContextFactory).AddGroupToUser(account, group);
         return true;
     }
 
     public bool RemoveUserFromGroup(User account, Group group)
     {
-        using (var context = _dbContextFactory.CreateDbContext())
-        {
-            group.Users.Remove(account);
-            UpdateGroup(group);
-        }
+        new UserService(_dbContextFactory).RemoveGroupFromUser(account, group);
         return true;
     }
     
@@ -100,6 +91,7 @@ public class GroupService
         using (var context = _dbContextFactory.CreateDbContext())
         {
             Group group = context.Groups.Include(g => g.Users)
+                .Include(g => g.Ogsms)
                 .Where(group => group.ID == groupID)
                 .First();
 
